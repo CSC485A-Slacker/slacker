@@ -1,3 +1,5 @@
+<img src="Slacker_logo.png" alt="drawing" width="400"/>
+
 # Slacker - A Slackliner's Every day Solution
 📝 **Authors**:
 - Dianna Borinaga (DiannaBanana)
