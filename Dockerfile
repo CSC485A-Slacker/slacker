@@ -6,4 +6,5 @@ RUN npm install --global expo/ngrok
 RUN npm install --global expo-cli
 COPY . .
 EXPOSE 19002
-CMD ["expo", "start", "--tunnel"]
+
+ENTRYPOINT [ "./entrypoint.sh" ]
