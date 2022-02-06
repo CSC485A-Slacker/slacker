@@ -1,0 +1,10 @@
+version: "3"
+services:
+  image:
+    build: .
+    ports: 
+      - "19002:19002"
+    volumes:
+      - ./src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
