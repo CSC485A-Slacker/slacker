@@ -1,21 +1,99 @@
-import { StatusBar } from 'expo-status-bar';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function App() {
+function Explore() {
   return (
-    <View style={styles.container}>
-      <Text style={{color:'white'}}>Welcome to Slacker! A slackliner's everyday solution!</Text>
-      <Image source={{width: 200, height:200, uri:"https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker_logo.png"}}/>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Explore!</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+function Favourites() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Favourites!</Text>
+    </View>
+  );
+}
+
+function Friends() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Friends!</Text>
+    </View>
+  );
+}
+
+function Profile() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Profile!</Text>
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+function MyTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Explore"
+      screenOptions={{
+        tabBarActiveTintColor: '#e91e63',
+      }}
+    >
+      <Tab.Screen
+        name="Explore"
+        component={Explore}
+        options={{
+          tabBarLabel: 'Explore',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="map" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Favourites"
+        component={Favourites}
+        options={{
+          tabBarLabel: 'Favourites',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="heart-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Friends"
+        component={Friends}
+        options={{
+          tabBarLabel: 'Friends',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-multiple" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <MyTabs />
+    </NavigationContainer>
+  );
+}
