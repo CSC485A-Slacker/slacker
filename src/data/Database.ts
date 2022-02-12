@@ -3,7 +3,6 @@ import { getFirestore, collection, getDocs, setDoc, doc, Firestore, getDoc, quer
 import { Pin, Location, PinDetails } from "./Pin"
 import { IDatabase, IPin, ILocation, IDatabaseActionResult, IPinDetails, IPinResult } from "./Interfaces"
 
-// Firestore details data converter
 const pinDetailsConverter = {
     toFirestore: (details: IPinDetails) => {
         return {
@@ -32,11 +31,27 @@ const pinLocationConverter = {
     }
 }
 
+// to convert the location string from the database back into a location object
+function getLocationFromString(locationString: string): ILocation {
+
+    const splitLocation: string[] = locationString.split(",", 2);
+
+    return new Location(Number(splitLocation[0]), Number(splitLocation[1]));
+}
+
 const database = getFirestore(firebaseApp);
 
 // Adds a pin to the database
 async function addPin (pin: IPin) {
     const pinRef = doc(database, "pins", pin.location.toString());
+
+    const pinDocSnap = await getDoc(pinRef);
+
+        if (pinDocSnap.exists()) {
+            console.log("could not place pin at location: " + pin.location + ". Because pin already exists");
+            return
+        }
+
     await setDoc(pinRef, (Object.assign({}, pin.details)));
 }
 
@@ -48,7 +63,10 @@ async function removePin (location: Location) {
 // Get a DocumentData[] of all pins from the database
 // Can iterate through list to access pins
 async function getAllPins () {
-    const pinsCollection = collection(database, 'pins').withConverter(pinLocationConverter);
+    // const pinsCollection = collection(database, 'pins').withConverter(pinLocationConverter);
+    // const pinSnapshot = await getDocs(pinsCollection);
+
+    const pinsCollection = collection(database, 'pins');
     const pinSnapshot = await getDocs(pinsCollection);
 
     const pinsList = pinSnapshot.docs.map(doc => doc.data());
@@ -70,4 +88,4 @@ async function getPinByLocation (location: Location) {
     console.log("could not find data at location: " + location.toString());
 }
 
-export { addPin, getAllPins, getPinByLocation, removePin }
+export { addPin, getAllPins, getPinByLocation, removePin, database }
