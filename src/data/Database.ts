@@ -51,7 +51,7 @@ async function addPin (pin: IPin) {
             console.log("could not place pin at location: " + pin.location + ". Because pin already exists");
             return
         }
-
+        
     await setDoc(pinRef, (Object.assign({}, pin.details)));
 }
 
@@ -60,18 +60,21 @@ async function removePin (location: Location) {
     await deleteDoc(doc(database, "pins", location.toString()));
 }
 
-// Get a DocumentData[] of all pins from the database
-// Can iterate through list to access pins
-async function getAllPins () {
-    // const pinsCollection = collection(database, 'pins').withConverter(pinLocationConverter);
-    // const pinSnapshot = await getDocs(pinsCollection);
-
+// Get a Location[] of all pins from the database
+// Use getPinByLocation to get the details of the given pin
+async function getAllPinLocations () {
     const pinsCollection = collection(database, 'pins');
-    const pinSnapshot = await getDocs(pinsCollection);
 
-    const pinsList = pinSnapshot.docs.map(doc => doc.data());
+    const pinSnapshot = await getDocs(pinsCollection)
+
+    const pinsList = pinSnapshot.docs.map(doc => doc.id);
+    const pinLocationsList: Location[] = [];
+
+    pinsList.forEach(pin => {
+        pinLocationsList.push(getLocationFromString(pin));
+    });
     
-    return pinsList;
+    return pinLocationsList;
 }
 
 // Get the pin at a given location
@@ -88,4 +91,4 @@ async function getPinByLocation (location: Location) {
     console.log("could not find data at location: " + location.toString());
 }
 
-export { addPin, getAllPins, getPinByLocation, removePin, database }
+export { addPin, getAllPinLocations, getPinByLocation, removePin, database }
