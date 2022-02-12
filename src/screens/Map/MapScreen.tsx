@@ -10,7 +10,15 @@ const victoriaMarker = {
 export const MapScreen= () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <MapView style={styles.map}>
+      <MapView 
+      style={styles.map}
+      initialRegion={{
+        latitude: 48.463708,
+        latitudeDelta: 0.1,
+        longitude: -123.311406,
+        longitudeDelta: 0.1,
+      }}
+      >
         <Marker coordinate={victoriaMarker} draggable></Marker>
         </MapView>
     </View>
