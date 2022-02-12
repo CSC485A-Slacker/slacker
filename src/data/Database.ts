@@ -55,6 +55,20 @@ async function addPin (pin: IPin) {
     await setDoc(pinRef, (Object.assign({}, pin.details)));
 }
 
+// Edit pin at location
+async function editPin (location: ILocation, details: PinDetails) {
+    const pinRef = doc(database, "pins", location.toString());
+
+    const pinDocSnap = await getDoc(pinRef);
+
+    if (!pinDocSnap.exists()) {
+        console.log("could not edit pin at location: " + location + ". Because pin does not exist");
+        return
+    }
+
+    await setDoc(pinRef, (Object.assign({}, details), { merge: true}));
+}
+
 // deletes pin at given location
 async function removePin (location: Location) {
     await deleteDoc(doc(database, "pins", location.toString()));
@@ -91,4 +105,4 @@ async function getPinByLocation (location: Location) {
     console.log("could not find data at location: " + location.toString());
 }
 
-export { addPin, getAllPinLocations, getPinByLocation, removePin, database }
+export { addPin, getAllPinLocations, getPinByLocation, removePin, editPin }
