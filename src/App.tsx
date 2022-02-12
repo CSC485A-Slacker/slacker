@@ -1,55 +1,27 @@
 import * as React from 'react';
-import MapView from 'react-native-maps';
 import { Text, View, StyleSheet, Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-function Explore() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <MapView style={styles.map} />
-    </View>
-  );
-}
-
-function Favourites() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Favourites!</Text>
-    </View>
-  );
-}
-
-function Friends() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Friends!</Text>
-    </View>
-  );
-}
-
-function Profile() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Profile!</Text>
-    </View>
-  );
-}
+import { MapScreen } from './screens/Map/MapScreen';
+import { ProfileScreen } from './screens/Profile/ProfileScreen';
+import { FriendsScreen } from './screens/Friends/FriendsScreen';
+import { FavouritesScreen } from './screens/Favourites/FavouritesScreen';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="Explore"
+      initialRouteName="Map"
       screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
+        tabBarActiveTintColor: '#219f94',
       }}
     >
       <Tab.Screen
-        name="Explore"
-        component={Explore}
+        name="Map"
+        component={MapScreen}
         options={{
           tabBarLabel: 'Explore',
           tabBarIcon: ({ color, size }) => (
@@ -59,27 +31,27 @@ function MyTabs() {
       />
       <Tab.Screen
         name="Favourites"
-        component={Favourites}
+        component={FavouritesScreen}
         options={{
           tabBarLabel: 'Favourites',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="heart-outline" color={color} size={size} />
+            <MaterialCommunityIcons name="heart" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
         name="Friends"
-        component={Friends}
+        component={FriendsScreen}
         options={{
           tabBarLabel: 'Friends',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-multiple" color={color} size={size} />
+            <MaterialCommunityIcons name="account-multiple-outline" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
         name="Profile"
-        component={Profile}
+        component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => (
@@ -98,17 +70,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-});
