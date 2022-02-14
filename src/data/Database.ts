@@ -72,7 +72,7 @@ async function getAllPins () {
 }
 
 // Get a Location[] of all pins from the database without retreiving details
-// Use getPinByLocation to get the details of a pin
+// Use getPin to get a specific pin
 async function getAllPinLocations () {
     const pinsCollection = collection(database, 'pins');
 
