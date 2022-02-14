@@ -23,6 +23,8 @@ interface IPinDetails {
     slacklineType: string;
 }
 
+//  TODO: fix interfaces so that they represent Database.ts functions
+
 interface IDatabase {
     // attempts to add a pin at a given location.
     // returns an IDatabaseAction result.
@@ -32,7 +34,7 @@ interface IDatabase {
     // attempts to edit a pin at a given location, replacing existing details with provided details.
     // returns an IDatabaseAction result.
     // will fail if no pin exists
-    editPin(pin: IPin, details: IPinDetails): IDatabaseActionResult;
+    editPinDetials(pin: ILocation, details: IPinDetails): IDatabaseActionResult;
 
     // attempts to remove the pin at a given location.
     // returns an IDatabaseAction result.
