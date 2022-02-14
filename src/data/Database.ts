@@ -1,5 +1,5 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, Firestore, getDoc, updateDoc, query, DocumentData, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, setDoc, doc, Firestore, getDoc, updateDoc, query, DocumentData, QueryDocumentSnapshot, deleteDoc, where } from 'firebase/firestore/lite';
 import { Pin, Location, PinDetails } from "./Pin"
 import { IPin, ILocation, IPinDetails } from "./Interfaces"
 
@@ -41,16 +41,12 @@ async function deletePin (location: Location) {
 
 // Get the pin at a given location
 async function getPin (location: Location) {
-    const pinRef = doc(database, "pins", location.toString()).withConverter(pinConverter);
+    const pinRef = doc(database, "pins", location.toString());
 
     const pinDocSnap = await getDoc(pinRef);
 
-    const pin = pinDocSnap.data();
-
-    console.log("pin.location: " + pin?.location)
-
     if (pinDocSnap.exists()) {
-        return pinDocSnap.data();
+        return pinConverter.fromFirestore(pinDocSnap);
     }
     
     console.log("could not find data at location: " + location.toString());
@@ -90,18 +86,22 @@ async function getAllPinLocations () {
 
 // data converters to transform data to and from json objects for firestore use
 const pinDetailsConverter = {
-    toFirestore: (details: IPinDetails) => {
-        return {
-            slacklineLength: details.slacklineLength,
-            slacklineType: details.slacklineType,
-            description: details.description
-        };
-    },
-    // fromFirestore: (details: any) => {
-    //     // const data = snapshot.data();
-    //     return new PinDetails(details.description, details.slacklineLength, details.slacklineType);
-    // }
-}
+  toFirestore: (details: IPinDetails) => {
+    return {
+      slacklineLength: details.slacklineLength,
+      slacklineType: details.slacklineType,
+      description: details.description,
+    };
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    const details = snapshot.get("details");
+    return new PinDetails(
+      details.description,
+      details.slacklineLength,
+      details.slacklineType
+    );
+  },
+};
 
 // Firestore location data converter
 const pinLocationConverter = {
@@ -111,10 +111,10 @@ const pinLocationConverter = {
       longitude: location.longitude,
     };
   },
-//   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-//     // const data = snapshot.data().location;
-//     return new Location(snapshot.data().location.latitude, snapshot.data().location.longitude);
-//   },
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    const location = snapshot.get("location");
+    return new Location(location.latitude, location.longitude);
+  },
 };
 
 const pinConverter = {
@@ -125,11 +125,10 @@ const pinConverter = {
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const data = snapshot.data();
 
     return new Pin(
-      data.location,
-      data.details
+      pinLocationConverter.fromFirestore(snapshot),
+      pinDetailsConverter.fromFirestore(snapshot)
     );
   },
 };
