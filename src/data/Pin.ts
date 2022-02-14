@@ -10,7 +10,7 @@ class Pin implements IPin {
     }
 
     toString (): string {
-        return location.toString() + "\n" + this.details.toString();
+        return this.location.toString() + "\n" + this.details.toString();
     }
 }
 
@@ -29,7 +29,6 @@ class Location implements ILocation {
 
     toString (): string {
         return this.latitude.toString() + "," + this.longitude.toString();
-
     }
 }
 
