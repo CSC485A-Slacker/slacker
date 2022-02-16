@@ -1,7 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { TestAll } from './tests/Database';
 
 export default function App() {
+    TestAll();
+
   return (
     <View style={styles.container}>
       <Text style={{color:'white'}}>Welcome to Slacker! A slackliner's everyday solution!</Text>
