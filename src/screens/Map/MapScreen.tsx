@@ -4,25 +4,15 @@ import {
   View,
   StyleSheet,
   Dimensions,
-  Text,
-  Pressable,
-  Modal,
-  TextInput,
 } from "react-native";
 import { Marker } from "react-native-maps";
-import { Fab, Icon } from "native-base";
-import { AntDesign } from "@expo/vector-icons";
-
+import { FAB } from "react-native-elements";
 
 const victoriaMarker = {
-  latitude: 48.463708,
-  longitude: -123.311406,
+  latitude: 48.458494,
+  longitude: -123.295260,
 };
 
-const otherMarker = {
-  latitude: 48.468708,
-  longitude: -123.318406,
-};
 
 let id = 0;
 const victoriaPin = {
@@ -31,121 +21,75 @@ const victoriaPin = {
   color: "red",
   draggable: false,
   title: "Quad Liner",
-  description: "Its pretty cool"
+  description: "Its pretty cool",
 };
+
+let regionLatitude = 48.463708
+let regionLongitude = -123.311406
+
 
 let newPin = {
   key: id++,
-  coordinate: otherMarker,
+  coordinate: {
+    latitude: regionLatitude,
+    longitude: regionLatitude
+  },
   draggable: true,
-  color: "blue", // Change to whatever we want
+  color: "blue"
 };
 
-export const MapScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [addPinVisble, setAddPinVisible] = useState(true);
-  const [buttonVisible, setButtonVisible] = useState(false);
-  const [slacklineLength, onChangeLength] = useState(null);
-  const [slacklineType, onChangeType] = useState(null);
-  const [locationDescription, onChangeDescription] = useState(null);
+export const MapScreen = ({ navigation }) => {
 
-  // Used to keep track of the pins
+  // Used to keep track of button visibility and pins
+  const [addPinVisble, setAddPinVisible] = useState(true);
+  const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
   const [pins, setPins] = useState([victoriaPin]);
 
-  const handleAdd = () => {
+
+  // Whenever the user moves the map, we update center coordinates
+  const updateRegion = (e: any) => {
+    regionLatitude = e.latitude
+    regionLongitude = e.longitude
+  }
+
+  // Add a pin to the center of the map
+  const handleAddPin = () => {
     const newPins = [...pins];
-    console.log("I clicked a pin!");
     newPin = {
       key: id++,
-      coordinate: otherMarker,
+      coordinate: {
+        latitude: regionLatitude,
+        longitude: regionLongitude
+      },
       draggable: true,
-      color: "blue", // Change to whatever we want
+      color: "blue",
     };
     newPins.push(newPin);
-    console.log(newPins);
     setPins(newPins);
-    setButtonVisible(true);
-  };
-
-  const onMapPress = (e: any) => {
-    console.log(e.nativeEvent.coordinate);
-  };
-
-  const handleCancel = () => {
-    const newPins = [...pins];
-    console.log("Remove a pin");
-    const updatedPins = newPins.filter((pin) => pin.key != newPin.key);
-    console.log(updatedPins);
-    setPins(updatedPins);
-    setButtonVisible(false);
-    setAddPinVisible(true)
-    setModalVisible(false)
-  };
-
-  const handleAddPin = () => {
-    console.log("Add new pin to list")
-    console.log(locationDescription)
-    onChangeDescription(locationDescription)
-    onChangeLength(slacklineLength)
-    onChangeType(slacklineType)
-    const newPins = [...pins];
-    const addPin = {
-      key: newPin.key,
-      coordinate: newPin.coordinate,
-      draggable: false,
-      color: "red",
-      title: slacklineType,
-      description: locationDescription
-    }
-    const updatedPins = newPins.filter((pin) => pin.key != newPin.key);
-    updatedPins.push(addPin)
-    setPins(updatedPins);
-    console.log(pins)
-    setButtonVisible(false);
-    setModalVisible(false)
-    setAddPinVisible(true)
-  }
-
-  const handleConfirm = () => {
-    setButtonVisible(false);
-    setModalVisible(true)
     setAddPinVisible(false)
-  }
+    setConfirmCancelVisible(true);
+  };
+
+  const handleConfirmPress = () => {
+    setConfirmCancelVisible(false)
+    setAddPinVisible(true);
+    navigation.navigate('Spot Details', {
+          newPin: newPin
+        })
+  };
+
+  // Remove pin from map
+  const handleCancelPress = () => {
+    const newPins = [...pins];
+    const updatedPins = newPins.filter((pin) => pin.key != newPin.key);
+    setPins(updatedPins);
+    setConfirmCancelVisible(false);
+    setAddPinVisible(true);
+  };
+
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {addPinVisble ? (
-        <Fab
-          renderInPortal={false}
-          shadow={2}
-          size="sm"
-          onPress={handleAdd}
-          icon={<Icon color="white" as={AntDesign} name="plus" size="sm" />}
-        />
-      ) : null}
-      {buttonVisible ? (
-        <Fab
-          renderInPortal={false}
-          shadow={2}
-          size="sm"
-          onPress={handleConfirm}
-          placement="bottom-left"
-          icon={<Icon color="white" as={AntDesign} name="check" size="sm" />}
-          label="Confirm"
-        />
-      ) : null}
-      {buttonVisible ? (
-        <Fab
-          renderInPortal={false}
-          shadow={2}
-          size="sm"
-          onPress={handleCancel}
-          placement="bottom-right"
-          icon={<Icon color="white" as={AntDesign} name="close" size="sm" />}
-          label="Cancel"
-        />
-      ) : null}
-
       <MapView
         style={styles.map}
         initialRegion={{
@@ -154,6 +98,7 @@ export const MapScreen = () => {
           longitude: -123.311406,
           longitudeDelta: 0.1,
         }}
+        onRegionChangeComplete={e => updateRegion(e)}
       >
         {pins.map((pin) => (
           <Marker
@@ -161,58 +106,34 @@ export const MapScreen = () => {
             coordinate={pin.coordinate}
             pinColor={pin.color}
             draggable={pin.draggable}
-            title={pin.title}
-            description={pin.description}
+            onDragEnd={e => console.log(e.nativeEvent)}
           ></Marker>
         ))}
       </MapView>
-      <View style={styles.centeredView}>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Saved new location, thanks!");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Enter new location details</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Slackline Length"
-                onChangeLength={onChangeLength}
-                value={slacklineLength}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Slackline Type"
-                onChangeType={onChangeType}
-                value={slacklineType}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Location Description"
-                onChangeDescription={onChangeDescription}
-                value={locationDescription}
-              />
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={handleAddPin}
-              >
-                <Text style={styles.textStyle}>Confirm</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={handleCancel}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-      </View>
+      <FAB
+        visible={addPinVisble}
+        icon={{ name: "add", color: "white" }}
+        color="green"
+        onPress={handleAddPin}
+        placement="right"
+      />
+      <FAB
+        title="Add Pin"
+        visible={confirmCancelVisible}
+        icon={{ name: "add", color: "white" }}
+        color="blue"
+        onPress={handleConfirmPress }
+        placement="left"
+      />
+      <FAB
+        titleStyle={{ color: 'blue' }}
+        title="Cancel"
+        visible={confirmCancelVisible}
+        icon={{ name: "close", color: "blue" }}
+        color="white"
+        onPress={handleCancelPress}
+        placement="right"
+      />
     </View>
   );
 };
@@ -229,64 +150,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get("window").height,
     zIndex: -1,
   },
-  cancelFab: {
-    backgroundColor: "purple",
-  },
-  overlay: {
-    position: "absolute",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-    zIndex: 10,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    marginVertical: 10,
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: "#2196F3",
-  },
-  buttonClose: {
-    backgroundColor: "#2196F3",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    padding: 10,
-  },
-  buttonBox: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
+  cancelButton: {
+    color: "blue"
+  }
 });

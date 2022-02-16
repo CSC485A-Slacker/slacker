@@ -1,26 +1,39 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { MapScreen } from './screens/Map/MapScreen';
-import { ProfileScreen } from './screens/Profile/ProfileScreen';
-import { FriendsScreen } from './screens/Friends/FriendsScreen';
-import { FavouritesScreen } from './screens/Favourites/FavouritesScreen';
+import { MapScreen } from "./screens/Map/MapScreen";
+import { PinDetailsScreen } from "./screens/Map/PinDetailsScreen";
+import { ProfileScreen } from "./screens/Profile/ProfileScreen";
+import { FriendsScreen } from "./screens/Friends/FriendsScreen";
+import { FavouritesScreen } from "./screens/Favourites/FavouritesScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Tab = createBottomTabNavigator();
+
+const MapStack = createNativeStackNavigator();
+
+function MapStackScreen() {
+  return (
+    <MapStack.Navigator>
+      <MapStack.Screen name="Map" component={MapScreen} />
+      <MapStack.Screen name="Spot Details" component={PinDetailsScreen} />
+    </MapStack.Navigator>
+  );
+}
 
 export const NavTabs = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Map"
       screenOptions={{
-        tabBarActiveTintColor: '#219f94',
+        tabBarActiveTintColor: "#219f94",
+        headerShown: false
       }}
     >
       <Tab.Screen
-        name="Map"
-        component={MapScreen}
+        name="Explore"
+        component={MapStackScreen}
         options={{
-          tabBarLabel: 'Explore',
+          tabBarLabel: "Explore",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="map" color={color} size={size} />
           ),
@@ -30,7 +43,7 @@ export const NavTabs = () => {
         name="Favourites"
         component={FavouritesScreen}
         options={{
-          tabBarLabel: 'Favourites',
+          tabBarLabel: "Favourites",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="heart" color={color} size={size} />
           ),
@@ -40,9 +53,13 @@ export const NavTabs = () => {
         name="Friends"
         component={FriendsScreen}
         options={{
-          tabBarLabel: 'Friends',
+          tabBarLabel: "Friends",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-multiple-outline" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="account-multiple-outline"
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
@@ -50,7 +67,7 @@ export const NavTabs = () => {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),
@@ -58,4 +75,4 @@ export const NavTabs = () => {
       />
     </Tab.Navigator>
   );
-}
+};
