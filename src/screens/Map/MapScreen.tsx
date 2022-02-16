@@ -95,6 +95,7 @@ export const MapScreen = ({ route, navigation }) => {
           longitudeDelta: 0.1,
         }}
         onRegionChangeComplete={(e) => updateRegion(e)}
+        provider={"google"}
       >
         {pins.map((pin) => (
           <Marker
