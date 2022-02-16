@@ -49,7 +49,6 @@ export const MapScreen = ({ route, navigation }) => {
   };
 
   const handleAddPin = () => {
-    console.log(pins)
     newPin = {
       key: generateRandomKey(),
       coordinate: {
@@ -63,9 +62,6 @@ export const MapScreen = ({ route, navigation }) => {
       type: "",
       description: "",
     }
-
-    console.log(newPin)
-
     dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
