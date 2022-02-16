@@ -1,104 +1,99 @@
-import { useState } from "react";
-import MapView from "react-native-maps";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
-import { Marker } from "react-native-maps";
-import { FAB } from "react-native-elements";
+import { useEffect, useState } from "react";
+import MapView, { LatLng } from "react-native-maps";
+import { View, StyleSheet, Dimensions } from "react-native";
+import { Marker, Callout } from "react-native-maps";
+import { FAB, Text } from "react-native-elements";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/Store";
+import { addPin, generateRandomKey, Pin, removePin } from "../../redux/PinSlice";
 
-const victoriaMarker = {
-  latitude: 48.458494,
-  longitude: -123.295260,
-};
+// The middle point of the current map display
+let regionLatitude = 48.463708;
+let regionLongitude = -123.311406;
 
-
-let id = 0;
-const victoriaPin = {
-  key: 123,
-  coordinate: victoriaMarker,
-  color: "red",
-  draggable: false,
-  title: "Quad Liner",
-  description: "Its pretty cool",
-};
-
-let regionLatitude = 48.463708
-let regionLongitude = -123.311406
-
-
-let newPin = {
-  key: id++,
+// New pin to be modified
+let newPin: Pin = {
+  key: generateRandomKey(),
   coordinate: {
     latitude: regionLatitude,
-    longitude: regionLatitude
+    longitude: regionLongitude,
   },
+  color: "blue",
   draggable: true,
-  color: "blue"
+  title: "",
+  length: 0,
+  type: "",
+  description: "",
 };
 
-export const MapScreen = ({ navigation }) => {
+export const MapScreen = ({ route, navigation }) => {
+  const pins = useSelector((state: RootState) => state.pins.pins);
+  const dispatch = useDispatch();
 
-  // Used to keep track of button visibility and pins
   const [addPinVisble, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
-  const [pins, setPins] = useState([victoriaPin]);
 
+  // If pin was added, reset to original view
+  useEffect(() => {
+    if (route.params?.confirmedPin) {
+      setAddPinVisible(true);
+      setConfirmCancelVisible(false);
+      route.params.confirmedPin = false;
+    }
+  });
 
-  // Whenever the user moves the map, we update center coordinates
-  const updateRegion = (e: any) => {
-    regionLatitude = e.latitude
-    regionLongitude = e.longitude
-  }
+  // Keeps track of the map region
+  const updateRegion = (e: LatLng) => {
+    regionLatitude = e.latitude;
+    regionLongitude = e.longitude;
+  };
 
-  // Add a pin to the center of the map
   const handleAddPin = () => {
-    const newPins = [...pins];
+    console.log(pins)
     newPin = {
-      key: id++,
+      key: generateRandomKey(),
       coordinate: {
         latitude: regionLatitude,
-        longitude: regionLongitude
+        longitude: regionLongitude,
       },
-      draggable: true,
       color: "blue",
-    };
-    newPins.push(newPin);
-    setPins(newPins);
-    setAddPinVisible(false)
+      draggable: true,
+      title: "",
+      length: 0,
+      type: "",
+      description: "",
+    }
+
+    console.log(newPin)
+
+    dispatch(addPin(newPin));
+    setAddPinVisible(false);
     setConfirmCancelVisible(true);
   };
 
   const handleConfirmPress = () => {
-    setConfirmCancelVisible(false)
-    setAddPinVisible(true);
-    navigation.navigate('Spot Details', {
-          newPin: newPin
-        })
+    navigation.navigate("Spot Details", {
+      newPin: newPin,
+    });
   };
 
-  // Remove pin from map
   const handleCancelPress = () => {
-    const newPins = [...pins];
-    const updatedPins = newPins.filter((pin) => pin.key != newPin.key);
-    setPins(updatedPins);
+    dispatch(removePin(newPin));
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
   };
-
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 48.463708,
+          latitude: regionLatitude,
           latitudeDelta: 0.1,
-          longitude: -123.311406,
+          longitude: regionLongitude,
           longitudeDelta: 0.1,
         }}
-        onRegionChangeComplete={e => updateRegion(e)}
+        onRegionChangeComplete={(e) => updateRegion(e)}
       >
         {pins.map((pin) => (
           <Marker
@@ -106,14 +101,24 @@ export const MapScreen = ({ navigation }) => {
             coordinate={pin.coordinate}
             pinColor={pin.color}
             draggable={pin.draggable}
-            onDragEnd={e => console.log(e.nativeEvent)}
-          ></Marker>
+          >
+            {pin.title ? (
+              <Callout style={styles.callout}>
+                <View>
+                  <Text style={styles.title}>{pin.title}</Text>
+                  <Text style={styles.description}>{pin.description}</Text>
+                  <Text>{pin.type}</Text>
+                  <Text style={styles.text}>{pin.length + "m"}</Text>
+                </View>
+              </Callout>
+            ) : null}
+          </Marker>
         ))}
       </MapView>
       <FAB
         visible={addPinVisble}
         icon={{ name: "add", color: "white" }}
-        color="green"
+        color="#219f94"
         onPress={handleAddPin}
         placement="right"
       />
@@ -121,18 +126,18 @@ export const MapScreen = ({ navigation }) => {
         title="Add Pin"
         visible={confirmCancelVisible}
         icon={{ name: "add", color: "white" }}
-        color="blue"
-        onPress={handleConfirmPress }
-        placement="left"
+        color="#219f94"
+        onPress={handleConfirmPress}
+        placement="right"
       />
       <FAB
-        titleStyle={{ color: 'blue' }}
+        titleStyle={{ color: "#219f94" }}
         title="Cancel"
         visible={confirmCancelVisible}
-        icon={{ name: "close", color: "blue" }}
+        icon={{ name: "close", color: "#219f94" }}
         color="white"
         onPress={handleCancelPress}
-        placement="right"
+        placement="left"
       />
     </View>
   );
@@ -150,7 +155,19 @@ const styles = StyleSheet.create({
     height: Dimensions.get("window").height,
     zIndex: -1,
   },
-  cancelButton: {
-    color: "blue"
-  }
+  callout: {
+    maxWidth: 200,
+  },
+  title: {
+    fontSize: 20,
+    color: "#219f94",
+    paddingBottom: 2,
+  },
+  text: {
+    paddingBottom: 5,
+  },
+  description: {
+    fontSize: 10,
+    paddingBottom: 7,
+  },
 });

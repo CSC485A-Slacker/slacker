@@ -1,39 +1,42 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Text, Input, Button, FAB } from "react-native-elements";
+import { Text, Input, FAB } from "react-native-elements";
+import { useDispatch } from "react-redux";
+import { Pin, updatePin } from "../../redux/PinSlice";
 
 export const PinDetailsScreen = ({ route, navigation }) => {
+  const dispatch = useDispatch()
+  const { newPin } = route.params;
+
   const [name, onChangeName] = useState("");
   const [type, onChangeType] = useState("");
   const [description, onChangeDescription] = useState("");
   const [length, onChangeLength] = useState("");
 
-  const { newPin } = route.params;
-
   const onConfirmPress = () => {
-    const confirmPin = {
+    const confirmPin:Pin = {
       key: newPin.key,
-      coordinate: {
-        latitude: newPin.latitude,
-        longitude: newPin.longitude
-      },
+      coordinate: newPin.coordinate,
       draggable: false,
       color: "red",
       title: name,
       description: description,
       type: type,
-      length: length
+      length: parseInt(length)
     }
+    dispatch(updatePin(confirmPin))
     navigation.navigate({
-      name: 'Map',
-      params: confirmPin
+      name: "Map",
+      params: {
+        confirmedPin: true
+      }
     })
   }
-
+  
   return (
     <View style={styles.view}>
       <Text style={styles.text} h4>
-        Enter Information
+        Add Information
       </Text>
       <Input
         style={styles.input}
@@ -53,19 +56,17 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         onChangeText={(type) => onChangeType(type)}
         value={type}
       />
-
       <Input
         style={styles.input}
         placeholder="Distance (m)"
         onChangeText={(length) => onChangeLength(length)}
         value={length}
-        errorStyle={{ color: "red" }}
-        errorMessage="Enter a valid length"
       />
       <FAB
+        containerStyle={{margin:20}}
         visible={true}
         icon={{ name: "check", color: "white" }}
-        color="blue"
+        color="#219f94"
         title='Confirm'
         onPress={onConfirmPress}
       />
@@ -76,13 +77,13 @@ export const PinDetailsScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   view: {
     margin: 10,
-    backgroundColor: "#fff",
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
   },
   text: {
-    padding: 50,
+    padding: 40,
+    color: "#219f94"
   },
   input: {
     fontSize: 14,

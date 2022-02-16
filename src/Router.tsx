@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
 import { MapScreen } from "./screens/Map/MapScreen";
 import { PinDetailsScreen } from "./screens/Map/PinDetailsScreen";
 import { ProfileScreen } from "./screens/Profile/ProfileScreen";
@@ -26,7 +25,7 @@ export const NavTabs = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: "#219f94",
-        headerShown: false
+        headerShown: false,
       }}
     >
       <Tab.Screen
