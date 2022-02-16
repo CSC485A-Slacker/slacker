@@ -5,7 +5,12 @@ import { Marker, Callout } from "react-native-maps";
 import { FAB, Text } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/Store";
-import { addPin, generateRandomKey, Pin, removePin } from "../../redux/PinSlice";
+import {
+  addPin,
+  generateRandomKey,
+  Pin,
+  removePin,
+} from "../../redux/PinSlice";
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -30,7 +35,7 @@ export const MapScreen = ({ route, navigation }) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
 
-  const [addPinVisble, setAddPinVisible] = useState(true);
+  const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
 
   // If pin was added, reset to original view
@@ -61,7 +66,7 @@ export const MapScreen = ({ route, navigation }) => {
       length: 0,
       type: "",
       description: "",
-    }
+    };
     dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
@@ -111,30 +116,34 @@ export const MapScreen = ({ route, navigation }) => {
           </Marker>
         ))}
       </MapView>
-      <FAB
-        visible={addPinVisble}
-        icon={{ name: "add", color: "white" }}
-        color="#219f94"
-        onPress={handleAddPin}
-        placement="right"
-      />
-      <FAB
-        title="Add Pin"
-        visible={confirmCancelVisible}
-        icon={{ name: "add", color: "white" }}
-        color="#219f94"
-        onPress={handleConfirmPress}
-        placement="right"
-      />
-      <FAB
-        titleStyle={{ color: "#219f94" }}
-        title="Cancel"
-        visible={confirmCancelVisible}
-        icon={{ name: "close", color: "#219f94" }}
-        color="white"
-        onPress={handleCancelPress}
-        placement="left"
-      />
+      {confirmCancelVisible ? (
+        <FAB
+          title="Add Pin"
+          icon={{ name: "add", color: "white" }}
+          color="#219f94"
+          onPress={handleConfirmPress}
+          placement="right"
+        />
+      ) : null}
+      {confirmCancelVisible ? (
+        <FAB
+          titleStyle={{ color: "#219f94" }}
+          title="Cancel"
+          icon={{ name: "close", color: "#219f94" }}
+          color="white"
+          onPress={handleCancelPress}
+          placement="left"
+        />
+      ) : null}
+      {addPinVisible ? (
+        <FAB
+          visible={addPinVisible}
+          icon={{ name: "add", color: "white" }}
+          color="#219f94"
+          onPress={handleAddPin}
+          placement="right"
+        />
+      ) : null}
     </View>
   );
 };

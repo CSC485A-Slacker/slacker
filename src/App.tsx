@@ -9,10 +9,10 @@ export default function App() {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-      <NavigationContainer>
-        <NavTabs />
-      </NavigationContainer>
-    </SafeAreaProvider>
+        <NavigationContainer>
+          <NavTabs />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </Provider>
   );
 }

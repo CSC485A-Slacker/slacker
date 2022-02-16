@@ -12,9 +12,8 @@ export type Pin = {
   description: string;
 };
 
-
 export function generateRandomKey() {
-  return Date.now() + Math.random()
+  return Date.now() + Math.random();
 }
 
 // TODO: Remove hardcoded examples after integration with backend
