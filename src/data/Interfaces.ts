@@ -13,7 +13,8 @@ interface IPinDetails {
 }
 
 interface IDatabase {
-  /* Purpose: attempts to add a pin at the given location.
+  /* Purpose: attempts to add a pin to the database.
+   *          Will fail if a pin exists with the sam location.
    * Return: an IDatabaseActionResult where success==true if the pin was
    *         was added at location.
    */
@@ -24,10 +25,7 @@ interface IDatabase {
    * Return: an IDatabaseActionResult where success==true if the pin at location was deleted
    *         or success==false otherwise
    */
-  editPinDetails(
-    pin: GeoPoint,
-    details: IPinDetails
-  ): Promise<IDatabaseActionResult>;
+  editPinDetails(location: GeoPoint, details: IPinDetails): Promise<IDatabaseActionResult>;
 
   /* Purpose: attempts to delete a pin at the given location.
    *          Will fail if no pin is found at location.
