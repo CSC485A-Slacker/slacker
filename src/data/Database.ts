@@ -1,8 +1,9 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, QueryDocumentSnapshot, deleteDoc, Firestore } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore } from 'firebase/firestore/lite';
 import { Pin, Location, PinDetails } from "./Pin"
-import { IPin, ILocation, IPinDetails, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
-import { FirebaseApp } from "firebase/app";
+import { IPin, ILocation, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
+import { pinConverter, pinDetailsConverter } from "./DataConverters";
+
 
 class Database implements IDatabase {
     database: Firestore;
@@ -133,54 +134,6 @@ class Database implements IDatabase {
         }
     }
 }
-
-// data converters to transform data to and from json objects for firestore use
-const pinDetailsConverter = {
-  toFirestore: (details: IPinDetails) => {
-    return {
-      slacklineLength: details.slacklineLength,
-      slacklineType: details.slacklineType,
-      description: details.description,
-    };
-  },
-  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const details = snapshot.get("details");
-    return new PinDetails(
-      details.description,
-      details.slacklineLength,
-      details.slacklineType
-    );
-  },
-};
-
-const pinLocationConverter = {
-  toFirestore: (location: ILocation) => {
-    return {
-      latitude: location.latitude,
-      longitude: location.longitude,
-    };
-  },
-  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const location = snapshot.get("location");
-    return new Location(location.latitude, location.longitude);
-  },
-};
-
-const pinConverter = {
-  toFirestore: (pin: IPin) => {
-    return {
-      location: pinLocationConverter.toFirestore(pin.location),
-      details: pinDetailsConverter.toFirestore(pin.details),
-    };
-  },
-  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-
-    return new Pin(
-      pinLocationConverter.fromFirestore(snapshot),
-      pinDetailsConverter.fromFirestore(snapshot)
-    );
-  },
-};
 
 // to convert the location string from the database back into a location object
 function getLocationFromString(locationString: string): ILocation {
