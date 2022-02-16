@@ -1,7 +1,7 @@
-import { IPinDetails, ILocation, IPin } from "./Interfaces";
+import { IPinDetails, IPin } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
-import { PinDetails, Pin, Location } from "./Pin";
-
+import { PinDetails, Pin } from "./Pin";
+import { GeoPoint } from "firebase/firestore/lite";
 
 // data converters to transform data to and from json objects for firestore use
 const pinDetailsConverter = {
@@ -23,15 +23,12 @@ const pinDetailsConverter = {
 };
 
 const pinLocationConverter = {
-  toFirestore: (location: ILocation) => {
-    return {
-      latitude: location.latitude,
-      longitude: location.longitude,
-    };
+  toFirestore: (location: GeoPoint) => {
+    return location.toJSON();
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     const location = snapshot.get("location");
-    return new Location(location.latitude, location.longitude);
+    return new GeoPoint(location.latitude, location.longitude);
   },
 };
 

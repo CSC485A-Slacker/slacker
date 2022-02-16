@@ -1,21 +1,17 @@
-import { addPin } from "./Database"
 import { GeoPoint } from 'firebase/firestore/lite';
-import { Pin } from "./Pin";
 
 interface IPin {
-    readonly location: ILocation;
+    readonly location: GeoPoint;
     details: IPinDetails;
 }
 
-interface ILocation {
-    readonly latitude: number;
-    readonly longitude: number;
+// interface ILocation {
+//     readonly latitude: number;
+//     readonly longitude: number;
 
-    isEqual(other: ILocation): boolean;
-
-    // used to search the database by location
-    toString (): string;
-}
+//     isEqual(other: ILocation): boolean;
+//     toString (): string;
+// }
 
 interface IPinDetails {
     description: string;
@@ -23,29 +19,29 @@ interface IPinDetails {
     slacklineType: string;
 }
 
-//  TODO: fix interfaces so that they represent Database.ts functions
-
 interface IDatabase {
-    // attempts to add a pin at a given location.
-    // returns an IDatabaseAction result.
-    // will fail if a pin already exists
-    addPin(pin: IPin): IDatabaseActionResult;
+  // attempts to add a pin at a given location.
+  // returns an IDatabaseAction result.
+  // will fail if a pin already exists
+  addPin(pin: IPin): Promise<IDatabaseActionResult>;
 
-    // attempts to edit a pin at a given location, replacing existing details with provided details.
-    // returns an IDatabaseAction result.
-    // will fail if no pin exists
-    editPinDetials(pin: ILocation, details: IPinDetails): IDatabaseActionResult;
+  // attempts to edit a pin at a given location, replacing existing details with provided details.
+  // returns an IDatabaseAction result.
+  // will fail if no pin exists
+  editPinDetails(pin: GeoPoint, details: IPinDetails): Promise<IDatabaseActionResult>;
 
-    // attempts to remove the pin at a given location.
-    // returns an IDatabaseAction result.
-    removePin(location: ILocation): Promise<IDatabaseActionResult>;
+  // attempts to remove the pin at a given location.
+  // returns an IDatabaseAction result.
+  deletePin(location: GeoPoint): Promise<IDatabaseActionResult>;
 
-    // returns a list of all pins
-    getAllPins(): IPin[];
+  // returns a pin by its location
+  getPin(location: GeoPoint): Promise<IPinActionResult<IPin>>;
 
-    // returns a pin by its location
-    getPin(location: ILocation): Promise<IPinResult>;
+  // returns a list of all pins
+  getAllPins(): Promise<IPinActionResult<IPin[]>>;
 
+  // returns a Location[] containing all pin locations
+  getAllPinLocations(): Promise<IPinActionResult<GeoPoint[]>>;
 }
 
 // succeeded returns true if the action was complete, false otherwise
@@ -57,9 +53,8 @@ interface IDatabaseActionResult {
 
 // returns the result of attemping to get a pin
 // returns the pin on success, or an empty pin on failure
-interface IPinResult {
-    result: IDatabaseActionResult,
-    pin: IPin;
+interface IPinActionResult<T> extends IDatabaseActionResult {
+    data?: T;
 }
 
-export { IPin, ILocation, IPinDetails, IPinResult, IDatabase, IDatabaseActionResult }
+export { IPin, IPinDetails, IPinActionResult, IDatabase, IDatabaseActionResult }
