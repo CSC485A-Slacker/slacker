@@ -1,21 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { NavTabs } from "./Router";
+import { store } from "./redux/Store";
+import { Provider } from "react-redux";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={{color:'white'}}>Welcome to Slacker! A slackliner's everyday solution!</Text>
-      <Image source={{width: 200, height:200, uri:"https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker_logo.png"}}/>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <NavTabs />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
