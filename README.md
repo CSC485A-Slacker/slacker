@@ -25,7 +25,7 @@ Please note that we are **not** tracking users' GPS location, instead, the user 
 * Hosting will be done on [GCP](https://cloud.google.com/)
 * Database: [Google Firestore](https://cloud.google.com/firestore)
 * UI framework: [React Native](https://reactnative.dev/)
-* Map API: [Leaflet](https://leafletjs.com/)
+* Map API: [React Native Maps](https://github.com/react-native-maps/react-native-maps)
 
 ## Milestone 1: Map Dashboard (⚠ Due Feb 18, 2022)
 This milestone will entail only the most basic functionality of the app to be considered semi-usable. To that end, we will have implemented the following features:
