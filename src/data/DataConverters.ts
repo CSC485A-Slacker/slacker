@@ -1,6 +1,6 @@
-import { IPinDetails, IPin, IPinReviews } from "./Interfaces";
+import { IPinDetails, IPin } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
-import { PinDetails, Pin, PinReviews } from "./Pin";
+import { PinDetails, Pin } from "./Pin";
 import { GeoPoint } from "firebase/firestore/lite";
 
 // data converters to transform data to and from json objects for firestore use
@@ -11,6 +11,8 @@ const pinDetailsConverter = {
       slacklineLength: details.slacklineLength,
       slacklineType: details.slacklineType,
       description: details.description,
+      color: details.color,
+      draggable: details.draggable,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -19,7 +21,9 @@ const pinDetailsConverter = {
       details.title,
       details.description,
       details.slacklineLength,
-      details.slacklineType
+      details.slacklineType,
+      details.color,
+      details.draggable,
     );
   },
 };

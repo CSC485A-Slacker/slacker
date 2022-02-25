@@ -59,17 +59,23 @@ class PinDetails implements IPinDetails {
   description: string;
   slacklineLength: number;
   slacklineType: string;
+  color: string;
+  draggable: boolean;
 
   constructor(
     title: string,
     description: string,
     slacklineLength: number,
-    slacklineType: string
+    slacklineType: string,
+    color: string, 
+    draggable: boolean,
   ) {
     this.title = title;
     this.description = description;
     this.slacklineLength = slacklineLength;
     this.slacklineType = slacklineType;
+    this.color = color;
+    this.draggable = draggable;
   }
 
   toString(): string {
@@ -81,7 +87,11 @@ class PinDetails implements IPinDetails {
       "\nslacklineLength: " +
       this.slacklineLength +
       "\nslacklineType: " +
-      this.slacklineType
+      this.slacklineType +
+      "\ncolor: " +
+      this.color +
+      "\ndraggable: " +
+      this.draggable
     );
   }
 }

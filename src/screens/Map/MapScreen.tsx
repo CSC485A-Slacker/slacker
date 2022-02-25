@@ -8,9 +8,9 @@ import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
-  Pin,
   removePin,
 } from "../../redux/PinSlice";
+import { Pin } from "../../data/Pin";
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -24,12 +24,12 @@ let newPin: Pin = {
     longitude: regionLongitude,
   },
   details: {
-    color: "blue",
-    draggable: true,
     title: "",
     description: "",
     slacklineLength: 0,
     slacklineType: "",
+    color: "blue",
+    draggable: true,
   }
 };
 

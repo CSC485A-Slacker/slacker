@@ -15,6 +15,8 @@ interface IPinDetails {
   description: string;
   slacklineLength: number;
   slacklineType: string;
+  color: string;
+  draggable: boolean;
 }
 
 interface IPinReviews {
