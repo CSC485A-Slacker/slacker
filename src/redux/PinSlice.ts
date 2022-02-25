@@ -4,12 +4,14 @@ import { LatLng } from "react-native-maps";
 export type Pin = {
   key: number;
   coordinate: LatLng;
-  color: string;
-  draggable: boolean;
-  title: string;
-  length: number;
-  type: string;
-  description: string;
+  details: {
+    color: string;
+    draggable: boolean;
+    title: string;
+    description: string;
+    slacklineLength: number;
+    slacklineType: string;
+  }
 };
 
 export function generateRandomKey() {
@@ -23,12 +25,14 @@ const examplePin1: Pin = {
     latitude: 48.458494,
     longitude: -123.29526,
   },
-  color: "red",
-  draggable: false,
-  title: "Caddy Bay Liner",
-  length: 10,
-  type: "Trickline",
-  description: "Woah that's a big octopus!",
+  details: {
+    color: "red",
+    draggable: false,
+    title: "Caddy Bay Liner",
+    description: "Woah that's a big octopus!",
+    slacklineLength: 10,
+    slacklineType: "Trickline",
+  }
 };
 
 const examplePin2: Pin = {
@@ -36,13 +40,15 @@ const examplePin2: Pin = {
   coordinate: {
     latitude: 48.459405,
     longitude: -123.327318,
-  },
-  color: "red",
-  draggable: false,
-  title: "Mt Tomie",
-  length: 15,
-  type: "Highline",
-  description: "Its pretty cool, nice views.",
+  }, 
+  details: {
+    color: "red",
+    draggable: false,
+    title: "Mt Tomie",
+    description: "Its pretty cool, nice views.",
+    slacklineLength: 15,
+    slacklineType: "Highline",
+  }
 };
 
 export interface PinsState {
@@ -66,12 +72,14 @@ export const pinSlice = createSlice({
           return {
             ...pin,
             coordinate: action.payload.coordinate,
-            color: "red",
-            draggable: false,
-            title: action.payload.title,
-            description: action.payload.description,
-            length: action.payload.length,
-            type: action.payload.type,
+            details: {
+              color: "red",
+              draggable: false,
+              title: action.payload.details.title,
+              description: action.payload.details.description,
+              slacklineLength: action.payload.details.slacklineLength,
+              slacklineType: action.payload.details.slacklineType,
+            }
           };
         }
         return pin;

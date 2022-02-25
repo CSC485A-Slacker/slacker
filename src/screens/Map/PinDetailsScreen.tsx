@@ -14,20 +14,23 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const { newPin } = route.params;
 
   const [name, onChangeName] = useState("");
-  const [type, onChangeType] = useState("");
   const [description, onChangeDescription] = useState("");
-  const [length, onChangeLength] = useState("");
+  const [slacklineLength, onChangeLength] = useState("");
+  const [slacklineType, onChangeType] = useState("");
+
 
   const onConfirmPress = () => {
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
-      draggable: false,
+      details: {
+        draggable: false,
       color: "red",
-      title: name,
-      description: description,
-      type: type,
-      length: parseInt(length),
+        title: name,
+        description: description,
+        slacklineType: slacklineType,
+        slacklineLength: parseInt(slacklineLength),
+      }
     };
     dispatch(updatePin(confirmPin));
     navigation.navigate({
@@ -60,14 +63,14 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         <Input
           style={styles.input}
           placeholder="Slackline Type"
-          onChangeText={(type) => onChangeType(type)}
-          value={type}
+          onChangeText={(slacklineType) => onChangeType(slacklineType)}
+          value={slacklineType}
         />
         <Input
           style={styles.input}
           placeholder="Distance (m)"
-          onChangeText={(length) => onChangeLength(length)}
-          value={length}
+          onChangeText={(slacklineLength) => onChangeLength(slacklineLength)}
+          value={slacklineLength}
           keyboardType="number-pad"
         />
         <FAB

@@ -1,21 +1,42 @@
-import { IPin, IPinDetails } from "./Interfaces"
+import {
+  IPin,
+  IPinDetails,
+  IPinReviews,
+  IPinPhotos,
+  IPinActivity,
+} from "./Interfaces";
 import { GeoPoint } from "firebase/firestore/lite";
 
 class Pin implements IPin {
-    readonly location: GeoPoint;
-    details: PinDetails;
+  key: number;
+  readonly coordinate: GeoPoint;
+  details: PinDetails;
+  reviews: IPinReviews[];
+  photos: IPinPhotos[];
+  activity: IPinActivity;
 
-    constructor (location: GeoPoint, details: PinDetails) {
-        this.location = location;
-        this.details = details;
-    }
+  constructor(
+    key: number,
+    coordinate: GeoPoint,
+    details: PinDetails,
+    reviews: PinReviews[],
+    photos: IPinPhotos[],
+    activity: PinActivity
+  ) {
+    this.key = key;
+    this.coordinate = coordinate;
+    this.details = details;
+    this.reviews = reviews;
+    this.photos = photos;
+    this.activity = activity;
+  }
 
-    toString (): string {
-        return locationToString(this.location) + "\n" + this.details.toString();
-    }
+  toString(): string {
+    return coordinateToString(this.coordinate) + "\n" + this.details.toString();
+  }
 }
 
-// class Location implements ILocation {
+// class coordinate implements ICoordinate {
 //     readonly latitude: number;
 //     readonly longitude: number;
 
@@ -24,7 +45,7 @@ class Pin implements IPin {
 //         this.longitude = longitude;
 //     }
 
-//     isEqual (other: ILocation): boolean {
+//     isEqual (other: ICoordinate): boolean {
 //         return other.latitude == this.latitude && other.longitude == this.longitude;
 //     }
 
@@ -34,31 +55,115 @@ class Pin implements IPin {
 // }
 
 class PinDetails implements IPinDetails {
-    description: string;
-    slacklineLength: number;
-    slacklineType: string;
+  title: string;
+  description: string;
+  slacklineLength: number;
+  slacklineType: string;
 
-    constructor(description: string, slacklineLength: number, slacklineType: string) {
-        this.description = description;
-        this.slacklineLength = slacklineLength;
-        this.slacklineType = slacklineType;
-    }
+  constructor(
+    title: string,
+    description: string,
+    slacklineLength: number,
+    slacklineType: string
+  ) {
+    this.title = title;
+    this.description = description;
+    this.slacklineLength = slacklineLength;
+    this.slacklineType = slacklineType;
+  }
 
-    toString (): string{
-        return "description: " + this.description + "\nslacklineLength: " + this.slacklineLength + "\nslacklineType: " + this.slacklineType;
-    }
+  toString(): string {
+    return (
+      "title: " +
+      this.title +
+      "\ndescription: " +
+      this.description +
+      "\nslacklineLength: " +
+      this.slacklineLength +
+      "\nslacklineType: " +
+      this.slacklineType
+    );
+  }
 }
 
-// to convert the location string from the database back into a location object
-function locationFromString(locationString: string): GeoPoint {
-    const splitLocation: string[] = locationString.split(",", 2);
+class PinReviews implements IPinReviews {
+  comment: string;
+  rating: number;
+  date: Date;
 
-    return new GeoPoint(Number(splitLocation[0]), Number(splitLocation[1]));
+  constructor(comment: string, rating: number, date: Date) {
+    this.comment = comment;
+    this.rating = rating;
+    this.date = date;
+  }
+
+  toString(): string {
+    return (
+      "comment: " +
+      this.comment +
+      "\nrating: " +
+      this.rating +
+      "\ndate: " +
+      this.date
+    );
+  }
+}
+
+class PinPhotos implements IPinPhotos {
+  url: string;
+  date: Date;
+
+  constructor(url: string, date: Date) {
+    this.url = url;
+    this.date = date;
+  }
+
+  toString(): string {
+    return "url: " + this.url + "\ndate: " + this.date;
+  }
+}
+
+class PinActivity implements IPinActivity {
+  checkIn: boolean;
+  activeUsers: number;
+  totalUsers: number;
+
+  constructor(checkIn: boolean, activeUsers: number, totaUsers: number) {
+    this.checkIn = checkIn;
+    this.activeUsers = activeUsers;
+    this.totalUsers = totaUsers;
+  }
+
+  toString(): string {
+    return (
+      "checkIn: " +
+      this.checkIn +
+      "\nactiveUsers " +
+      this.activeUsers +
+      "\ntotalUsers: " +
+      this.totalUsers
+    );
+  }
+}
+
+// to convert the coordinate string from the database back into a coordinate object
+function coordinateFromString(coordinateString: string): GeoPoint {
+  const splitCoordinate: string[] = coordinateString.split(",", 2);
+
+  return new GeoPoint(Number(splitCoordinate[0]), Number(splitCoordinate[1]));
 }
 
 // converts GeoPoint to string
-function locationToString(location: GeoPoint): string {
-    return location.latitude.toString() + "," + location.longitude.toString();
+function coordinateToString(coordinate: GeoPoint): string {
+  return coordinate.latitude.toString() + "," + coordinate.longitude.toString();
 }
 
-export { Pin, PinDetails, locationFromString, locationToString }
+export {
+  Pin,
+  PinDetails,
+  PinReviews,
+  PinPhotos,
+  PinActivity,
+  coordinateFromString,
+  coordinateToString,
+};
