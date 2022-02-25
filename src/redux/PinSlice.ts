@@ -19,6 +19,13 @@ const examplePin1: Pin = {
     slacklineType: "Trickline",
     color: "red",
     draggable: false,
+  },
+  reviews: [],
+  photos: [],
+  activity: {
+    checkIn: false,
+    activeUsers: 0,
+    totalUsers:  0,
   }
 };
 
@@ -35,6 +42,13 @@ const examplePin2: Pin = {
     slacklineType: "Highline",
     color: "red",
     draggable: false,
+  },
+  reviews: [],
+  photos: [],
+  activity: {
+    checkIn: false,
+    activeUsers: 0,
+    totalUsers:  0,
   }
 };
 

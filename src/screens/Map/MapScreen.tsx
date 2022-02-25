@@ -30,6 +30,13 @@ let newPin: Pin = {
     slacklineType: "",
     color: "blue",
     draggable: true,
+  },
+  reviews: [],
+  photos: [],
+  activity: {
+    checkIn: false,
+    activeUsers: 0,
+    totalUsers:  0,
   }
 };
 
@@ -69,7 +76,14 @@ export const MapScreen = ({ route, navigation }) => {
         description: "",
         slacklineLength: 0,
         slacklineType: "",
-      }
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
+       }
     };
     dispatch(addPin(newPin));
     setAddPinVisible(false);

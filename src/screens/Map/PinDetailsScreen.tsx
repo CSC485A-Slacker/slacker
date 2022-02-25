@@ -7,7 +7,8 @@ import {
 } from "react-native";
 import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
-import { Pin, updatePin } from "../../redux/PinSlice";
+import { updatePin } from "../../redux/PinSlice";
+import { Pin } from "../../data/Pin";
 
 export const PinDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -30,6 +31,13 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         description: description,
         slacklineType: slacklineType,
         slacklineLength: parseInt(slacklineLength),
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
       }
     };
     dispatch(updatePin(confirmPin));
