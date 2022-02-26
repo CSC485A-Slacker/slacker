@@ -1,9 +1,8 @@
-import { GeoPoint } from "firebase/firestore/lite";
+import { LatLng } from "react-native-maps";
 
 interface IPin {
-  // https://firebase.google.com/docs/reference/node/firebase.firestore.GeoPoint
   key: number;
-  readonly coordinate: GeoPoint;
+  readonly coordinate: LatLng;
   details: IPinDetails;
   reviews: IPinReviews[];
   photos: IPinPhotos[];
@@ -52,7 +51,7 @@ interface IDatabase {
    *         or success==false otherwise
    */
   editPinDetails(
-    coordinate: GeoPoint,
+    coordinate: LatLng,
     details: IPinDetails
   ): Promise<IDatabaseActionResult>;
 
@@ -62,14 +61,14 @@ interface IDatabase {
    * Return: an IDatabaseActionResult where success==true if the pin at coordinate was deleted
    *        or false otherwise
    */
-  deletePin(coordinate: GeoPoint): Promise<IDatabaseActionResult>;
+  deletePin(coordinate: LatLng): Promise<IDatabaseActionResult>;
 
   /* Purpose: attempts to get a pin from the given coordinate.
    *          Will fail if no pin is found at coordinate.
    *
    * Return: an IPinActionResult<IPin> that will contain an IPin on success (undefined on failure)
    */
-  getPin(coordinate: GeoPoint): Promise<IPinActionResult<IPin>>;
+  getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>>;
 
   /* Purpose: attempts to get an array of all pins from the database.
    *
@@ -77,11 +76,11 @@ interface IDatabase {
    */
   getAllPins(): Promise<IPinActionResult<IPin[]>>;
 
-  /* Purpose: attempts to get an array of all pin coordinates (GeoPoints) from the database.
+  /* Purpose: attempts to get an array of all pin coordinates (LatLng) from the database.
    *
-   * Return: an IPinActionResult<GeoPoint[]> that will contain a GeoPoint[] on success (undefined on failure)
+   * Return: an IPinActionResult<LatLng[]> that will contain a LatLng[] on success (undefined on failure)
    */
-  getAllPinCoordinates(): Promise<IPinActionResult<GeoPoint[]>>;
+  getAllPinCoordinates(): Promise<IPinActionResult<LatLng[]>>;
 }
 
 /*

@@ -3,7 +3,7 @@ import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, dele
 import { Pin, PinDetails, coordinateToString, coordinateFromString } from "./Pin"
 import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
 import { pinConverter, pinDetailsConverter } from "./DataConverters";
-import { GeoPoint } from "firebase/firestore/lite";
+import { LatLng } from "react-native-maps";
 
 
 class Database implements IDatabase {
@@ -41,7 +41,7 @@ class Database implements IDatabase {
     }
 
     // Edits pin details at coordinate
-    async editPinDetails(coordinate: GeoPoint,details: PinDetails): Promise<IDatabaseActionResult> {
+    async editPinDetails(coordinate: LatLng,details: PinDetails): Promise<IDatabaseActionResult> {
         try {
         const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
         const pinDocSnap = await getDoc(pinRef);
@@ -61,7 +61,7 @@ class Database implements IDatabase {
     }
 
     // Deletes pin at given coordinate
-    async deletePin(coordinate: GeoPoint): Promise<IDatabaseActionResult> {
+    async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
         try {
             const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
             const pinDocSnap = await getDoc(pinRef);
@@ -84,7 +84,7 @@ class Database implements IDatabase {
     }
 
     // Get the pin at a given coordinate
-    async getPin(coordinate: GeoPoint): Promise<IPinActionResult<IPin>> {
+    async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
         try {
         const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
 
@@ -150,7 +150,7 @@ class Database implements IDatabase {
 
   // Get a coordinate[] of all pins from the database without retreiving details
   // Use getPin to get a specific pin
-  async getAllPinCoordinates(): Promise<IPinActionResult<GeoPoint[]>> {
+  async getAllPinCoordinates(): Promise<IPinActionResult<LatLng[]>> {
     try {
       const pinsCollection = collection(this.database, "pins");
 
@@ -158,13 +158,13 @@ class Database implements IDatabase {
 
       const pinsList = pinSnapshot.docs.map((doc) => doc.id);
 
-      const pinCoordinatesList: GeoPoint[] = [];
+      const pinCoordinatesList: LatLng[] = [];
 
       pinsList.forEach((pin) => {
         pinCoordinatesList.push(coordinateFromString(pin));
       });
 
-      return new PinActionResult<GeoPoint[]>(
+      return new PinActionResult<LatLng[]>(
         new DatabaseActionResult(
           true,
           `Succeeded: pin coordinates retrieved.`
@@ -172,7 +172,7 @@ class Database implements IDatabase {
         pinCoordinatesList
       );
     } catch (error) {
-      return new PinActionResult<GeoPoint[]>(
+      return new PinActionResult<LatLng[]>(
         new DatabaseActionResult(
           false,
           `Failed: pin coordinates could not be retrieved. ${error}`

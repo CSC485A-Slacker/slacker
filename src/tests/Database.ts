@@ -7,7 +7,6 @@ import {
 } from "../data/Pin";
 
 import { Database } from "../data/Database";
-import { GeoPoint } from "firebase/firestore/lite";
 
 const database = new Database();
 var passedCount = 0;
@@ -15,7 +14,7 @@ var totalCount = 0;
 
 const pin1 = new Pin(
   1,
-  new GeoPoint(2, 0),
+  {latitude: 0, longitude: 1},
   new PinDetails("nice", "a damn fine spot", 10, "good one", "red", false),
   [new PinReviews("comment comment", 4.5, new Date())],
   [new PinPhotos("url1", new Date())],
@@ -24,7 +23,7 @@ const pin1 = new Pin(
 
 const pin2 = new Pin(
   2,
-  new GeoPoint(0, 1),
+  {latitude: 3, longitude: 1},
   new PinDetails("Bad", "a damn bad spot", 1, "bad one", "red", false),
   [new PinReviews("comment comment", 1.5, new Date())],
   [new PinPhotos("url2", new Date())],
@@ -33,7 +32,7 @@ const pin2 = new Pin(
 
 const pin3 = new Pin(
   3,
-  new GeoPoint(0, 0),
+  {latitude: 1, longitude: 2},
   new PinDetails("funky", "a damn funky spot", 1, "funky one", "red", false),
   [new PinReviews("comment comment", 3.5, new Date())],
   [new PinPhotos("url3", new Date())],
@@ -42,7 +41,7 @@ const pin3 = new Pin(
 
 const pin4 = new Pin(
   4,
-  new GeoPoint(0, 2),
+  {latitude: 2, longitude: 2},
   new PinDetails("a", "another pin", 1, "funny pin", "red", false),
   [new PinReviews("comment comment", 3.5, new Date())],
   [new PinPhotos("url4", new Date())],
@@ -101,7 +100,7 @@ async function TestDeletePin() {
   await database.addPin(pin1);
 
   console.log("delete existing pin");
-  var result = await database.deletePin(new GeoPoint(2, 0));
+  var result = await database.deletePin({latitude: 0, longitude: 1},);
   var passed = result.succeeded == true;
   console.log(`Passed: ${passed}. ${result.message}`);
   console.log("\n");
@@ -110,7 +109,7 @@ async function TestDeletePin() {
   totalCount++;
 
   console.log("delete non-existent pin");
-  result = await database.deletePin(new GeoPoint(5, 0));
+  result = await database.deletePin({latitude: 5, longitude: 0},);
   passed = result.succeeded == false;
   console.log(`Passed: ${passed}. ${result.message}`);
   console.log("\n");
@@ -124,7 +123,7 @@ async function TestGetPin() {
   await database.addPin(pin1);
 
   console.log("get existing pin");
-  var result = await database.getPin(new GeoPoint(2, 0));
+  var result = await database.getPin({latitude: 2, longitude: 2},);
   var passed = result.succeeded == true;
   console.log(`Passed: ${passed}. ${result.message}`);
   console.log(`data:\n${result.data}\n`);
@@ -133,7 +132,7 @@ async function TestGetPin() {
   totalCount++;
 
   console.log("get non-existent pin");
-  result = await database.getPin(new GeoPoint(5, 0));
+  result = await database.getPin({latitude: 5, longitude: 0},);
   passed = result.succeeded == false;
   console.log(`Passed: ${passed}. ${result.message}`);
   console.log(`data:\n${result.data}\n`);

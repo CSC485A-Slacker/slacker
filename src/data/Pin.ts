@@ -5,11 +5,11 @@ import {
   IPinPhotos,
   IPinActivity,
 } from "./Interfaces";
-import { GeoPoint } from "firebase/firestore/lite";
+import { LatLng } from "react-native-maps";
 
 class Pin implements IPin {
   key: number;
-  readonly coordinate: GeoPoint;
+  readonly coordinate: LatLng;
   details: PinDetails;
   reviews: IPinReviews[];
   photos: IPinPhotos[];
@@ -17,7 +17,7 @@ class Pin implements IPin {
 
   constructor(
     key: number,
-    coordinate: GeoPoint,
+    coordinate: LatLng,
     details: PinDetails,
     reviews: PinReviews[],
     photos: IPinPhotos[],
@@ -157,14 +157,16 @@ class PinActivity implements IPinActivity {
 }
 
 // to convert the coordinate string from the database back into a coordinate object
-function coordinateFromString(coordinateString: string): GeoPoint {
+function coordinateFromString(coordinateString: string): LatLng {
   const splitCoordinate: string[] = coordinateString.split(",", 2);
-
-  return new GeoPoint(Number(splitCoordinate[0]), Number(splitCoordinate[1]));
+  return {
+    latitude: Number(splitCoordinate[0]),
+    longitude: Number(splitCoordinate[1])
+  };
 }
 
-// converts GeoPoint to string
-function coordinateToString(coordinate: GeoPoint): string {
+// converts LatLng to string
+function coordinateToString(coordinate: LatLng): string {
   return coordinate.latitude.toString() + "," + coordinate.longitude.toString();
 }
 

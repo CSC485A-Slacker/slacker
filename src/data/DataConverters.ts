@@ -1,7 +1,7 @@
 import { IPinDetails, IPin } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin } from "./Pin";
-import { GeoPoint } from "firebase/firestore/lite";
+import { LatLng } from "react-native-maps";
 
 // data converters to transform data to and from json objects for firestore use
 const pinDetailsConverter = {
@@ -29,12 +29,16 @@ const pinDetailsConverter = {
 };
 
 const pinCoordinateConverter = {
-  toFirestore: (coordinate: GeoPoint) => {
-    return coordinate.toJSON();
+  toFirestore: (coordinate: LatLng) => {
+    return {
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude
+    }
   },
+  // This may not be correct, as before it returns a new geopoint object
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const coordinate = snapshot.get("coordinate");
-    return new GeoPoint(coordinate.latitude, coordinate.longitude);
+    const coordinate: LatLng = snapshot.get("coordinate");
+    return coordinate;
   },
 };
 
