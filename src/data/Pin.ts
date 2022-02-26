@@ -138,10 +138,10 @@ class PinActivity implements IPinActivity {
   activeUsers: number;
   totalUsers: number;
 
-  constructor(checkIn: boolean, activeUsers: number, totaUsers: number) {
+  constructor(checkIn: boolean, activeUsers: number, totalUsers: number) {
     this.checkIn = checkIn;
     this.activeUsers = activeUsers;
-    this.totalUsers = totaUsers;
+    this.totalUsers = totalUsers;
   }
 
   toString(): string {
