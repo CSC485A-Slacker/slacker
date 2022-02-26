@@ -1,7 +1,7 @@
 import {
   IPin,
   IPinDetails,
-  IPinReviews,
+  IPinReview,
   IPinPhotos,
   IPinActivity,
 } from "./Interfaces";
@@ -11,7 +11,7 @@ class Pin implements IPin {
   key: number;
   readonly coordinate: GeoPoint;
   details: PinDetails;
-  reviews: IPinReviews[];
+  reviews: IPinReview[];
   photos: IPinPhotos[];
   activity: IPinActivity;
 
@@ -19,7 +19,7 @@ class Pin implements IPin {
     key: number,
     coordinate: GeoPoint,
     details: PinDetails,
-    reviews: PinReviews[],
+    reviews: PinReview[],
     photos: IPinPhotos[],
     activity: PinActivity
   ) {
@@ -96,7 +96,7 @@ class PinDetails implements IPinDetails {
   }
 }
 
-class PinReviews implements IPinReviews {
+class PinReview implements IPinReview {
   comment: string;
   rating: number;
   date: Date;
@@ -171,7 +171,7 @@ function coordinateToString(coordinate: GeoPoint): string {
 export {
   Pin,
   PinDetails,
-  PinReviews,
+  PinReview,
   PinPhotos,
   PinActivity,
   coordinateFromString,
