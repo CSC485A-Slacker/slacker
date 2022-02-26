@@ -2,7 +2,7 @@ import {
   IPin,
   IPinDetails,
   IPinReview,
-  IPinPhotos,
+  IPinPhoto,
   IPinActivity,
 } from "./Interfaces";
 import { GeoPoint } from "firebase/firestore/lite";
@@ -12,7 +12,7 @@ class Pin implements IPin {
   readonly coordinate: GeoPoint;
   details: PinDetails;
   reviews: IPinReview[];
-  photos: IPinPhotos[];
+  photos: IPinPhoto[];
   activity: IPinActivity;
 
   constructor(
@@ -20,7 +20,7 @@ class Pin implements IPin {
     coordinate: GeoPoint,
     details: PinDetails,
     reviews: PinReview[],
-    photos: IPinPhotos[],
+    photos: IPinPhoto[],
     activity: PinActivity
   ) {
     this.key = key;
@@ -119,7 +119,7 @@ class PinReview implements IPinReview {
   }
 }
 
-class PinPhotos implements IPinPhotos {
+class PinPhoto implements IPinPhoto {
   url: string;
   date: Date;
 
@@ -172,7 +172,7 @@ export {
   Pin,
   PinDetails,
   PinReview,
-  PinPhotos,
+  PinPhoto,
   PinActivity,
   coordinateFromString,
   coordinateToString,

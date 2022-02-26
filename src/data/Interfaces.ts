@@ -6,7 +6,7 @@ interface IPin {
   readonly coordinate: GeoPoint;
   details: IPinDetails;
   reviews: IPinReview[];
-  photos: IPinPhotos[];
+  photos: IPinPhoto[];
   activity: IPinActivity;
 }
 
@@ -25,7 +25,7 @@ interface IPinReview {
   date: Date;
 }
 
-interface IPinPhotos {
+interface IPinPhoto {
   url: string;
   date: Date;
 }
@@ -108,7 +108,7 @@ export {
   IPin,
   IPinDetails,
   IPinReview,
-  IPinPhotos,
+  IPinPhoto,
   IPinActivity,
   IPinActionResult,
   IDatabase,

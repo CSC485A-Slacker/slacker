@@ -3,7 +3,7 @@ import {
   PinActivity,
   PinDetails,
   PinReview,
-  PinPhotos,
+  PinPhoto,
 } from "../data/Pin";
 
 import { Database } from "../data/Database";
@@ -18,7 +18,7 @@ const pin1 = new Pin(
   new GeoPoint(2, 0),
   new PinDetails("nice", "a damn fine spot", 10, "good one", "red", false),
   [new PinReview("comment comment", 4.5, new Date())],
-  [new PinPhotos("url1", new Date())],
+  [new PinPhoto("url1", new Date())],
   new PinActivity(false, 0, 10)
 );
 
@@ -27,7 +27,7 @@ const pin2 = new Pin(
   new GeoPoint(0, 1),
   new PinDetails("Bad", "a damn bad spot", 1, "bad one", "red", false),
   [new PinReview("comment comment", 1.5, new Date())],
-  [new PinPhotos("url2", new Date())],
+  [new PinPhoto("url2", new Date())],
   new PinActivity(false, 0, 0)
 );
 
@@ -36,7 +36,7 @@ const pin3 = new Pin(
   new GeoPoint(0, 0),
   new PinDetails("funky", "a damn funky spot", 1, "funky one", "red", false),
   [new PinReview("comment comment", 3.5, new Date())],
-  [new PinPhotos("url3", new Date())],
+  [new PinPhoto("url3", new Date())],
   new PinActivity(true, 3, 15)
 );
 
@@ -45,7 +45,7 @@ const pin4 = new Pin(
   new GeoPoint(0, 2),
   new PinDetails("a", "another pin", 1, "funny pin", "red", false),
   [new PinReview("comment comment", 3.5, new Date())],
-  [new PinPhotos("url4", new Date())],
+  [new PinPhoto("url4", new Date())],
   new PinActivity(true, 1, 3)
 );
 
