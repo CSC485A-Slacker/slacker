@@ -1,9 +1,19 @@
-import { IPinDetails, IPin } from "./Interfaces";
-import { QueryDocumentSnapshot } from "firebase/firestore/lite";
-import { PinDetails, Pin } from "./Pin";
+import { IPinDetails, IPin, IPinReview, IPinPhoto, IPinActivity } from "./Interfaces";
+import { doc, DocumentData, QueryDocumentSnapshot } from "firebase/firestore/lite";
+import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
 import { GeoPoint } from "firebase/firestore/lite";
 
 // data converters to transform data to and from json objects for firestore use
+const pinCoordinateConverter = {
+  toFirestore: (coordinate: GeoPoint) => {
+    return coordinate.toJSON();
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    const coordinate = snapshot.get("coordinate");
+    return new GeoPoint(coordinate.latitude, coordinate.longitude);
+  },
+};
+
 const pinDetailsConverter = {
   toFirestore: (details: IPinDetails) => {
     return {
@@ -28,27 +38,120 @@ const pinDetailsConverter = {
   },
 };
 
-const pinCoordinateConverter = {
-  toFirestore: (coordinate: GeoPoint) => {
-    return coordinate.toJSON();
+const pinReviewConverter = {
+  toFirestore: (review: IPinReview) => {
+    return {
+      comment: review.comment,
+      rating: review. rating,
+      date: review.date
+    };
+  },
+  fromFirestore: (review: any) => {
+    return new PinReview(
+      review.comment,
+      review.rating,
+      review.date
+    );
+  },
+};
+
+// TODO: implement generic array converter
+const pinReviewsConverter = {
+    toFirestore: (reviews: IPinReview[]) => {
+        const reviewsArray: any = [];
+
+        reviews.forEach(review => {
+            reviewsArray.push(pinReviewConverter.toFirestore(review))
+        });
+
+        return reviewsArray
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+        const reviews = snapshot.get("reviews");
+
+        const reviewsList: PinReview[] = [];
+        reviews.forEach((review: any) => {
+        reviewsList.push(pinReviewConverter.fromFirestore(review))
+        })
+
+        return reviewsList
+    },
+};
+
+const pinPhotoConverter = {
+  toFirestore: (photo: IPinPhoto) => {
+    return {
+      url: photo.url,
+      date: photo.date
+    };
+  },
+  fromFirestore: (photo: any) => {
+    return new PinPhoto(
+        photo.url,
+        photo.date
+    );
+  },
+};
+
+const pinPhotosConverter = {
+  toFirestore: (photos: IPinPhoto[]) => {
+        const photosArray: any = [];
+
+        photos.forEach(photo => {
+            photosArray.push(pinPhotoConverter.toFirestore(photo))
+        });
+
+        return photosArray
+    },
+  fromFirestore: (snapshot: any) => {
+    const photos = snapshot.get("photos");
+
+        const photosList: PinPhoto[] = [];
+        photos.forEach((photo: any) => {
+        photosList.push(pinPhotoConverter.fromFirestore(photo))
+        })
+
+        return photosList
+  },
+};
+
+const pinActivityConverter = {
+  toFirestore: (activity: IPinActivity) => {
+    return {
+      checkIn: activity.checkIn,
+      activeUsers: activity.activeUsers,
+      totalUsers: activity.totalUsers
+    };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const coordinate = snapshot.get("coordinate");
-    return new GeoPoint(coordinate.latitude, coordinate.longitude);
+    const activity = snapshot.get("activity");
+    return new PinActivity(
+      activity.checkIn,
+      activity.activeUsers,
+      activity.totalUsers
+    );
   },
 };
 
 const pinConverter = {
   toFirestore: (pin: IPin) => {
     return {
-      coordinate: pinCoordinateConverter.toFirestore(pin.coordinate),
-      details: pinDetailsConverter.toFirestore(pin.details),
+        key: pin.key,
+        coordinate: pinCoordinateConverter.toFirestore(pin.coordinate),
+        details: pinDetailsConverter.toFirestore(pin.details),
+        reviews: pinReviewsConverter.toFirestore(pin.reviews),
+        photos: pinPhotosConverter.toFirestore(pin.photos),
+        activity: pinActivityConverter.toFirestore(pin.activity)
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new Pin(
-      pinCoordinateConverter.fromFirestore(snapshot),
-      pinDetailsConverter.fromFirestore(snapshot)
+        snapshot.get("key"),
+        pinCoordinateConverter.fromFirestore(snapshot),
+        pinDetailsConverter.fromFirestore(snapshot),
+        pinReviewsConverter.fromFirestore(snapshot),
+        pinPhotosConverter.fromFirestore(snapshot),
+        pinActivityConverter.fromFirestore(snapshot)
     );
   },
 };
