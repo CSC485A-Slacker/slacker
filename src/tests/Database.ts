@@ -123,7 +123,7 @@ async function TestGetPin() {
   await database.addPin(pin1);
 
   console.log("get existing pin");
-  var result = await database.getPin({latitude: 2, longitude: 2},);
+  var result = await database.getPin(pin1.coordinate,);
   var passed = result.succeeded == true;
   console.log(`Passed: ${passed}. ${result.message}`);
   console.log(`data:\n${result.data}\n`);
