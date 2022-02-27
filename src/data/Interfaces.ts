@@ -4,8 +4,8 @@ interface IPin {
   key: number;
   readonly coordinate: LatLng;
   details: IPinDetails;
-  reviews: IPinReviews[];
-  photos: IPinPhotos[];
+  reviews: IPinReview[];
+  photos: IPinPhoto[];
   activity: IPinActivity;
 }
 
@@ -18,13 +18,13 @@ interface IPinDetails {
   draggable: boolean;
 }
 
-interface IPinReviews {
+interface IPinReview {
   comment: string;
   rating: number;
   date: Date;
 }
 
-interface IPinPhotos {
+interface IPinPhoto {
   url: string;
   date: Date;
 }
@@ -106,8 +106,8 @@ interface IPinActionResult<T> extends IDatabaseActionResult {
 export {
   IPin,
   IPinDetails,
-  IPinReviews,
-  IPinPhotos,
+  IPinReview,
+  IPinPhoto,
   IPinActivity,
   IPinActionResult,
   IDatabase,

@@ -1,8 +1,8 @@
 import {
   IPin,
   IPinDetails,
-  IPinReviews,
-  IPinPhotos,
+  IPinReview,
+  IPinPhoto,
   IPinActivity,
 } from "./Interfaces";
 import { LatLng } from "react-native-maps";
@@ -11,16 +11,16 @@ class Pin implements IPin {
   key: number;
   readonly coordinate: LatLng;
   details: PinDetails;
-  reviews: IPinReviews[];
-  photos: IPinPhotos[];
+  reviews: IPinReview[];
+  photos: IPinPhoto[];
   activity: IPinActivity;
 
   constructor(
     key: number,
     coordinate: LatLng,
     details: PinDetails,
-    reviews: PinReviews[],
-    photos: IPinPhotos[],
+    reviews: PinReview[],
+    photos: IPinPhoto[],
     activity: PinActivity
   ) {
     this.key = key;
@@ -96,7 +96,7 @@ class PinDetails implements IPinDetails {
   }
 }
 
-class PinReviews implements IPinReviews {
+class PinReview implements IPinReview {
   comment: string;
   rating: number;
   date: Date;
@@ -119,7 +119,7 @@ class PinReviews implements IPinReviews {
   }
 }
 
-class PinPhotos implements IPinPhotos {
+class PinPhoto implements IPinPhoto {
   url: string;
   date: Date;
 
@@ -138,10 +138,10 @@ class PinActivity implements IPinActivity {
   activeUsers: number;
   totalUsers: number;
 
-  constructor(checkIn: boolean, activeUsers: number, totaUsers: number) {
+  constructor(checkIn: boolean, activeUsers: number, totalUsers: number) {
     this.checkIn = checkIn;
     this.activeUsers = activeUsers;
-    this.totalUsers = totaUsers;
+    this.totalUsers = totalUsers;
   }
 
   toString(): string {
@@ -173,8 +173,8 @@ function coordinateToString(coordinate: LatLng): string {
 export {
   Pin,
   PinDetails,
-  PinReviews,
-  PinPhotos,
+  PinReview,
+  PinPhoto,
   PinActivity,
   coordinateFromString,
   coordinateToString,
