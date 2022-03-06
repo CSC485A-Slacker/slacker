@@ -40,6 +40,9 @@ let newPin: Pin = {
   }
 };
 
+const defaultColor = "#219f94";
+const hotColor = "#D2042D";
+
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
@@ -48,8 +51,6 @@ export const MapScreen = ({ route, navigation }: any) => {
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
 
   const [hotspotToggleVisible, setHotSpotToggleVisible] = useState(true);
-  const defaultColor = "#219f94";
-  const hotColor = "#D2042D";
   const [hotspotToggleColor, setHotspotToggleColor] = useState(defaultColor);
 
   // If pin was added, reset to original view
@@ -175,16 +176,16 @@ export const MapScreen = ({ route, navigation }: any) => {
         <FAB
           title="Add Pin"
           icon={{ name: "add", color: "white" }}
-          color="#219f94"
+          color={defaultColor}
           onPress={handleConfirmPress}
           placement="right"
         />
       ) : null}
       {confirmCancelVisible ? (
         <FAB
-          titleStyle={{ color: "#219f94" }}
+          titleStyle={{ color: defaultColor}}
           title="Cancel"
-          icon={{ name: "close", color: "#219f94" }}
+          icon={{ name: "close", color: defaultColor}}
           color="white"
           onPress={handleCancelPress}
           placement="left"
@@ -202,7 +203,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         ) : null}
         <FAB
           icon={{ name: "add", color: "white" }}
-          color="#219f94"
+          color={defaultColor}
           onPress={handleAddPin}
           placement="right"
         />
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: "#219f94",
+    color:defaultColor,
     paddingBottom: 2,
   },
   text: {
