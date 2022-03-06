@@ -40,21 +40,55 @@ let newPin: Pin = {
   }
 };
 
-export const MapScreen = ({ route, navigation }) => {
+export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
 
+  const [hotspotToggleVisible, setHotSpotToggleVisible] = useState(true);
+  const defaultColor = "#219f94";
+  const hotColor = "#D2042D";
+  const [hotspotToggleColor, setHotspotToggleColor] = useState(defaultColor);
+
   // If pin was added, reset to original view
   useEffect(() => {
     if (route.params?.confirmedPin) {
       setAddPinVisible(true);
+      setHotSpotToggleVisible(true)
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
     }
-  });
+  }, [addPinVisible]);
+
+
+  // effect hook for when the hotspot toggle button changes visibility
+  // this might not be necessary, consider deleting later
+  useEffect(() => {
+    
+  }, [hotspotToggleVisible]);
+
+
+  // change color of hotspot toggle button and show appropriate pins
+  // button is red -> only pins with people currently checked in
+  // button is aqua -> all pins
+  const handleHotspotToggle = () => {
+    switch(hotspotToggleColor){
+      case defaultColor:
+          setHotspotToggleColor(hotColor);
+          break;
+      case hotColor:
+          setHotspotToggleColor(defaultColor);
+          break;
+      default:
+        return;
+    }
+
+
+    // TODO: decide whether to show all pins or only pins
+    // with people currently checked in there
+  }
 
   // Keeps track of the map region
   const updateRegion = (e: LatLng) => {
@@ -87,6 +121,7 @@ export const MapScreen = ({ route, navigation }) => {
     };
     dispatch(addPin(newPin));
     setAddPinVisible(false);
+    setHotSpotToggleVisible(false);
     setConfirmCancelVisible(true);
   };
 
@@ -100,6 +135,7 @@ export const MapScreen = ({ route, navigation }) => {
     dispatch(removePin(newPin));
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
+    setHotSpotToggleVisible(true);
   };
 
   return (
@@ -155,12 +191,22 @@ export const MapScreen = ({ route, navigation }) => {
         />
       ) : null}
       {addPinVisible ? (
+        <>
+        {hotspotToggleVisible? (
+          <FAB
+            icon={{ name: "whatshot", color: "white" }}
+            color={hotspotToggleColor}
+            onPress={handleHotspotToggle}
+            placement="left"
+          />
+        ) : null}
         <FAB
           icon={{ name: "add", color: "white" }}
           color="#219f94"
           onPress={handleAddPin}
           placement="right"
         />
+        </>
       ) : null}
     </View>
   );
