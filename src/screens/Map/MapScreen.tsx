@@ -196,9 +196,10 @@ export const MapScreen = ({ route, navigation }: any) => {
         {hotspotToggleVisible? (
           <FAB
             icon={{ name: "whatshot", color: "white" }}
+            style={{ paddingBottom: 65 }}
             color={hotspotToggleColor}
             onPress={handleHotspotToggle}
-            placement="left"
+            placement="right"
           />
         ) : null}
         <FAB
