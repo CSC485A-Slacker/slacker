@@ -40,8 +40,8 @@ let newPin: Pin = {
   }
 };
 
-const defaultColor = "#219f94";
-const hotColor = "#D2042D";
+const defaultColor:string = "#219f94";
+const hotColor:string = "#D2042D";
 
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
@@ -75,17 +75,9 @@ export const MapScreen = ({ route, navigation }: any) => {
   // button is red -> only pins with people currently checked in
   // button is aqua -> all pins
   const handleHotspotToggle = () => {
-    switch(hotspotToggleColor){
-      case defaultColor:
-          setHotspotToggleColor(hotColor);
-          break;
-      case hotColor:
-          setHotspotToggleColor(defaultColor);
-          break;
-      default:
-        return;
-    }
-
+    let newColor:string = defaultColor;
+    if(hotspotToggleColor == defaultColor) newColor = hotColor;
+    setHotspotToggleColor(newColor);
 
     // TODO: decide whether to show all pins or only pins
     // with people currently checked in there
@@ -196,7 +188,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         {hotspotToggleVisible? (
           <FAB
             icon={{ name: "whatshot", color: "white" }}
-            style={{ paddingBottom: 65 }}
+            style={{ paddingBottom: 65 }} // ensure the button doesn't overlap with the one below it
             color={hotspotToggleColor}
             onPress={handleHotspotToggle}
             placement="right"
