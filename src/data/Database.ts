@@ -1,10 +1,18 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query, QuerySnapshot } from 'firebase/firestore/lite';
 import { Pin, PinDetails, coordinateToString, coordinateFromString } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IPinsState } from "./Interfaces"
 import { pinConverter, pinDetailsConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
-
+import { onSnapshot, Unsubscribe } from "@firebase/firestore";
+import { useDispatch } from "react-redux";
+import {
+  addPin,
+  PinsState,
+  removePin,
+  updatePin,
+} from "../redux/PinSlice";
+import { createContext } from "react";
 
 class Database implements IDatabase {
     database: Firestore;
@@ -183,6 +191,32 @@ class Database implements IDatabase {
   }
 }
 
+// creates a listener for changes to the db
+// should update the state of the store dependent on changes
+// returns a subscriber that can be called to unsubcribe from changes
+// https://firebase.google.com/docs/firestore/query-data/listen
+const monitorDatabaseChanges = (database: Database) => {
+    const dispatch = useDispatch();
+    const pinsCollection = collection(database.database, "pins");
+    const q = query(pinsCollection);
+
+    return onSnapshot(q, (snapshot) => {
+
+        snapshot.docChanges().forEach((change) => {
+            const pin = pinConverter.fromFirestore(change.doc); 
+            
+            if(change.type === "added") {
+                dispatch(addPin(pin));
+            }
+            else if(change.type === "modified") {
+                dispatch(updatePin(pin));
+            } else if(change.type === "removed") {
+                dispatch(removePin(pin));
+            }
+        })
+    })
+}
+
 // action result implementations
 
 class DatabaseActionResult implements IDatabaseActionResult {
@@ -207,5 +241,5 @@ class PinActionResult<T> implements IPinActionResult<T> {
     }
 }
 
- export { Database };
+ export { Database, monitorDatabaseChanges };
 
