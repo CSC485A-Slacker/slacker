@@ -19,9 +19,13 @@ import { pinConverter } from "../../data/DataConverters";
 
 const database = new Database();
 
-// The middle point of the current map display
+// Keeps track of the middle point of the current map display
 let regionLatitude = 48.463708;
 let regionLongitude = -123.311406;
+
+// Keep track of the new pin lat and long
+let newPinLatitude = regionLatitude;
+let newPinLongitude = regionLongitude;
 
 // New pin to be modified
 let newPin: Pin = {
@@ -62,8 +66,7 @@ useEffect( () => {
     snapshot.docChanges().forEach((change) => {
         
       const pin = pinConverter.fromFirestore(change.doc)
-        console.log(`PIN KEY: ${pin.key}`)
-        console.log(`change: ${change}`);
+        //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
             if(change.type === "added") {
                 dispatch(addPin(pin));
             }
@@ -86,9 +89,15 @@ useEffect( () => {
   });
 
   // Keeps track of the map region
-  const updateRegion = (e: LatLng) => {
+  const updateRegionCoordinates = (e: LatLng) => {
     regionLatitude = e.latitude;
     regionLongitude = e.longitude;
+  };
+
+  // Keeps track of the map region
+  const updateNewPinCoordinates = (e: LatLng) => {
+    newPinLatitude = e.latitude;
+    newPinLongitude = e.longitude;
   };
 
   const handleAddPin = () => {
@@ -114,14 +123,38 @@ useEffect( () => {
         totalUsers:  0,
        }
     };
+    newPinLatitude = regionLatitude;
+    newPinLongitude = regionLongitude;
     dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
   };
 
   const handleConfirmPress = () => {
+    const pinToAdd = {
+      key: newPin.key,
+      coordinate: {
+        latitude: newPinLatitude,
+        longitude: newPinLongitude,
+      },
+      details: {
+        color: "blue",
+        draggable: true,
+        title: "",
+        description: "",
+        slacklineLength: 0,
+        slacklineType: "",
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
+       }
+    };
     navigation.navigate("Spot Details", {
-      newPin: newPin,
+      newPin: pinToAdd,
     });
   };
 
@@ -140,7 +173,7 @@ useEffect( () => {
           longitude: regionLongitude,
           longitudeDelta: 0.1,
         }}
-        onRegionChangeComplete={(e) => updateRegion(e)}
+        onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
       >
         {pins.map((pin) => (
@@ -150,6 +183,7 @@ useEffect( () => {
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
             draggable={pin.details.draggable}
+            onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
           >
             {pin.details.title ? (
               <Callout style={styles.callout}>
