@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import Cards from "../../components/DetailsSheet";
+import PinInfoCard from "../../components/PinInfoCard";
 import BottomDrawer from "react-native-bottom-drawer-view";
 
 export const FriendsScreen = () => {
@@ -9,7 +9,7 @@ export const FriendsScreen = () => {
       <Text>No friends yet 😢</Text>
 
       <BottomDrawer containerHeight={400} offset={49}>
-        <Cards />
+        <PinInfoCard />
       </BottomDrawer>
     </View>
   );

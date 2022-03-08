@@ -10,7 +10,7 @@ import {
   generateRandomKey,
   removePin,
 } from "../../redux/PinSlice";
-import Cards from "../../components/DetailsSheet";
+import PinInfoCard from "../../components/PinInfoCard";
 import BottomDrawer from "react-native-bottom-drawer-view";
 import { Pin } from "../../data/Pin";
 
@@ -53,6 +53,7 @@ export const MapScreen = ({ route, navigation }) => {
     latitude: regionLatitude,
     longitude: regionLongitude
   })
+  const [selectedPin, setSelectedPin] = useState(pins[0])
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -111,19 +112,11 @@ export const MapScreen = ({ route, navigation }) => {
 
   const handlePinPress = (pin: Pin) => {
     setPinInfoVisible(true);
-    newPin = {
-      key: pin.key,
-      coordinate: {
-        latitude: pin.coordinate.latitude,
-        longitude: pin.coordinate.longitude,
-      },
-      color: pin.color,
-      draggable: false,
-      title: pin.title,
-      length: pin.length,
-      type: pin.type,
-      description: pin.description,
-    };
+    setSelectedPin(selectedPin => ({
+      ...selectedPin,
+      ...pin
+    }))
+   console.log(selectedPin)
   };
 
   const updateMap = (e: LatLng) => {
@@ -205,54 +198,10 @@ export const MapScreen = ({ route, navigation }) => {
       ) : null}
       {pinInfoVisible ? (
         <BottomDrawer containerHeight={300} offset={49}>
-          <View style={styles.infoContainer}>
-            <Text h4>{newPin.title}</Text>
-            <Text>6m</Text>
-            <Text>Highline</Text>
-            <View style={styles.buttonsContainer}>
-              <View style={styles.buttonContainer}>
-                <Chip title="Check In"
-                  containerStyle={{ marginRight: 10 }}
-                  onPress={(e) => {
-
-                    console.log("Check Pressed");
-                    navigation.navigate("Spot Details", {
-                      newPin: newPin,
-                    });
-                  }}
-                
-                />
-              </View>
-              <View style={styles.buttonContainer}>
-                <Chip
-                  title="Reviews"
-                  type="outline"
-                  containerStyle={{ marginHorizontal: 10 }}
-                  onPress={(e) => {
-
-                    console.log("Review Pressed");
-                    navigation.navigate("Reviews", {
-                      newPin: newPin,
-                    });
-                  }}
-                />
-              </View>
-              <View style={styles.buttonContainer}>
-                <Chip
-                  title="Photos"
-                  type="outline"
-                  containerStyle={{ marginHorizontal: 10 }}
-                  onPress={(e) => {
-
-                    console.log("Photos Pressed");
-                    navigation.navigate("Spot Details", {
-                      newPin: newPin,
-                    });
-                  }}
-                />
-              </View>
-            </View>
-          </View>
+          <PinInfoCard
+            pin={{ ...selectedPin }}
+            navigation={navigation}
+          ></PinInfoCard>
         </BottomDrawer>
       ) : null}
     </View>

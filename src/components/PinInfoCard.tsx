@@ -1,27 +1,19 @@
 import React, { useState } from "react";
 import { Text, Button, Card, Icon, Chip } from "react-native-elements";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { Pin } from "../data/Pin";
 
-type CardsComponentsProps = {};
-
-const Cards: React.FunctionComponent<CardsComponentsProps> = () => {
+function PinInfoCard(prop) {
   const [isVisible, setIsVisible] = useState(false);
-  const list = [
-    { title: "List Item 1" },
-    { title: "List Item 2" },
-    {
-      title: "Cancel",
-      containerStyle: { backgroundColor: "red" },
-      titleStyle: { color: "white" },
-      onPress: () => setIsVisible(false),
-    },
-  ];
-
+  console.log("here is the object")
+  console.log(prop.pin)
+  const pin = prop.pin
+  const navigation = prop.navigation
   return (
     <View style={styles.container}>
-      <Text h4>Hyde Park</Text>
-      <Text>6m</Text>
-      <Text>Highline</Text>
+      <Text h4>{pin.details.title}</Text>
+      <Text>{pin.details.slacklineLength}</Text>
+      <Text>{pin.details.slacklineType}</Text>
       <View style={styles.buttonsContainer}>
         <View style={styles.buttonContainer}>
           <Chip title="Check In" containerStyle={{ marginRight: 10 }} />
@@ -38,6 +30,13 @@ const Cards: React.FunctionComponent<CardsComponentsProps> = () => {
             title="Photos"
             type="outline"
             containerStyle={{ marginHorizontal: 10 }}
+            onPress={(e) => {
+
+                    console.log("Check Pressed");
+                    navigation.navigate("Spot Details", {
+                      newPin: pin,
+                    });
+                  }}
           />
         </View>
       </View>
@@ -63,4 +62,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Cards;
+export default PinInfoCard;
