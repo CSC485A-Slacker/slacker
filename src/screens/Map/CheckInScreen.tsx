@@ -9,7 +9,7 @@ import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { Pin, updatePin } from "../../redux/PinSlice";
 
-export const PinDetailsScreen = ({ route, navigation }) => {
+export const CheckInScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { newPin } = route.params;
 

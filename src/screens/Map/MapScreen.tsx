@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import MapView, { LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Alert } from "react-native";
 import { Marker, Callout } from "react-native-maps";
-import { FAB, Text } from "react-native-elements";
+import { FAB, Text, Chip } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/Store";
 import {
@@ -11,6 +11,8 @@ import {
   Pin,
   removePin,
 } from "../../redux/PinSlice";
+import Cards from "../../components/DetailsSheet";
+import BottomDrawer from "react-native-bottom-drawer-view";
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -37,6 +39,11 @@ export const MapScreen = ({ route, navigation }) => {
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+  const [pinInfoVisible, setPinInfoVisible] = useState(false);
+  const [mapRegion, setMapRegion] = useState({
+    latitude: regionLatitude,
+    longitude: regionLongitude
+  })
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -84,6 +91,27 @@ export const MapScreen = ({ route, navigation }) => {
     setAddPinVisible(true);
   };
 
+  const handlePinPress = (pin: Pin) => {
+    setPinInfoVisible(true);
+    newPin = {
+      key: pin.key,
+      coordinate: {
+        latitude: pin.coordinate.latitude,
+        longitude: pin.coordinate.longitude,
+      },
+      color: pin.color,
+      draggable: false,
+      title: pin.title,
+      length: pin.length,
+      type: pin.type,
+      description: pin.description,
+    };
+  };
+
+  const updateMap = (e: LatLng) => {
+    setMapRegion(e)
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -96,6 +124,8 @@ export const MapScreen = ({ route, navigation }) => {
         }}
         onRegionChangeComplete={(e) => updateRegion(e)}
         provider={"google"}
+        showsPointsOfInterest={false}
+        onMarkerPress={(e) => updateMap(e.nativeEvent.coordinate)}
       >
         {pins.map((pin) => (
           <Marker
@@ -103,18 +133,18 @@ export const MapScreen = ({ route, navigation }) => {
             coordinate={pin.coordinate}
             pinColor={pin.color}
             draggable={pin.draggable}
-          >
-            {pin.title ? (
-              <Callout style={styles.callout}>
-                <View>
-                  <Text style={styles.title}>{pin.title}</Text>
-                  <Text style={styles.description}>{pin.description}</Text>
-                  <Text>{pin.type}</Text>
-                  <Text style={styles.text}>{pin.length + "m"}</Text>
-                </View>
-              </Callout>
-            ) : null}
-          </Marker>
+            onPress={(e) => {
+              if (
+                e.nativeEvent.action === "marker-inside-overlay-press" ||
+                e.nativeEvent.action === "callout-inside-press"
+              ) {
+                return;
+              }
+
+              console.log("Pin Pressed");
+              handlePinPress(pin);
+            }}
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
@@ -145,6 +175,58 @@ export const MapScreen = ({ route, navigation }) => {
           placement="right"
         />
       ) : null}
+      {pinInfoVisible ? (
+        <BottomDrawer containerHeight={300} offset={49}>
+          <View style={styles.infoContainer}>
+            <Text h4>{newPin.title}</Text>
+            <Text>6m</Text>
+            <Text>Highline</Text>
+            <View style={styles.buttonsContainer}>
+              <View style={styles.buttonContainer}>
+                <Chip title="Check In"
+                  containerStyle={{ marginRight: 10 }}
+                  onPress={(e) => {
+
+                    console.log("Check Pressed");
+                    navigation.navigate("Spot Details", {
+                      newPin: newPin,
+                    });
+                  }}
+                
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Chip
+                  title="Reviews"
+                  type="outline"
+                  containerStyle={{ marginHorizontal: 10 }}
+                  onPress={(e) => {
+
+                    console.log("Review Pressed");
+                    navigation.navigate("Reviews", {
+                      newPin: newPin,
+                    });
+                  }}
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Chip
+                  title="Photos"
+                  type="outline"
+                  containerStyle={{ marginHorizontal: 10 }}
+                  onPress={(e) => {
+
+                    console.log("Photos Pressed");
+                    navigation.navigate("Spot Details", {
+                      newPin: newPin,
+                    });
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </BottomDrawer>
+      ) : null}
     </View>
   );
 };
@@ -155,13 +237,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-    zIndex: -1,
+    //width: Dimensions.get("window").width,
+    //height: Dimensions.get("window").height,
+    //zIndex: -1,
+    ...StyleSheet.absoluteFillObject,
   },
   callout: {
+    flex: 1,
     maxWidth: 200,
   },
   title: {
@@ -175,5 +260,20 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 10,
     paddingBottom: 7,
+  },
+  infoContainer: {
+    flex: 1,
+    alignItems: "flex-start",
+    margin: 10,
+  },
+  buttonsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    // justifyContent: 'center',
+    marginVertical: 10,
+  },
+  buttonContainer: {
+    flex: 1,
   },
 });
