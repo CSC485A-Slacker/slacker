@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
@@ -23,7 +22,6 @@ export const LoginScreen = ({navigation}) => {
       createUserWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        console.log('Registered with:', user.email);
       })
       .catch(error => alert(error.message))
   }
@@ -34,7 +32,6 @@ export const LoginScreen = ({navigation}) => {
       .then(userCredentials => {
         const user = userCredentials.user;
         navigation.navigate("Map")
-        console.log('Logged in with:', user.email);
       })
       .catch(error => alert(error.message))
   }
