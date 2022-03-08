@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
-import { updatePin } from "../../redux/PinSlice";
+import { removePin, updatePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
@@ -44,7 +44,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         totalUsers:  0,
       }
     };
-    dispatch(updatePin(confirmPin));
+    dispatch(removePin(confirmPin));
     navigation.navigate({
       name: "Map",
       params: {

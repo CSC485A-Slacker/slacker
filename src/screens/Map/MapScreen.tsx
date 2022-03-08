@@ -114,7 +114,7 @@ useEffect( () => {
         totalUsers:  0,
        }
     };
-    // dispatch(addPin(newPin));
+    dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
   };
@@ -130,9 +130,6 @@ useEffect( () => {
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
   };
-//   pins.forEach((pin) =>{
-// jVl
-//   })
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
