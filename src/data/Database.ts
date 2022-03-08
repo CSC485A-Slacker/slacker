@@ -14,12 +14,85 @@ import {
 } from "../redux/PinSlice";
 import { createContext } from "react";
 import { store } from "../redux/Store"
+import { User } from "./User";
+
 
 class Database implements IDatabase {
     database: Firestore;
 
     constructor() {
         this.database = getFirestore(firebaseApp);
+    }
+
+    async addUser(user: IUser) {
+      const userDocRef = doc(this.database, "users", user._userID)
+        try
+        {
+          const userSnap =await getDoc(userDocRef)
+          if(userSnap.exists())
+          {
+            throw new Error(`User already existed with ID ${user._userID}`)
+          }
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
+        } catch (e) {
+          console.log("Error adding user: ", e);
+        }
+        
+    }
+
+    async getUser(userID: string): Promise<User> {
+      const userDocRef = doc(this.database, "users", userID)
+      try
+      {
+        const userDocSnap = await getDoc(userDocRef)
+        if (!userDocSnap.exists())
+        {
+          throw new Error(`User with ID ${userID} doesn\'t exist`)
+        }
+        return new User(userDocSnap.get('userID'), userDocSnap.get('checkInSpot'))
+        
+      }
+      catch (error)
+      {
+        console.log(`Get user fail: ${error}`)
+        return new User("not exist", 0)
+      }
+    }
+
+    async ChangeCheckInSpot(userID:string, newCheckInSpot:number)
+    {
+        const userDocRef = doc(this.database, "users", userID)
+        try
+        {
+          const userDocSnap = await getDoc(userDocRef)
+          if(!userDocSnap.exists())
+          {
+            throw new Error("User doesn't exist")
+          }
+          updateDoc(userDocRef, {checkInSpot: newCheckInSpot})
+        }
+        catch(error)
+        {
+          console.log(`change check in spot failed for user ${userID}: ${error}`)
+        }
+        
+    }
+
+    async deleteUser(userID: string) {
+      const userDocRef = doc(this.database, "users", userID)
+      try
+      {
+        const userDocSnap = await getDoc(userDocRef)
+        if (!userDocSnap.exists())
+        {
+          throw new Error(`User with ID ${userID} doesn\'t exist`)
+        }
+        await deleteDoc(userDocRef)
+      }
+      catch(error)
+      {
+        console.log(`delete user failed: ${error}`)
+      }
     }
 
     // Adds a pin to the database

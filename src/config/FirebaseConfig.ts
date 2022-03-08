@@ -18,15 +18,8 @@ const firebaseConfig = {
     messagingSenderId: "",
     appId: ""
 };
-let firebaseApp
-if(getApps().length === 0)
-{
-    firebaseApp = initializeApp(firebaseConfig)
-}
-else
-{
-    firebaseApp = getApps()[0]
-}
+
+const firebaseApp = initializeApp(firebaseConfig)
 
 const auth = getAuth()
 export { firebaseApp, auth }

@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../config/FirebaseConfig'
+import { auth, firebaseApp } from '../../config/FirebaseConfig'
+import { Database } from '../../data/Database';
+import { collection, addDoc, getFirestore } from "firebase/firestore"
+import { IUser } from '../../data/Interfaces';
+import { User } from '../../data/User';
 
 export const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const db = new Database()
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -18,10 +23,11 @@ export const LoginScreen = ({navigation}) => {
   }, [])
 
   const handleSignUp = () => {
-    
+
       createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
+      .then(async userCredentials => {
         const user = userCredentials.user;
+        db.addUser(new User(user.uid, 0))
       })
       .catch(error => alert(error.message))
   }
