@@ -1,108 +1,211 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, Firestore, getDoc, query, DocumentData, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore/lite';
-import { Pin, Location, PinDetails } from "./Pin"
-import { IDatabase, IPin, ILocation, IDatabaseActionResult, IPinDetails, IPinResult } from "./Interfaces"
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore } from 'firebase/firestore/lite';
+import { Pin, PinDetails, coordinateToString, coordinateFromString } from "./Pin"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
+import { pinConverter, pinDetailsConverter } from "./DataConverters";
+import { LatLng } from "react-native-maps";
 
-const pinDetailsConverter = {
-    toFirestore: (details: IPinDetails) => {
-        return {
-            slacklineLength: details.slacklineLength,
-            slacklineType: details.slacklineType,
-            description: details.description
-        };
-    },
-    fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-        const data = snapshot.data();
-        return new PinDetails(data.description, data.slacklineLength, data.slacklineType);
+
+class Database implements IDatabase {
+    database: Firestore;
+
+    constructor() {
+        this.database = getFirestore(firebaseApp);
     }
-}
 
-// Firestore location data converter
-const pinLocationConverter = {
-    toFirestore: (location: ILocation) => {
-        return {
-            latitude: location.latitude,
-            longitude: location.longitude
-        };
-    },
-    fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-        const data = snapshot.data();
-        return new Location(data.latitude, data.longitude);
-    }
-}
+    // Adds a pin to the database
+    async addPin(pin: IPin): Promise<IDatabaseActionResult> {
+        const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
 
-// to convert the location string from the database back into a location object
-function getLocationFromString(locationString: string): ILocation {
-
-    const splitLocation: string[] = locationString.split(",", 2);
-
-    return new Location(Number(splitLocation[0]), Number(splitLocation[1]));
-}
-
-const database = getFirestore(firebaseApp);
-
-// Adds a pin to the database
-async function addPin (pin: IPin) {
-    const pinRef = doc(database, "pins", pin.location.toString());
-
-    const pinDocSnap = await getDoc(pinRef);
+        try {
+        const pinDocSnap = await getDoc(pinRef);
 
         if (pinDocSnap.exists()) {
-            console.log("could not place pin at location: " + pin.location + ". Because pin already exists");
-            return
+            throw new Error(`Pin already exists.`);
         }
-        
-    await setDoc(pinRef, (Object.assign({}, pin.details)));
-}
 
-// Edit pin at location
-async function editPin (location: ILocation, details: PinDetails) {
-    const pinRef = doc(database, "pins", location.toString());
+        await setDoc(pinRef, pinConverter.toFirestore(pin));
+        } catch (error) {
+        return new DatabaseActionResult(
+          false,
+          `Failed: could not place pin at coordinate: ${coordinateToString(
+            pin.coordinate
+          )}. ${error}`
+        );
+        }
 
-    const pinDocSnap = await getDoc(pinRef);
-
-    if (!pinDocSnap.exists()) {
-        console.log("could not edit pin at location: " + location + ". Because pin does not exist");
-        return
+        return new DatabaseActionResult(
+          true,
+          `Succeeded: pin added at ${coordinateToString(pin.coordinate)}`
+        );
     }
 
-    await setDoc(pinRef, (Object.assign({}, details), { merge: true}));
-}
+    // Edits pin details at coordinate
+    async editPinDetails(coordinate: LatLng,details: PinDetails): Promise<IDatabaseActionResult> {
+        try {
+        const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+        const pinDocSnap = await getDoc(pinRef);
 
-// deletes pin at given location
-async function removePin (location: Location) {
-    await deleteDoc(doc(database, "pins", location.toString()));
-}
+        if (!pinDocSnap.exists()) {
+            throw new Error(`Pin could not be found.`);
+        }
 
-// Get a Location[] of all pins from the database
-// Use getPinByLocation to get the details of the given pin
-async function getAllPinLocations () {
-    const pinsCollection = collection(database, 'pins');
+        await updateDoc(pinRef, { details: pinDetailsConverter.toFirestore(details) });
+        } catch (error) {
+        return new DatabaseActionResult(
+          false,
+          `Failed: could not edit pin at coordinate ${coordinateToString(coordinate)}. ${error}`);
+        }
 
-    const pinSnapshot = await getDocs(pinsCollection)
-
-    const pinsList = pinSnapshot.docs.map(doc => doc.id);
-    const pinLocationsList: Location[] = [];
-
-    pinsList.forEach(pin => {
-        pinLocationsList.push(getLocationFromString(pin));
-    });
-    
-    return pinLocationsList;
-}
-
-// Get the pin at a given location
-async function getPinByLocation (location: Location) {
-    const pinRef = doc(database, "pins", location.toString()).withConverter(pinDetailsConverter);
-
-    const pinSnap = await getDoc(pinRef);
-    const data = pinSnap.data();
-
-    if (data != undefined) {
-        return new Pin(location, new PinDetails(data.description, data.slacklineLength, data.slacklineType));
+        return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
     }
 
-    console.log("could not find data at location: " + location.toString());
+    // Deletes pin at given coordinate
+    async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
+        try {
+            const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+            const pinDocSnap = await getDoc(pinRef);
+
+            if (!pinDocSnap.exists()) {
+                throw new Error(`Pin could not be found.`);
+            }
+            await deleteDoc(pinRef);
+
+        } catch (error) {
+
+        return new DatabaseActionResult(false, `Failed: could not delete pin at coordinate ${coordinateToString(coordinate)}. ${error}`);
+
+        }
+
+        return new DatabaseActionResult(
+        true,
+        `Succeeded: pin deleted at: ${coordinateToString(coordinate)}`
+        );
+    }
+
+    // Get the pin at a given coordinate
+    async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
+        try {
+        const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+
+        const pinDocSnap = await getDoc(pinRef);
+
+        if (!pinDocSnap.exists()) {
+            throw new Error(`Pin could not be found`);
+        }
+
+        const pin = pinConverter.fromFirestore(pinDocSnap);
+
+        return new PinActionResult<IPin>(
+          new DatabaseActionResult(
+            true,
+            `Succeeded: pin retrieved from ${coordinateToString(coordinate)}`
+          ),
+          pin
+        );
+        } catch (error) {
+        return new PinActionResult<IPin>(
+            new DatabaseActionResult(
+            false,
+            `Failed: pin could not be retrieved from ${coordinateToString(coordinate)}. ${error}`
+            ),
+            undefined
+        );
+        }
+    }
+
+  // Get a pin[] of all pins from the database
+  async getAllPins(): Promise<IPinActionResult<IPin[]>> {
+    try {
+      const pinsCollection = collection(this.database, "pins").withConverter(
+        pinConverter
+      );
+
+      const pinSnapshot = await getDocs(pinsCollection);
+
+      const pinsList: Pin[] = [];
+
+      // converts each document into a pin object
+      pinSnapshot.forEach((pin) => {
+        pinsList.push(pin.data());
+      });
+
+      return new PinActionResult<IPin[]>(
+        new DatabaseActionResult(
+          true,
+          `Succeeded: pins retrieved`
+        ),
+        pinsList
+      );
+    } catch (error) {
+      return new PinActionResult<IPin[]>(
+        new DatabaseActionResult(
+          false,
+          `Failed: pins could not be retrieved. ${error}`
+        ),
+        undefined
+      );
+    }
+  }
+
+  // Get a coordinate[] of all pins from the database without retreiving details
+  // Use getPin to get a specific pin
+  async getAllPinCoordinates(): Promise<IPinActionResult<LatLng[]>> {
+    try {
+      const pinsCollection = collection(this.database, "pins");
+
+      const pinSnapshot = await getDocs(pinsCollection);
+
+      const pinsList = pinSnapshot.docs.map((doc) => doc.id);
+
+      const pinCoordinatesList: LatLng[] = [];
+
+      pinsList.forEach((pin) => {
+        pinCoordinatesList.push(coordinateFromString(pin));
+      });
+
+      return new PinActionResult<LatLng[]>(
+        new DatabaseActionResult(
+          true,
+          `Succeeded: pin coordinates retrieved.`
+        ),
+        pinCoordinatesList
+      );
+    } catch (error) {
+      return new PinActionResult<LatLng[]>(
+        new DatabaseActionResult(
+          false,
+          `Failed: pin coordinates could not be retrieved. ${error}`
+        ),
+        undefined
+      );
+    }
+  }
 }
 
-export { addPin, getAllPinLocations, getPinByLocation, removePin, editPin }
+// action result implementations
+
+class DatabaseActionResult implements IDatabaseActionResult {
+    readonly succeeded: boolean;
+    readonly message: string;
+
+    constructor(succeeded: boolean, message: string) {
+        this.succeeded = succeeded;
+        this.message = message;
+    }
+}
+
+class PinActionResult<T> implements IPinActionResult<T> {
+    succeeded: boolean;
+    message: string;
+    data?: T;
+
+    constructor(result: IDatabaseActionResult, data?: T) {
+        this.succeeded = result.succeeded;
+        this.message = result.message;
+        this.data = data;
+    }
+}
+
+ export { Database };
+

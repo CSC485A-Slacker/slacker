@@ -7,27 +7,38 @@ import {
 } from "react-native";
 import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
-import { Pin, updatePin } from "../../redux/PinSlice";
+import { updatePin } from "../../redux/PinSlice";
+import { Pin } from "../../data/Pin";
 
 export const AddPinScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { newPin } = route.params;
 
   const [name, onChangeName] = useState("");
-  const [type, onChangeType] = useState("");
   const [description, onChangeDescription] = useState("");
-  const [length, onChangeLength] = useState("");
+  const [slacklineLength, onChangeLength] = useState("");
+  const [slacklineType, onChangeType] = useState("");
+
 
   const onConfirmPress = () => {
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
-      draggable: false,
+      details: {
+        draggable: false,
       color: "red",
-      title: name,
-      description: description,
-      type: type,
-      length: parseInt(length),
+        title: name,
+        description: description,
+        slacklineType: slacklineType,
+        slacklineLength: parseInt(slacklineLength),
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
+      }
     };
     dispatch(updatePin(confirmPin));
     navigation.navigate({
@@ -60,14 +71,14 @@ export const AddPinScreen = ({ route, navigation }) => {
         <Input
           style={styles.input}
           placeholder="Slackline Type"
-          onChangeText={(type) => onChangeType(type)}
-          value={type}
+          onChangeText={(slacklineType) => onChangeType(slacklineType)}
+          value={slacklineType}
         />
         <Input
           style={styles.input}
           placeholder="Distance (m)"
-          onChangeText={(length) => onChangeLength(length)}
-          value={length}
+          onChangeText={(slacklineLength) => onChangeLength(slacklineLength)}
+          value={slacklineLength}
           keyboardType="number-pad"
         />
         <FAB

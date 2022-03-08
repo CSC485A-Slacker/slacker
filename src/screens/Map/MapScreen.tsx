@@ -8,11 +8,11 @@ import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
-  Pin,
   removePin,
 } from "../../redux/PinSlice";
 import Cards from "../../components/DetailsSheet";
 import BottomDrawer from "react-native-bottom-drawer-view";
+import { Pin } from "../../data/Pin";
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -25,12 +25,21 @@ let newPin: Pin = {
     latitude: regionLatitude,
     longitude: regionLongitude,
   },
-  color: "blue",
-  draggable: true,
-  title: "",
-  length: 0,
-  type: "",
-  description: "",
+  details: {
+    title: "",
+    description: "",
+    slacklineLength: 0,
+    slacklineType: "",
+    color: "blue",
+    draggable: true,
+  },
+  reviews: [],
+  photos: [],
+  activity: {
+    checkIn: false,
+    activeUsers: 0,
+    totalUsers:  0,
+  }
 };
 
 export const MapScreen = ({ route, navigation }) => {
@@ -67,12 +76,21 @@ export const MapScreen = ({ route, navigation }) => {
         latitude: regionLatitude,
         longitude: regionLongitude,
       },
-      color: "blue",
-      draggable: true,
-      title: "",
-      length: 0,
-      type: "",
-      description: "",
+      details: {
+        color: "blue",
+        draggable: true,
+        title: "",
+        description: "",
+        slacklineLength: 0,
+        slacklineType: "",
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
+       }
     };
     dispatch(addPin(newPin));
     setAddPinVisible(false);
@@ -131,8 +149,8 @@ export const MapScreen = ({ route, navigation }) => {
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
-            pinColor={pin.color}
-            draggable={pin.draggable}
+            pinColor={pin.details.color}
+            draggable={pin.details.draggable}
             onPress={(e) => {
               if (
                 e.nativeEvent.action === "marker-inside-overlay-press" ||
@@ -144,7 +162,18 @@ export const MapScreen = ({ route, navigation }) => {
               console.log("Pin Pressed");
               handlePinPress(pin);
             }}
-          ></Marker>
+          >
+            {pin.details.title ? (
+              <Callout style={styles.callout}>
+                <View>
+                  <Text style={styles.title}>{pin.details.title}</Text>
+                  <Text style={styles.description}>{pin.details.description}</Text>
+                  <Text>{pin.details.slacklineType}</Text>
+                  <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
+                </View>
+              </Callout>
+            ) : null}
+          </Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
@@ -168,7 +197,6 @@ export const MapScreen = ({ route, navigation }) => {
       ) : null}
       {addPinVisible ? (
         <FAB
-          visible={addPinVisible}
           icon={{ name: "add", color: "white" }}
           color="#219f94"
           onPress={handleAddPin}

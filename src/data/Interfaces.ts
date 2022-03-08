@@ -1,63 +1,115 @@
-import { addPin } from "./Database"
-import { GeoPoint } from 'firebase/firestore/lite';
-import { Pin } from "./Pin";
+import { LatLng } from "react-native-maps";
 
 interface IPin {
-    readonly location: ILocation;
-    details: IPinDetails;
-}
-
-interface ILocation {
-    readonly latitude: number;
-    readonly longitude: number;
-
-    isEqual(other: ILocation): boolean;
-
-    // used to search the database by location
-    toString (): string;
+  key: number;
+  readonly coordinate: LatLng;
+  details: IPinDetails;
+  reviews: IPinReview[];
+  photos: IPinPhoto[];
+  activity: IPinActivity;
 }
 
 interface IPinDetails {
-    description: string;
-    slacklineLength: number;
-    slacklineType: string;
+  title: string;
+  description: string;
+  slacklineLength: number;
+  slacklineType: string;
+  color: string;
+  draggable: boolean;
+}
+
+interface IPinReview {
+  comment: string;
+  rating: number;
+  date: Date;
+}
+
+interface IPinPhoto {
+  url: string;
+  date: Date;
+}
+
+interface IPinActivity {
+  checkIn: boolean;
+  activeUsers: number;
+  totalUsers: number;
 }
 
 interface IDatabase {
-    // attempts to add a pin at a given location.
-    // returns an IDatabaseAction result.
-    // will fail if a pin already exists
-    addPin(pin: IPin): IDatabaseActionResult;
+  /* Purpose: attempts to add a pin to the database.
+   *          Will fail if a pin exists with the same coordinate.
+   *
+   * Return: an IDatabaseActionResult where success==true if the pin was
+   *         was added at coordinate.
+   */
+  addPin(pin: IPin): Promise<IDatabaseActionResult>;
 
-    // attempts to edit a pin at a given location, replacing existing details with provided details.
-    // returns an IDatabaseAction result.
-    // will fail if no pin exists
-    editPin(pin: IPin, details: IPinDetails): IDatabaseActionResult;
+  /* Purpose: attempts to edit a pin at the given coordinate, replacing existing details with provided details.
+   *          Will fail if no pin is found at coordinate.
+   *
+   * Return: an IDatabaseActionResult where success==true if the pin at coordinate was deleted
+   *         or success==false otherwise
+   */
+  editPinDetails(
+    coordinate: LatLng,
+    details: IPinDetails
+  ): Promise<IDatabaseActionResult>;
 
-    // attempts to remove the pin at a given location.
-    // returns an IDatabaseAction result.
-    removePin(location: ILocation): Promise<IDatabaseActionResult>;
+  /* Purpose: attempts to delete a pin at the given coordinate.
+   *          Will fail if no pin is found at coordinate.
+   *
+   * Return: an IDatabaseActionResult where success==true if the pin at coordinate was deleted
+   *        or false otherwise
+   */
+  deletePin(coordinate: LatLng): Promise<IDatabaseActionResult>;
 
-    // returns a list of all pins
-    getAllPins(): IPin[];
+  /* Purpose: attempts to get a pin from the given coordinate.
+   *          Will fail if no pin is found at coordinate.
+   *
+   * Return: an IPinActionResult<IPin> that will contain an IPin on success (undefined on failure)
+   */
+  getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>>;
 
-    // returns a pin by its location
-    getPin(location: ILocation): Promise<IPinResult>;
+  /* Purpose: attempts to get an array of all pins from the database.
+   *
+   * Return: an IPinActionResult<IPin[]> that will contain an IPin[] on success (undefined on failure)
+   */
+  getAllPins(): Promise<IPinActionResult<IPin[]>>;
 
+  /* Purpose: attempts to get an array of all pin coordinates (LatLng) from the database.
+   *
+   * Return: an IPinActionResult<LatLng[]> that will contain a LatLng[] on success (undefined on failure)
+   */
+  getAllPinCoordinates(): Promise<IPinActionResult<LatLng[]>>;
 }
 
-// succeeded returns true if the action was complete, false otherwise
-// message contains information about the result (such as why an action failed)
+/*
+ * Purpose: used as a return value for database access functions to provide info about the result
+ *
+ * succeeded: true if action completed without error, false otherwise
+ * message: Error message
+ */
 interface IDatabaseActionResult {
-    succeeded: boolean;
-    message: string;
+  succeeded: boolean;
+  message: string;
 }
 
-// returns the result of attemping to get a pin
-// returns the pin on success, or an empty pin on failure
-interface IPinResult {
-    result: IDatabaseActionResult,
-    pin: IPin;
+/*
+ * Purpose: contains IDatabaseActionResult info (succeeded and message)
+ *
+ * data: contains data of specified type if succeeded, otherwise undefined
+ */
+interface IPinActionResult<T> extends IDatabaseActionResult {
+  data?: T;
 }
 
-export { IPin, ILocation, IPinDetails, IPinResult, IDatabase, IDatabaseActionResult }
+export {
+  IPin,
+  IPinDetails,
+  IPinReview,
+  IPinPhoto,
+  IPinActivity,
+  IPinActionResult,
+  IDatabase,
+  IDatabaseActionResult,
+};
