@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { updatePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
+import { pinConverter } from "../../data/DataConverters";
 
 const database = new Database();
 
@@ -23,7 +24,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const [slacklineType, onChangeType] = useState("");
 
 
-  const onConfirmPress = () => {
+  const onConfirmPress = async () => {
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
@@ -50,11 +51,12 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         confirmedPin: true,
       },
     });
-
     try {
-        database.addPin(newPin);
-    } catch(error) {
-        console.log(`error adding pin: ${error}`);
+      console.log(confirmPin)
+      const resp = await database.addPin(pinConverter.toFirestore(confirmPin));
+      console.log(resp)
+    } catch (err) {
+      console.log(err)
     }
   };
 
