@@ -130,7 +130,9 @@ useEffect( () => {
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
   };
-
+//   pins.forEach((pin) =>{
+// jVl
+//   })
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -145,6 +147,7 @@ useEffect( () => {
         provider={"google"}
       >
         {pins.map((pin) => (
+          
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
