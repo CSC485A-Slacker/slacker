@@ -9,6 +9,9 @@ import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { updatePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
+import { Database } from "../../data/Database";
+
+const database = new Database();
 
 export const PinDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -47,6 +50,12 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         confirmedPin: true,
       },
     });
+
+    try {
+        database.addPin(newPin);
+    } catch(error) {
+        console.log(`error adding pin: ${error}`);
+    }
   };
 
   return (

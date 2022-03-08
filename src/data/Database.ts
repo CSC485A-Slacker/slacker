@@ -13,6 +13,7 @@ import {
   updatePin,
 } from "../redux/PinSlice";
 import { createContext } from "react";
+import { store } from "../redux/Store"
 
 class Database implements IDatabase {
     database: Firestore;
@@ -26,13 +27,13 @@ class Database implements IDatabase {
         const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
 
         try {
-        const pinDocSnap = await getDoc(pinRef);
+            const pinDocSnap = await getDoc(pinRef);
 
-        if (pinDocSnap.exists()) {
-            throw new Error(`Pin already exists.`);
-        }
+            if (pinDocSnap.exists()) {
+                throw new Error(`Pin already exists.`);
+            }
 
-        await setDoc(pinRef, pinConverter.toFirestore(pin));
+            await setDoc(pinRef, pinConverter.toFirestore(pin));
         } catch (error) {
         return new DatabaseActionResult(
           false,
@@ -189,33 +190,34 @@ class Database implements IDatabase {
       );
     }
   }
-}
 
 // creates a listener for changes to the db
 // should update the state of the store dependent on changes
 // returns a subscriber that can be called to unsubcribe from changes
 // https://firebase.google.com/docs/firestore/query-data/listen
-const monitorDatabaseChanges = (database: Database) => {
-    const dispatch = useDispatch();
-    const pinsCollection = collection(database.database, "pins");
+ async monitorDatabaseChanges() {
+    const pinsCollection = collection(this.database, "pins");
+    const pinSnapshot = await getDocs(pinsCollection);
     const q = query(pinsCollection);
 
-    return onSnapshot(q, (snapshot) => {
+    return onSnapshot(pinsCollection, (snapshot) => {
 
         snapshot.docChanges().forEach((change) => {
             const pin = pinConverter.fromFirestore(change.doc); 
-            
+            console.log(`change: ${change}`);
             if(change.type === "added") {
-                dispatch(addPin(pin));
+                store.dispatch(addPin(pin));
             }
             else if(change.type === "modified") {
-                dispatch(updatePin(pin));
+                store.dispatch(updatePin(pin));
             } else if(change.type === "removed") {
-                dispatch(removePin(pin));
+                store.dispatch(removePin(pin));
             }
         })
     })
 }
+}
+
 
 // action result implementations
 
@@ -241,5 +243,5 @@ class PinActionResult<T> implements IPinActionResult<T> {
     }
 }
 
- export { Database, monitorDatabaseChanges };
+ export { Database };
 

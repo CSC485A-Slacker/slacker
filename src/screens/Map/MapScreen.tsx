@@ -4,13 +4,20 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { FAB, Text } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/Store";
+import { RootState, store } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
   removePin,
+  updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
+import { Database} from "../../data/Database";
+import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
+import { firebaseApp } from "../../config/FirebaseConfig";
+import { pinConverter } from "../../data/DataConverters";
+
+const database = new Database();
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -46,6 +53,28 @@ export const MapScreen = ({ route, navigation }) => {
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+
+  const db = getFirestore(firebaseApp);
+  const q = query(collection(db, "pins"))
+
+useEffect( () => { 
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+        
+      const pin = pinConverter.fromFirestore(change.doc)
+        console.log(`PIN KEY: ${pin.key}`)
+        console.log(`change: ${change}`);
+            if(change.type === "added") {
+                dispatch(addPin(pin));
+            }
+            else if(change.type === "modified") {
+                dispatch(updatePin(pin));
+            } else if(change.type === "removed") {
+                dispatch(removePin(pin));
+            }
+    });
+  }); }, [] )
+  
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -85,7 +114,7 @@ export const MapScreen = ({ route, navigation }) => {
         totalUsers:  0,
        }
     };
-    dispatch(addPin(newPin));
+    // dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
   };
