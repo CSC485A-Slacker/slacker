@@ -35,6 +35,10 @@ interface IPinActivity {
   totalUsers: number;
 }
 
+interface IPinsState {
+  pins: IPin[];
+}
+
 interface IDatabase {
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
@@ -110,6 +114,7 @@ export {
   IPinPhoto,
   IPinActivity,
   IPinActionResult,
+  IPinsState,
   IDatabase,
   IDatabaseActionResult,
 };

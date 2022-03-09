@@ -4,17 +4,31 @@ import { View, StyleSheet, Dimensions, Alert } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { FAB, Text, Chip } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/Store";
-import { addPin, generateRandomKey, removePin } from "../../redux/PinSlice";
-import PinInfoOverlay from "../../components/PinInfoOverlay";
-import BottomDrawer from "react-native-bottom-drawer-view";
+import { RootState, store } from "../../redux/Store";
+import {
+  addPin,
+  generateRandomKey,
+  removePin,
+  updatePin,
+} from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
+import { Database} from "../../data/Database";
+import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
+import { firebaseApp } from "../../config/FirebaseConfig";
+import { pinConverter } from "../../data/DataConverters";
+import PinInfoOverlay from "../../components/PinInfoOverlay";
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import BottomDrawer from "react-native-bottom-drawer-view";
 
+const database = new Database();
 
-// The middle point of the current map display
+// Keeps track of the middle point of the current map display
 let regionLatitude = 48.463708;
 let regionLongitude = -123.311406;
+
+// Keep track of the new pin lat and long
+let newPinLatitude = regionLatitude;
+let newPinLongitude = regionLongitude;
 
 // New pin to be modified
 let newPin: Pin = {
@@ -47,11 +61,28 @@ export const MapScreen = ({ route, navigation }) => {
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
   const [pinInfoVisible, setPinInfoVisible] = useState(false);
-  const [mapRegion, setMapRegion] = useState({
-    latitude: regionLatitude,
-    longitude: regionLongitude,
-  });
   const [selectedPin, setSelectedPin] = useState(pins[0]);
+
+  const db = getFirestore(firebaseApp);
+  const q = query(collection(db, "pins"))
+
+useEffect( () => { 
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+        
+      const pin = pinConverter.fromFirestore(change.doc)
+        //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
+            if(change.type === "added") {
+                dispatch(addPin(pin));
+            }
+            else if(change.type === "modified") {
+                dispatch(updatePin(pin));
+            } else if(change.type === "removed") {
+                dispatch(removePin(pin));
+            }
+    });
+  }); }, [] )
+  
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -63,9 +94,15 @@ export const MapScreen = ({ route, navigation }) => {
   });
 
   // Keeps track of the map region
-  const updateRegion = (e: LatLng) => {
+  const updateRegionCoordinates = (e: LatLng) => {
     regionLatitude = e.latitude;
     regionLongitude = e.longitude;
+  };
+
+  // Keeps track of the map region
+  const updateNewPinCoordinates = (e: LatLng) => {
+    newPinLatitude = e.latitude;
+    newPinLongitude = e.longitude;
   };
 
   const handleAddPin = () => {
@@ -91,14 +128,38 @@ export const MapScreen = ({ route, navigation }) => {
         totalUsers: 0,
       },
     };
+    newPinLatitude = regionLatitude;
+    newPinLongitude = regionLongitude;
     dispatch(addPin(newPin));
     setAddPinVisible(false);
     setConfirmCancelVisible(true);
   };
 
   const handleConfirmPress = () => {
+    const pinToAdd = {
+      key: newPin.key,
+      coordinate: {
+        latitude: newPinLatitude,
+        longitude: newPinLongitude,
+      },
+      details: {
+        color: "blue",
+        draggable: true,
+        title: "",
+        description: "",
+        slacklineLength: 0,
+        slacklineType: "",
+      },
+      reviews: [],
+      photos: [],
+      activity: {
+        checkIn: false,
+        activeUsers: 0,
+        totalUsers:  0,
+       }
+    };
     navigation.navigate("Spot Details", {
-      newPin: newPin,
+      newPin: pinToAdd,
     });
   };
 
@@ -110,18 +171,16 @@ export const MapScreen = ({ route, navigation }) => {
 
   const handlePinPress = (e, pin: Pin) => {
     // check first if pin is saved
-    e.stopPropagation();
-    setPinInfoVisible(true);
-    setSelectedPin((selectedPin) => ({
-      ...selectedPin,
-      ...pin,
-    }));
+    if (pin.details.title != "") {
+      e.stopPropagation();
+      setPinInfoVisible(true);
+      setSelectedPin((selectedPin) => ({
+        ...selectedPin,
+        ...pin,
+      }));
+    }
+    
   };
-
-  const updateMap = (e: LatLng) => {
-    setMapRegion(e);
-  };
-
 
   function onMapPress(): void {
     setPinInfoVisible(false);
@@ -137,18 +196,20 @@ export const MapScreen = ({ route, navigation }) => {
           longitude: regionLongitude,
           longitudeDelta: 0.1,
         }}
-        onRegionChangeComplete={(e) => updateRegion(e)}
+        onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
         showsPointsOfInterest={false}
-        onMarkerPress={(e) => updateMap(e.nativeEvent.coordinate)}
+        onMarkerPress={(e) => updateRegionCoordinates(e)}
         onPress={onMapPress}
       >
         {pins.map((pin) => (
+          
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
             draggable={pin.details.draggable}
+            onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
             onPress={(e) => {
               if (
                 e.nativeEvent.action === "marker-inside-overlay-press" ||
@@ -160,7 +221,8 @@ export const MapScreen = ({ route, navigation }) => {
               console.log("Pin Pressed");
               handlePinPress(e, pin);
             }}
-          ></Marker>
+          >
+          </Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (

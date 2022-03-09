@@ -29,9 +29,9 @@ Please note that we are **not** tracking users' GPS location, instead, the user 
 
 ## Milestone 1: Map Dashboard (⚠ Due Feb 18, 2022)
 This milestone will entail only the most basic functionality of the app to be considered semi-usable. To that end, we will have implemented the following features:
-- [ ] Users can view the map
-- [ ] Users can see any pins that others have placed
-- [ ] Users can place down their own pin, specifying only the most essential and basic information (short description, length & type of slackline)
+- [x] Users can view the map
+- [x] Users can see any pins that others have placed
+- [x] Users can place down their own pin, specifying only the most essential and basic information (short description, length & type of slackline)
 
 ## Milestone 2: Hotspots (⚠ Due Mar 11, 2022)
 By this point the team will have a more solid grasp of our tech stack and will be able to work more quickly, so more interesting features will be present.

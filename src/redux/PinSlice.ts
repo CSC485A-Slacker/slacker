@@ -57,7 +57,7 @@ export interface PinsState {
 }
 
 const initialState: PinsState = {
-  pins: [examplePin1, examplePin2],
+  pins: [],
 };
 
 export const pinSlice = createSlice({

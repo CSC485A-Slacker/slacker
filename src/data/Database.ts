@@ -1,10 +1,19 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query, QuerySnapshot } from 'firebase/firestore/lite';
 import { Pin, PinDetails, coordinateToString, coordinateFromString } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IPinsState } from "./Interfaces"
 import { pinConverter, pinDetailsConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
-
+import { onSnapshot, Unsubscribe } from "@firebase/firestore";
+import { useDispatch } from "react-redux";
+import {
+  addPin,
+  PinsState,
+  removePin,
+  updatePin,
+} from "../redux/PinSlice";
+import { createContext } from "react";
+import { store } from "../redux/Store"
 
 class Database implements IDatabase {
     database: Firestore;
@@ -18,13 +27,13 @@ class Database implements IDatabase {
         const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
 
         try {
-        const pinDocSnap = await getDoc(pinRef);
+            const pinDocSnap = await getDoc(pinRef);
 
-        if (pinDocSnap.exists()) {
-            throw new Error(`Pin already exists.`);
-        }
+            if (pinDocSnap.exists()) {
+                throw new Error(`Pin already exists.`);
+            }
 
-        await setDoc(pinRef, pinConverter.toFirestore(pin));
+            await setDoc(pinRef, pinConverter.toFirestore(pin));
         } catch (error) {
         return new DatabaseActionResult(
           false,
@@ -181,7 +190,34 @@ class Database implements IDatabase {
       );
     }
   }
+
+// creates a listener for changes to the db
+// should update the state of the store dependent on changes
+// returns a subscriber that can be called to unsubcribe from changes
+// https://firebase.google.com/docs/firestore/query-data/listen
+ async monitorDatabaseChanges() {
+    const pinsCollection = collection(this.database, "pins");
+    const pinSnapshot = await getDocs(pinsCollection);
+    const q = query(pinsCollection);
+
+    return onSnapshot(pinsCollection, (snapshot) => {
+
+        snapshot.docChanges().forEach((change) => {
+            const pin = pinConverter.fromFirestore(change.doc); 
+            console.log(`change: ${change}`);
+            if(change.type === "added") {
+                store.dispatch(addPin(pin));
+            }
+            else if(change.type === "modified") {
+                store.dispatch(updatePin(pin));
+            } else if(change.type === "removed") {
+                store.dispatch(removePin(pin));
+            }
+        })
+    })
 }
+}
+
 
 // action result implementations
 
