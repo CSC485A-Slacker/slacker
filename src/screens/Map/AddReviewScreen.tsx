@@ -10,6 +10,10 @@ import { useDispatch } from "react-redux";
 import { Pin, updatePin } from "../../redux/PinSlice";
 import { AirbnbRating } from 'react-native-ratings';
 import { PinReview } from "../../data/Pin";
+import { Database } from "../../data/Database";
+import { pinConverter } from "../../data/DataConverters";
+
+const database = new Database();
 
 export const AddReviewScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -18,24 +22,19 @@ export const AddReviewScreen = ({ route, navigation }) => {
   const [comment, setComment] = useState("");
   
 
-  const onSubmitPress = () => {
-    const newReview = new PinReview(comment, rating, new Date )
-     const confirmPin: Pin = {
-      key: pin.key,
-      coordinate: pin.coordinate,
-      details: pin.details,
-      reviews: pin.reviews.push(newReview),
-      photos: [],
-      activity: {
-        checkIn: false,
-        activeUsers: 0,
-        totalUsers: 0,
-      },
-     };
-    dispatch(updatePin(confirmPin));
+  const onSubmitPress = async () => {
+    pin.reviews.push(new PinReview(comment, rating, new Date ))
+    dispatch(updatePin(pin));
     navigation.navigate({
       name: "Map"
     });
+    try {
+      const resp = await database.editPinReviews(pin.coordinate, pin.reviews);
+      console.log(resp);
+      
+    } catch(error) {
+        console.log(`Error updating pin when trying to save new review: ${error}`);
+    }
   };
 
   const ratingCompleted = (rating: number) => {

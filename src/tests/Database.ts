@@ -229,6 +229,52 @@ async function TestEditPinDetails() {
   totalCount++;
 }
 
+async function TestEditPinReviews() {
+  console.log("Test edit pin reviews\n");
+
+  await database.deletePin(pin1.coordinate);
+  await database.deletePin(pin2.coordinate);
+  await database.addPin(pin1);
+
+  console.log("edit existing pin reviews");
+
+  var existingResult = await database.getPin(pin1.coordinate);
+  var existingPin = existingResult.data;
+
+  console.log(`pin before edit:\n${existingPin}`);
+
+  pin1.reviews.push(new PinReview("Pretty decent spot", 4, new Date))
+
+  var result = await database.editPinReviews(
+    pin1.coordinate, pin1.reviews
+  );
+
+  existingResult = await database.getPin(pin1.coordinate);
+  existingPin = existingResult.data;
+
+  console.log(`pin after edit:\n${existingPin}`);
+
+  var passed = result.succeeded == true;
+  console.log(`Passed: ${passed}. ${result.message}`);
+  console.log("\n");
+
+  if (passed) passedCount++;
+  totalCount++;
+
+  // console.log("edit non-existent pin");
+  // result = await database.editPinDetails(
+  //   pin2.coordinate,
+  //   new PinDetails("edit", "edited description", 420, "edited slackline type", "red", false)
+  // );
+  // passed = result.succeeded == false;
+  // console.log(`Passed: ${passed}. ${result.message}`);
+  // console.log("\n");
+
+  // if (passed) passedCount++;
+  // totalCount++;
+}
+
+
 async function TestAll() {
   console.log("TEST ALL");
 
@@ -241,6 +287,7 @@ async function TestAll() {
   await TestGetAllPins();
   await TestGetAllPinCoordinates();
   await TestEditPinDetails();
+  await TestEditPinReviews()
 
   console.log(`PASSED: ${passedCount}/${totalCount}`);
 }
@@ -252,5 +299,6 @@ export {
   TestGetAllPins,
   TestGetAllPinCoordinates,
   TestEditPinDetails,
+  TestEditPinReviews,
   TestAll,
 };

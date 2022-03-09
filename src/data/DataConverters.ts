@@ -158,4 +158,4 @@ const pinConverter = {
   },
 };
 
-export { pinConverter, pinCoordinateConverter, pinDetailsConverter };
+export { pinConverter, pinCoordinateConverter, pinDetailsConverter, pinReviewsConverter };
