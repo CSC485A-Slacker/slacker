@@ -40,6 +40,14 @@ const pinDetailsConverter = {
   },
 };
 
+//Firebase stores time as timestamp while here is it date
+// a quick function to convert between the two, need to update date object in future
+function timestampToDateConverter(timestamp) {
+  const time = "" + timestamp.seconds + (timestamp.nanoseconds / 1000000)
+  return new Date(parseInt(time))
+
+}
+
 const pinReviewConverter = {
   toFirestore: (review: IPinReview) => {
     return {
@@ -54,10 +62,12 @@ const pinReviewConverter = {
       review.key,
       review.comment,
       review.rating,
-      review.date
+      timestampToDateConverter(review.date)
     );
   },
 };
+
+
 
 // TODO: implement generic array converter
 const pinReviewsConverter = {
@@ -74,7 +84,7 @@ const pinReviewsConverter = {
         const reviews = snapshot.get("reviews");
 
         const reviewsList: PinReview[] = [];
-        reviews.forEach((review: any) => {
+      reviews.forEach((review: any) => {
         reviewsList.push(pinReviewConverter.fromFirestore(review))
         })
 

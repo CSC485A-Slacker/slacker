@@ -41,15 +41,11 @@ interface IPinsState {
   pins: IPin[];
 }
 
-<<<<<<< HEAD
-// TO DO: ADDD THE EDIT REVIEWS TO HERE THANKS
-=======
 interface IUser {
   _userID: string,
   _checkInSpot: number,
 }
-
->>>>>>> 6ede3b8a8d6507c622c4ae0dfc7e273aef2e40cb
+// TO DO: ADDD THE EDIT REVIEWS TO HERE THANKS
 interface IDatabase {
   addUser(user: IUser): void;
 

@@ -31,7 +31,7 @@ export const AddReviewScreen = ({ route, navigation }) => {
       name: "Map"
     });
     try {
-      const resp = await database.editPinReviews(pin.coordinate, pin.reviews);
+      const resp = await await database.editPinReviews(pin.coordinate, pin.reviews);
       console.log(resp);
       
     } catch(error) {
@@ -62,7 +62,7 @@ export const AddReviewScreen = ({ route, navigation }) => {
             <AirbnbRating
           count={5}
           reviews={[]}
-          defaultRating={3}
+          defaultRating={rating}
           size={20}
           onFinishRating={ratingCompleted}
 

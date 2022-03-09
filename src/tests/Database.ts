@@ -261,6 +261,31 @@ async function TestEditPinReviews() {
   if (passed) passedCount++;
   totalCount++;
 
+  console.log("add another existing pin reviews");
+
+  var existingResult = await database.getPin(pin1.coordinate);
+  var existingPin = existingResult.data;
+
+  console.log(`pin before edit:\n${existingPin}`);
+
+  pin1.reviews.push(new PinReview("key2","Horrible spot", 2, new Date))
+
+  var result = await database.editPinReviews(
+    pin1.coordinate, pin1.reviews
+  );
+
+  existingResult = await database.getPin(pin1.coordinate);
+  existingPin = existingResult.data;
+
+  console.log(`pin after edit:\n${existingPin}`);
+
+  var passed = result.succeeded == true;
+  console.log(`Passed: ${passed}. ${result.message}`);
+  console.log("\n");
+
+  if (passed) passedCount++;
+  totalCount++;
+
   console.log("edit non-existent pin");
 
   pin2.reviews.push(new PinReview("key2","Where are ya", 4, new Date))
@@ -290,7 +315,7 @@ async function TestAll() {
   await TestGetAllPins();
   await TestGetAllPinCoordinates();
   await TestEditPinDetails();
-  await TestEditPinReviews()
+  await TestEditPinReviews();
 
   console.log(`PASSED: ${passedCount}/${totalCount}`);
 }
