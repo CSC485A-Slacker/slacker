@@ -6,7 +6,6 @@ import { ProfileScreen } from "./screens/Profile/ProfileScreen";
 import { FriendsScreen } from "./screens/Friends/FriendsScreen";
 import { FavouritesScreen } from "./screens/Favourites/FavouritesScreen";
 import { CheckInScreen } from "./screens/Map/CheckInScreen";
-import { ReviewsScreen } from "./screens/Map/ReviewsScreen";
 import { AddReviewScreen } from "./screens/Map/AddReviewScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -20,7 +19,6 @@ function MapStackScreen() {
       <MapStack.Screen name="Map" component={MapScreen} />
       <MapStack.Screen name="Spot Details" component={AddPinScreen} />
       <MapStack.Screen name="Check In" component={CheckInScreen} />
-      <MapStack.Screen name="Reviews" component={ReviewsScreen} />
       <MapStack.Screen name="Add a Review" component={AddReviewScreen} />
     </MapStack.Navigator>
   );

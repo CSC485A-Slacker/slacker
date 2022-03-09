@@ -170,6 +170,7 @@ useEffect( () => {
   };
 
   const handlePinPress = (e, pin: Pin) => {
+    console.log(pin)
     // check first if pin is saved
     if (pin.details.title != "") {
       e.stopPropagation();
@@ -199,7 +200,7 @@ useEffect( () => {
         onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
         showsPointsOfInterest={false}
-        onMarkerPress={(e) => updateRegionCoordinates(e)}
+        onMarkerPress={(e) => updateRegionCoordinates(e.nativeEvent.coordinate)}
         onPress={onMapPress}
       >
         {pins.map((pin) => (
