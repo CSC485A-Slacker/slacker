@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import MapView, { LatLng } from "react-native-maps";
+import MapView, { CalloutSubview, LatLng } from "react-native-maps";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { FAB, Text } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, store } from "../../redux/Store";
+import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
@@ -16,6 +16,7 @@ import { Database} from "../../data/Database";
 import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
 import { firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
+import { Button } from "react-native-elements/dist/buttons/Button";
 
 const database = new Database();
 
@@ -61,7 +62,7 @@ export const MapScreen = ({ route, navigation }) => {
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"))
 
-useEffect( () => { 
+  useEffect( () => { 
     const unsubscribe = onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
         
@@ -163,6 +164,11 @@ useEffect( () => {
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
   };
+
+  const handleCheckIn = (pinId: number) => {
+    navigation.navigate("Check-In Details", {pinId})
+  }
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -186,12 +192,23 @@ useEffect( () => {
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
           >
             {pin.details.title ? (
-              <Callout style={styles.callout}>
+              <Callout style={styles.callout} tooltip={true}>
                 <View>
                   <Text style={styles.title}>{pin.details.title}</Text>
                   <Text style={styles.description}>{pin.details.description}</Text>
                   <Text>{pin.details.slacklineType}</Text>
                   <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
+                  <CalloutSubview onPress={() => handleCheckIn(pin.key)}>
+                    <Button 
+                      title="Check-In"
+                      icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
+                      iconRight
+                      iconContainerStyle={{ marginLeft: 10 }}
+                      titleStyle={{ fontWeight: '500', fontSize: 12 }}
+                      buttonStyle={{ backgroundColor: 'rgba(4, 147, 114, 1)', borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
+                      containerStyle={{ width: "auto", flex: 1, padding: 10 }}
+                    />
+                </CalloutSubview>
                 </View>
               </Callout>
             ) : null}
@@ -242,12 +259,21 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   callout: {
-    maxWidth: 200,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    maxWidth: 300,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    borderColor: "#000",
+    borderWidth: 1,
+    borderRadius: 25,
   },
   title: {
     fontSize: 20,
     color: "#219f94",
     paddingBottom: 2,
+    paddingTop: 2,
+    paddingHorizontal: 5,
   },
   text: {
     paddingBottom: 5,

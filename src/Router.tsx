@@ -6,6 +6,7 @@ import { ProfileScreen } from "./screens/Profile/ProfileScreen";
 import { FriendsScreen } from "./screens/Friends/FriendsScreen";
 import { FavouritesScreen } from "./screens/Favourites/FavouritesScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { CheckInDetailsScreen } from "./screens/Map/CheckInDetailsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -16,6 +17,7 @@ function MapStackScreen() {
     <MapStack.Navigator>
       <MapStack.Screen name="Map" component={MapScreen} />
       <MapStack.Screen name="Spot Details" component={PinDetailsScreen} />
+      <MapStack.Screen name="Check-In Details" component={CheckInDetailsScreen} />
     </MapStack.Navigator>
   );
 }
