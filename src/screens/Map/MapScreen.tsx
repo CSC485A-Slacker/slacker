@@ -5,14 +5,12 @@ import { Marker, Callout } from "react-native-maps";
 import { FAB, Text, Chip } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/Store";
-import {
-  addPin,
-  generateRandomKey,
-  removePin,
-} from "../../redux/PinSlice";
-import PinInfoCard from "../../components/PinInfoCard";
+import { addPin, generateRandomKey, removePin } from "../../redux/PinSlice";
+import PinInfoOverlay from "../../components/PinInfoOverlay";
 import BottomDrawer from "react-native-bottom-drawer-view";
 import { Pin } from "../../data/Pin";
+import SlidingUpPanel from 'rn-sliding-up-panel';
+
 
 // The middle point of the current map display
 let regionLatitude = 48.463708;
@@ -38,8 +36,8 @@ let newPin: Pin = {
   activity: {
     checkIn: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
 export const MapScreen = ({ route, navigation }) => {
@@ -51,9 +49,9 @@ export const MapScreen = ({ route, navigation }) => {
   const [pinInfoVisible, setPinInfoVisible] = useState(false);
   const [mapRegion, setMapRegion] = useState({
     latitude: regionLatitude,
-    longitude: regionLongitude
-  })
-  const [selectedPin, setSelectedPin] = useState(pins[0])
+    longitude: regionLongitude,
+  });
+  const [selectedPin, setSelectedPin] = useState(pins[0]);
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -90,8 +88,8 @@ export const MapScreen = ({ route, navigation }) => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     dispatch(addPin(newPin));
     setAddPinVisible(false);
@@ -110,18 +108,24 @@ export const MapScreen = ({ route, navigation }) => {
     setAddPinVisible(true);
   };
 
-  const handlePinPress = (pin: Pin) => {
+  const handlePinPress = (e, pin: Pin) => {
+    // check first if pin is saved
+    e.stopPropagation();
     setPinInfoVisible(true);
-    setSelectedPin(selectedPin => ({
+    setSelectedPin((selectedPin) => ({
       ...selectedPin,
-      ...pin
-    }))
-   console.log(selectedPin)
+      ...pin,
+    }));
   };
 
   const updateMap = (e: LatLng) => {
-    setMapRegion(e)
+    setMapRegion(e);
   };
+
+
+  function onMapPress(): void {
+    setPinInfoVisible(false);
+  }
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -137,6 +141,7 @@ export const MapScreen = ({ route, navigation }) => {
         provider={"google"}
         showsPointsOfInterest={false}
         onMarkerPress={(e) => updateMap(e.nativeEvent.coordinate)}
+        onPress={onMapPress}
       >
         {pins.map((pin) => (
           <Marker
@@ -153,20 +158,9 @@ export const MapScreen = ({ route, navigation }) => {
               }
 
               console.log("Pin Pressed");
-              handlePinPress(pin);
+              handlePinPress(e, pin);
             }}
-          >
-            {pin.details.title ? (
-              <Callout style={styles.callout}>
-                <View>
-                  <Text style={styles.title}>{pin.details.title}</Text>
-                  <Text style={styles.description}>{pin.details.description}</Text>
-                  <Text>{pin.details.slacklineType}</Text>
-                  <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
-                </View>
-              </Callout>
-            ) : null}
-          </Marker>
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
@@ -197,12 +191,10 @@ export const MapScreen = ({ route, navigation }) => {
         />
       ) : null}
       {pinInfoVisible ? (
-        <BottomDrawer containerHeight={300} offset={49}>
-          <PinInfoCard
-            pin={{ ...selectedPin }}
-            navigation={navigation}
-          ></PinInfoCard>
-        </BottomDrawer>
+        <PinInfoOverlay
+          pin={{ ...selectedPin }}
+          navigation={navigation}
+        ></PinInfoOverlay>
       ) : null}
     </View>
   );
@@ -217,9 +209,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   map: {
-    //width: Dimensions.get("window").width,
-    //height: Dimensions.get("window").height,
-    //zIndex: -1,
     ...StyleSheet.absoluteFillObject,
   },
   callout: {

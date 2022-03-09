@@ -21,7 +21,7 @@ function MapStackScreen() {
       <MapStack.Screen name="Spot Details" component={AddPinScreen} />
       <MapStack.Screen name="Check In" component={CheckInScreen} />
       <MapStack.Screen name="Reviews" component={ReviewsScreen} />
-      <MapStack.Screen name="Add a Review" component={AddReviewScreen } />
+      <MapStack.Screen name="Add a Review" component={AddReviewScreen} />
     </MapStack.Navigator>
   );
 }

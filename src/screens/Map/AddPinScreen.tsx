@@ -19,14 +19,13 @@ export const AddPinScreen = ({ route, navigation }) => {
   const [slacklineLength, onChangeLength] = useState("");
   const [slacklineType, onChangeType] = useState("");
 
-
   const onConfirmPress = () => {
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-      color: "red",
+        color: "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
@@ -37,8 +36,8 @@ export const AddPinScreen = ({ route, navigation }) => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-      }
+        totalUsers: 0,
+      },
     };
     dispatch(updatePin(confirmPin));
     navigation.navigate({
