@@ -19,6 +19,7 @@ interface IPinDetails {
 }
 
 interface IPinReview {
+  key: string;
   comment: string;
   rating: number;
   date: Date;
@@ -39,6 +40,7 @@ interface IPinsState {
   pins: IPin[];
 }
 
+// TO DO: ADDD THE EDIT REVIEWS TO HERE THANKS
 interface IDatabase {
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.

@@ -23,7 +23,9 @@ export const AddReviewScreen = ({ route, navigation }) => {
   
 
   const onSubmitPress = async () => {
-    pin.reviews.push(new PinReview(comment, rating, new Date ))
+    const date = new Date;
+    const key = comment + "-" + date.toUTCString()
+    pin.reviews.push(new PinReview(key, comment, rating, date))
     dispatch(updatePin(pin));
     navigation.navigate({
       name: "Map"

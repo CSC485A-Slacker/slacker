@@ -97,11 +97,13 @@ class PinDetails implements IPinDetails {
 }
 
 class PinReview implements IPinReview {
+  key: string;
   comment: string;
   rating: number;
   date: Date;
 
-  constructor(comment: string, rating: number, date: Date) {
+  constructor(key: string, comment: string, rating: number, date: Date) {
+    this.key = key
     this.comment = comment;
     this.rating = rating;
     this.date = date;
@@ -109,7 +111,9 @@ class PinReview implements IPinReview {
 
   toString(): string {
     return (
-      "comment: " +
+      "key: " +
+      this.key +
+      "\ncomment: " +
       this.comment +
       "\nrating: " +
       this.rating +

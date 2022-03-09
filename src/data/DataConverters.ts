@@ -43,6 +43,7 @@ const pinDetailsConverter = {
 const pinReviewConverter = {
   toFirestore: (review: IPinReview) => {
     return {
+      key: review.key,
       comment: review.comment,
       rating: review. rating,
       date: review.date
@@ -50,6 +51,7 @@ const pinReviewConverter = {
   },
   fromFirestore: (review: any) => {
     return new PinReview(
+      review.key,
       review.comment,
       review.rating,
       review.date
