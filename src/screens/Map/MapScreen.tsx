@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import MapView, { LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { Marker, Callout } from "react-native-maps";
-import { FAB, Text } from "react-native-elements";
+import { View, StyleSheet } from "react-native";
+import { Marker } from "react-native-maps";
+import { FAB } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, store } from "../../redux/Store";
+import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
@@ -12,10 +12,11 @@ import {
   updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
-import { Database} from "../../data/Database";
 import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
 import { auth, firebaseApp } from "../../config/FirebaseConfig";
+import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
+import PinInfoOverlay from "../../components/PinInfoOverlay";
 
 const database = new Database();
 
@@ -45,21 +46,29 @@ let newPin: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
-export const MapScreen = ({ route, navigation }) => {
+const defaultColor:string = "#219f94";
+const hotColor:string = "#D2042D";
+
+export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+  const [pinInfoVisible, setPinInfoVisible] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(pins[0]);
 
+  const [hotspotToggleVisible, setHotSpotToggleVisible] = useState(true);
+  const [hotspotToggleColor, setHotspotToggleColor] = useState(defaultColor);
   const db = getFirestore(firebaseApp);
-  const q = query(collection(db, "pins"))
+  const q = query(collection(db, "pins"));
+
 
   // navigate to login screen if user is not logged in
   useEffect( () => {
@@ -71,32 +80,39 @@ export const MapScreen = ({ route, navigation }) => {
     }
   }, [])
 
-useEffect( () => { 
+  useEffect(() => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        
-      const pin = pinConverter.fromFirestore(change.doc)
-        //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
-            if(change.type === "added") {
-                dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                dispatch(removePin(pin));
-            }
+      snapshot.docChanges().forEach((change) => {
+        const pin = pinConverter.fromFirestore(change.doc);
+        if (change.type === "added") {
+          dispatch(addPin(pin));
+        } else if (change.type === "modified") {
+          dispatch(updatePin(pin));
+        } else if (change.type === "removed") {
+          dispatch(removePin(pin));
+        }
+      });
     });
-  }); }, [] )
-  
+  }, []);
 
   // If pin was added, reset to original view
   useEffect(() => {
     if (route.params?.confirmedPin) {
       setAddPinVisible(true);
+      setHotSpotToggleVisible(true)
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
     }
   });
+
+  // change color of hotspot toggle button and show appropriate pins
+  // button is red -> only pins with people currently checked in
+  // button is aqua -> all pins
+  const handleHotspotToggle = () => {
+    let newColor:string = defaultColor;
+    if(hotspotToggleColor == defaultColor) newColor = hotColor;
+    setHotspotToggleColor(newColor);
+  }
 
   // Keeps track of the map region
   const updateRegionCoordinates = (e: LatLng) => {
@@ -128,15 +144,16 @@ useEffect( () => {
       reviews: [],
       photos: [],
       activity: {
-        checkIn: false,
+        shareableSlackline: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
     dispatch(addPin(newPin));
     setAddPinVisible(false);
+    setHotSpotToggleVisible(false);
     setConfirmCancelVisible(true);
   };
 
@@ -160,8 +177,8 @@ useEffect( () => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
@@ -172,7 +189,32 @@ useEffect( () => {
     dispatch(removePin(newPin));
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
+    setHotSpotToggleVisible(true);
   };
+
+  const handlePinPress = (e, pin: Pin) => {
+    if (pin.details.title != "") {
+      e.stopPropagation();
+      setHotSpotToggleVisible(false);
+      setAddPinVisible(false);
+      setPinInfoVisible(true);
+      setSelectedPin((selectedPin) => ({
+        ...selectedPin,
+        ...pin,
+      }));
+    }
+  };
+
+  const onMapPress = () => {
+    setPinInfoVisible(false);
+    setSelectedPin(null)
+    setHotSpotToggleVisible(true);
+    setAddPinVisible(true);
+  }
+
+  let pinsToRender = pins;
+  if (hotspotToggleColor == hotColor) pinsToRender = pins.filter(pin => pin.activity.activeUsers > 0);
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -185,55 +227,67 @@ useEffect( () => {
         }}
         onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
+        showsPointsOfInterest={false}
+        onMarkerPress={(e) => updateRegionCoordinates(e.nativeEvent.coordinate)}
+        onPress={onMapPress}
       >
-        {pins.map((pin) => (
-          
+        {pinsToRender.map((pin) => (
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
+            image={pin.activity.activeUsers ? require("../../assets/flame1.png") : null}
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
-          >
-            {pin.details.title ? (
-              <Callout style={styles.callout}>
-                <View>
-                  <Text style={styles.title}>{pin.details.title}</Text>
-                  <Text style={styles.description}>{pin.details.description}</Text>
-                  <Text>{pin.details.slacklineType}</Text>
-                  <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
-                </View>
-              </Callout>
-            ) : null}
-          </Marker>
+            onPress={(e) => {
+              handlePinPress(e, pin);
+            }}
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
         <FAB
           title="Add Pin"
           icon={{ name: "add", color: "white" }}
-          color="#219f94"
+          color={defaultColor}
           onPress={handleConfirmPress}
           placement="right"
         />
       ) : null}
       {confirmCancelVisible ? (
         <FAB
-          titleStyle={{ color: "#219f94" }}
+          titleStyle={{ color: defaultColor}}
           title="Cancel"
-          icon={{ name: "close", color: "#219f94" }}
+          icon={{ name: "close", color: defaultColor}}
           color="white"
           onPress={handleCancelPress}
           placement="left"
         />
       ) : null}
       {addPinVisible ? (
+        <>
+        {hotspotToggleVisible? (
+          <FAB
+            icon={{ name: "whatshot", color: "white" }}
+            style={{ paddingBottom: 65 }} // ensure the button doesn't overlap with the one below it
+            color={hotspotToggleColor}
+            onPress={handleHotspotToggle}
+            placement="right"
+          />
+        ) : null}
         <FAB
           icon={{ name: "add", color: "white" }}
-          color="#219f94"
+          color={defaultColor}
           onPress={handleAddPin}
           placement="right"
         />
+        </>
+      ) : null}
+      {pinInfoVisible ? (
+        <PinInfoOverlay
+          pin={{ ...selectedPin }}
+          navigation={navigation}
+        ></PinInfoOverlay>
       ) : null}
     </View>
   );
@@ -245,25 +299,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-    zIndex: -1,
-  },
-  callout: {
-    maxWidth: 200,
-  },
-  title: {
-    fontSize: 20,
-    color: "#219f94",
-    paddingBottom: 2,
-  },
-  text: {
-    paddingBottom: 5,
-  },
-  description: {
-    fontSize: 10,
-    paddingBottom: 7,
-  },
+    ...StyleSheet.absoluteFillObject,
+  }
 });

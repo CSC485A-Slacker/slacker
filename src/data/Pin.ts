@@ -67,8 +67,8 @@ class PinDetails implements IPinDetails {
     description: string,
     slacklineLength: number,
     slacklineType: string,
-    color: string, 
-    draggable: boolean,
+    color: string,
+    draggable: boolean
   ) {
     this.title = title;
     this.description = description;
@@ -97,11 +97,13 @@ class PinDetails implements IPinDetails {
 }
 
 class PinReview implements IPinReview {
+  key: string;
   comment: string;
   rating: number;
-  date: Date;
+  date: string;
 
-  constructor(comment: string, rating: number, date: Date) {
+  constructor(key: string, comment: string, rating: number, date: string) {
+    this.key = key;
     this.comment = comment;
     this.rating = rating;
     this.date = date;
@@ -109,7 +111,9 @@ class PinReview implements IPinReview {
 
   toString(): string {
     return (
-      "comment: " +
+      "key: " +
+      this.key +
+      "\ncomment: " +
       this.comment +
       "\nrating: " +
       this.rating +
@@ -121,9 +125,9 @@ class PinReview implements IPinReview {
 
 class PinPhoto implements IPinPhoto {
   url: string;
-  date: Date;
+  date: string;
 
-  constructor(url: string, date: Date) {
+  constructor(url: string, date: string) {
     this.url = url;
     this.date = date;
   }
@@ -134,20 +138,20 @@ class PinPhoto implements IPinPhoto {
 }
 
 class PinActivity implements IPinActivity {
-  checkIn: boolean;
+  shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
 
-  constructor(checkIn: boolean, activeUsers: number, totalUsers: number) {
-    this.checkIn = checkIn;
+  constructor(shareableSlackline: boolean, activeUsers: number, totalUsers: number) {
+    this.shareableSlackline = shareableSlackline;
     this.activeUsers = activeUsers;
     this.totalUsers = totalUsers;
   }
 
   toString(): string {
     return (
-      "checkIn: " +
-      this.checkIn +
+      "shareableSlackline: " +
+      this.shareableSlackline +
       "\nactiveUsers " +
       this.activeUsers +
       "\ntotalUsers: " +
@@ -161,7 +165,7 @@ function coordinateFromString(coordinateString: string): LatLng {
   const splitCoordinate: string[] = coordinateString.split(",", 2);
   return {
     latitude: Number(splitCoordinate[0]),
-    longitude: Number(splitCoordinate[1])
+    longitude: Number(splitCoordinate[1]),
   };
 }
 

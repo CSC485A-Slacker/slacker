@@ -20,18 +20,19 @@ interface IPinDetails {
 }
 
 interface IPinReview {
+  key: string;
   comment: string;
   rating: number;
-  date: Date;
+  date: string;
 }
 
 interface IPinPhoto {
   url: string;
-  date: Date;
+  date: string;
 }
 
 interface IPinActivity {
-  checkIn: boolean;
+  shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
 }
@@ -41,16 +42,16 @@ interface IPinsState {
 }
 
 interface IUser {
-  _userID: string,
-  _checkInSpot: number,
+  _userID: string;
+  _checkInSpot: number;
 }
 
 interface IDatabase {
   addUser(user: IUser): void;
 
-  getUser(userID: string): Promise<User>
+  getUser(userID: string): Promise<IUserActionResult<IUser>>
 
-  ChangeCheckInSpot(userID:string, newCheckInSpot:number): void
+  ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
 
   deleteUser(userID: string): void;
   /* Purpose: attempts to add a pin to the database.
@@ -70,6 +71,17 @@ interface IDatabase {
   editPinDetails(
     coordinate: LatLng,
     details: IPinDetails
+  ): Promise<IDatabaseActionResult>;
+
+  /* Purpose: attempts to edit a pin at the given coordinate, replacing existing reviews with provided reviews.
+   *          Will fail if no pin is found at coordinate.
+   *
+   * Return: an IDatabaseActionResult where success==true if the pin at coordinate was updated with new reviews
+   *         or success==false otherwise
+   */
+  editPinReviews(
+    coordinate: LatLng,
+    details: IPinReview[]
   ): Promise<IDatabaseActionResult>;
 
   /* Purpose: attempts to delete a pin at the given coordinate.
@@ -120,9 +132,19 @@ interface IPinActionResult<T> extends IDatabaseActionResult {
   data?: T;
 }
 
+/*
+ * Purpose: contains IDatabaseActionResult info (succeeded and message)
+ *
+ * data: contains data of specified type if succeeded, otherwise undefined
+ */
+interface IUserActionResult<T> extends IDatabaseActionResult {
+  data?: T;
+}
+
 export {
   IPin,
   IUser,
+  IUserActionResult,
   IPinDetails,
   IPinReview,
   IPinPhoto,
