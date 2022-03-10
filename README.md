@@ -36,8 +36,8 @@ This milestone will entail only the most basic functionality of the app to be co
 ## Milestone 2: Hotspots (⚠ Due Mar 11, 2022)
 By this point the team will have a more solid grasp of our tech stack and will be able to work more quickly, so more interesting features will be present.
 - [x] Users can sign up and sign in using their preferred email and a password
-- [ ] Hotspots with at least 1 person `checked in` at them will have a 🔥 emoji displayed to indicate current activity.
-- [ ] When a user checks in to a hotspot, they can optionally specify the duration which they plan on remaining at that location. After some time, the 🔥 emoji will dissapear, and the hotspot will no longer be considered active.
+- [x] Hotspots with at least 1 person `checked in` at them will have a 🔥 emoji displayed to indicate current activity.
+- [x] When a user checks in to a hotspot, they can optionally specify the duration which they plan on remaining at that location. After some time, the 🔥 emoji will dissapear, and the hotspot will no longer be considered active.
 - [ ] Hotspot filter: Users can press a toggle to either view only active hotspots, or to view all spots in general. Color mappings will be used for all kinds of spots to communicate popularity (ex. a blue hotspot might only have < 3 people at it, whereas a red one might have > 5).
 - [x] More pin details: Number of people checked in at the hotspot, view photographs users have taken of that spot, comments/reviews, and maybe more.
 
