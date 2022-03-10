@@ -38,7 +38,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       reviews: [],
       photos: [],
       activity: {
-        checkIn: false,
+        shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
       },
