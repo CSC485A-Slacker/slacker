@@ -180,6 +180,8 @@ useEffect( () => {
         totalUsers:  0,
        }
     };
+    setAddPinVisible(true);
+    setConfirmCancelVisible(false);
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
     });
