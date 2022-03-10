@@ -14,7 +14,7 @@ import { pinConverter } from "../../data/DataConverters";
 
 const database = new Database();
 
-export const AddPinScreen = ({ route, navigation }) => {
+export const PinDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { newPin } = route.params;
 

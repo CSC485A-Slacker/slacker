@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MapScreen } from "./screens/Map/MapScreen";
-import { AddPinScreen } from "./screens/Map/AddPinScreen";
+import { PinDetailsScreen } from "./screens/Map/PinDetailsScreen";
 import { LoginScreen } from "./screens/Login/LoginScreen";
 import { ProfileScreen } from "./screens/Profile/ProfileScreen";
 import { FriendsScreen } from "./screens/Friends/FriendsScreen";
@@ -20,7 +20,7 @@ function MapStackScreen() {
     <MapStack.Navigator>
       <MapStack.Screen name="Login" component={LoginScreen} />
       <MapStack.Screen name="Map" component={MapScreen} />
-      <MapStack.Screen name="Spot Details" component={AddPinScreen} />
+      <MapStack.Screen name="Spot Details" component={PinDetailsScreen} />
       <MapStack.Screen name="Check In" component={CheckInScreen} />
       <MapStack.Screen name="Add a Review" component={AddReviewScreen} />
       <MapStack.Screen name="Add a Photo" component={AddPhotoScreen} />
