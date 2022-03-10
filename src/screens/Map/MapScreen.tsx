@@ -92,7 +92,7 @@ useEffect( () => {
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
     }
-  }, [addPinVisible]);
+  });
 
 
   // effect hook for when the hotspot toggle button changes visibility
@@ -180,8 +180,6 @@ useEffect( () => {
         totalUsers:  0,
        }
     };
-    setAddPinVisible(true);
-    setConfirmCancelVisible(false);
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
     });
