@@ -1,9 +1,20 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query, QuerySnapshot } from 'firebase/firestore/lite';
 import { Pin, PinDetails, coordinateToString, coordinateFromString } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IPinsState } from "./Interfaces"
 import { pinConverter, pinDetailsConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
+import { onSnapshot, Unsubscribe } from "@firebase/firestore";
+import { useDispatch } from "react-redux";
+import {
+  addPin,
+  PinsState,
+  removePin,
+  updatePin,
+} from "../redux/PinSlice";
+import { createContext } from "react";
+import { store } from "../redux/Store"
+import { User } from "./User";
 
 
 class Database implements IDatabase {
@@ -13,18 +24,89 @@ class Database implements IDatabase {
         this.database = getFirestore(firebaseApp);
     }
 
+    async addUser(user: IUser) {
+      const userDocRef = doc(this.database, "users", user._userID)
+        try
+        {
+          const userSnap =await getDoc(userDocRef)
+          if(userSnap.exists())
+          {
+            throw new Error(`User already existed with ID ${user._userID}`)
+          }
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
+        } catch (e) {
+          console.log("Error adding user: ", e);
+        }
+        
+    }
+
+    async getUser(userID: string): Promise<User> {
+      const userDocRef = doc(this.database, "users", userID)
+      try
+      {
+        const userDocSnap = await getDoc(userDocRef)
+        if (!userDocSnap.exists())
+        {
+          throw new Error(`User with ID ${userID} doesn\'t exist`)
+        }
+        return new User(userDocSnap.get('userID'), userDocSnap.get('checkInSpot'))
+        
+      }
+      catch (error)
+      {
+        console.log(`Get user fail: ${error}`)
+        return new User("not exist", 0)
+      }
+    }
+
+    async ChangeCheckInSpot(userID:string, newCheckInSpot:number)
+    {
+        const userDocRef = doc(this.database, "users", userID)
+        try
+        {
+          const userDocSnap = await getDoc(userDocRef)
+          if(!userDocSnap.exists())
+          {
+            throw new Error("User doesn't exist")
+          }
+          updateDoc(userDocRef, {checkInSpot: newCheckInSpot})
+        }
+        catch(error)
+        {
+          console.log(`change check in spot failed for user ${userID}: ${error}`)
+        }
+        
+    }
+
+    async deleteUser(userID: string) {
+      const userDocRef = doc(this.database, "users", userID)
+      try
+      {
+        const userDocSnap = await getDoc(userDocRef)
+        if (!userDocSnap.exists())
+        {
+          throw new Error(`User with ID ${userID} doesn\'t exist`)
+        }
+        await deleteDoc(userDocRef)
+      }
+      catch(error)
+      {
+        console.log(`delete user failed: ${error}`)
+      }
+    }
+
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {
         const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
 
         try {
-        const pinDocSnap = await getDoc(pinRef);
+            const pinDocSnap = await getDoc(pinRef);
 
-        if (pinDocSnap.exists()) {
-            throw new Error(`Pin already exists.`);
-        }
+            if (pinDocSnap.exists()) {
+                throw new Error(`Pin already exists.`);
+            }
 
-        await setDoc(pinRef, pinConverter.toFirestore(pin));
+            await setDoc(pinRef, pinConverter.toFirestore(pin));
         } catch (error) {
         return new DatabaseActionResult(
           false,
@@ -181,7 +263,34 @@ class Database implements IDatabase {
       );
     }
   }
+
+// creates a listener for changes to the db
+// should update the state of the store dependent on changes
+// returns a subscriber that can be called to unsubcribe from changes
+// https://firebase.google.com/docs/firestore/query-data/listen
+ async monitorDatabaseChanges() {
+    const pinsCollection = collection(this.database, "pins");
+    const pinSnapshot = await getDocs(pinsCollection);
+    const q = query(pinsCollection);
+
+    return onSnapshot(pinsCollection, (snapshot) => {
+
+        snapshot.docChanges().forEach((change) => {
+            const pin = pinConverter.fromFirestore(change.doc); 
+            console.log(`change: ${change}`);
+            if(change.type === "added") {
+                store.dispatch(addPin(pin));
+            }
+            else if(change.type === "modified") {
+                store.dispatch(updatePin(pin));
+            } else if(change.type === "removed") {
+                store.dispatch(removePin(pin));
+            }
+        })
+    })
 }
+}
+
 
 // action result implementations
 

@@ -1,4 +1,5 @@
 import { LatLng } from "react-native-maps";
+import { User } from "./User";
 
 interface IPin {
   key: number;
@@ -35,7 +36,23 @@ interface IPinActivity {
   totalUsers: number;
 }
 
+interface IPinsState {
+  pins: IPin[];
+}
+
+interface IUser {
+  _userID: string,
+  _checkInSpot: number,
+}
+
 interface IDatabase {
+  addUser(user: IUser): void;
+
+  getUser(userID: string): Promise<User>
+
+  ChangeCheckInSpot(userID:string, newCheckInSpot:number): void
+
+  deleteUser(userID: string): void;
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
    *
@@ -105,11 +122,13 @@ interface IPinActionResult<T> extends IDatabaseActionResult {
 
 export {
   IPin,
+  IUser,
   IPinDetails,
   IPinReview,
   IPinPhoto,
   IPinActivity,
   IPinActionResult,
+  IPinsState,
   IDatabase,
   IDatabaseActionResult,
 };
