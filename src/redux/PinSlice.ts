@@ -65,7 +65,9 @@ export const pinSlice = createSlice({
   initialState,
   reducers: {
     addPin: (state, action: PayloadAction<Pin>) => {
-      state.pins.push(action.payload);
+        if(!state.pins.find((pin) => pin.key == action.payload.key)) {
+            state.pins.push(action.payload);
+        }
     },
     updatePin: (state, action: PayloadAction<Pin>) => {
       state.pins = state.pins.map((pin) => {
