@@ -139,11 +139,8 @@ class Database implements IDatabase {
         return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
     }
   
-      // Edits pin details at coordinate
-  async editPinReviews(
-    coordinate: LatLng,
-    reviews: PinReview[]
-  ): Promise<IDatabaseActionResult> {
+  // Edits pin details at coordinate
+  async editPinReviews(coordinate: LatLng, reviews: PinReview[]): Promise<IDatabaseActionResult> {
     try {
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
       const pinDocSnap = await getDoc(pinRef);
