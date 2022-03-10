@@ -9,13 +9,15 @@ import {
 import { Text, Icon, Slider, CheckBox, Button } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { Database } from "../../data/Database";
+import { Pin, PinActivity } from "../../data/Pin";
+import { updatePin } from "../../redux/PinSlice";
 
 const database = new Database();
 
 export const CheckInDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
-  const { pinId } = route.params;
+  const { pinId, pinCoords, usr } = route.params;
   const [timeValue, setTimeValue] = useState(0);
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
@@ -41,11 +43,46 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
   }
 
   const handleConfirmPress = () => {
+    // can remove these logs when done debugging
     console.log(sharingSlackline)
     console.log(notSharingSlackline)
     console.log(noSlackline)
     console.log(timeValue)
     console.log(pinId)
+    console.log(pinCoords)
+    console.log(usr._userID)
+    
+    const dbPinPromise = database.getPin(pinCoords);
+    dbPinPromise.then(result => {
+      const dbPin = result.data
+      if (dbPin) {
+        const updatedPinActivity = new PinActivity(
+          dbPin?.activity.shareableSlackline ? true : sharingSlackline,
+          dbPin?.activity.activeUsers + 1,
+          dbPin?.activity.totalUsers + 1
+        )
+        const updatedPin = new Pin(
+          dbPin.key,
+          dbPin.coordinate,
+          dbPin.details,
+          dbPin.reviews,
+          dbPin.photos,
+          updatedPinActivity
+        )
+        try {
+          const resp = database.editPinActivity(pinCoords, updatedPinActivity);
+          dispatch(updatePin(updatedPin))
+          const resp2 = database.ChangeCheckInSpot(usr._userID, pinId)
+          // Still need to update UI with fire emoji or smthn
+          // Still need to fix updating fresh map with details on navigation
+          navigation.navigate("Map", {updatedPin})
+        } catch(error) {
+            console.log(`error updating pin activity: ${error}`);
+            Alert.alert('Please try again')
+        }
+      }
+      // should add an else throw err or something here
+    })
   }
 
   const interpolate = (start: number, end: number) => {

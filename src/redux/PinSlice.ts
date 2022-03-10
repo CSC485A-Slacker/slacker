@@ -23,7 +23,7 @@ const examplePin1: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
   }
@@ -46,7 +46,7 @@ const examplePin2: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
   }
@@ -80,6 +80,11 @@ export const pinSlice = createSlice({
               slacklineType: action.payload.details.slacklineType,
               color: "red",
               draggable: false,
+            },
+            activity: {
+              shareableSlackline: action.payload.activity.shareableSlackline,
+              activeUsers: action.payload.activity.activeUsers,
+              totalUsers: action.payload.activity.totalUsers
             }
           };
         }

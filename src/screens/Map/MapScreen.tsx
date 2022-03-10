@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MapView, { CalloutSubview, LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Alert } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { FAB, Text } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,7 @@ import {
 import { Pin } from "../../data/Pin";
 import { Database} from "../../data/Database";
 import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
-import { firebaseApp } from "../../config/FirebaseConfig";
+import { firebaseApp, auth } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
 import { Button } from "react-native-elements/dist/buttons/Button";
 
@@ -46,7 +46,7 @@ let newPin: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
   }
@@ -58,6 +58,7 @@ export const MapScreen = ({ route, navigation }) => {
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+  const user = auth.currentUser
 
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"))
@@ -165,8 +166,20 @@ export const MapScreen = ({ route, navigation }) => {
     setAddPinVisible(true);
   };
 
-  const handleCheckIn = (pinId: number) => {
-    navigation.navigate("Check-In Details", {pinId})
+  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined) => {
+    if (userId) {
+      const userPromise = database.getUser(userId);
+      userPromise.then(result => {
+        const usr = result.data
+        if (usr?._checkInSpot == pinId) {
+          Alert.alert('You have already checked in here!')
+        } else {
+          navigation.navigate("Check-In Details", { pinId, pinCoords, usr })
+        }
+      })
+    } else {
+      Alert.alert('You must be signed in to use this feature!')
+    }
   }
 
   return (
@@ -198,7 +211,10 @@ export const MapScreen = ({ route, navigation }) => {
                   <Text style={styles.description}>{pin.details.description}</Text>
                   <Text>{pin.details.slacklineType}</Text>
                   <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
-                  <CalloutSubview onPress={() => handleCheckIn(pin.key)}>
+                  <Text style={styles.text}>{pin.activity.activeUsers + " active slackliners"}</Text>
+                  <Text style={styles.text}>{pin.activity.totalUsers + " total slackliners"}</Text>
+                  <Text style={styles.text}>{pin.activity.shareableSlackline ? "Slacklining gear is available to share!" : "Please bring your own gear!"}</Text>
+                  <CalloutSubview onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid)}>
                     <Button 
                       title="Check-In"
                       icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}

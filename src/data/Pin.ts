@@ -134,20 +134,20 @@ class PinPhoto implements IPinPhoto {
 }
 
 class PinActivity implements IPinActivity {
-  checkIn: boolean;
+  shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
 
-  constructor(checkIn: boolean, activeUsers: number, totalUsers: number) {
-    this.checkIn = checkIn;
+  constructor(shareableSlackline: boolean, activeUsers: number, totalUsers: number) {
+    this.shareableSlackline = shareableSlackline;
     this.activeUsers = activeUsers;
     this.totalUsers = totalUsers;
   }
 
   toString(): string {
     return (
-      "checkIn: " +
-      this.checkIn +
+      "shareableSlackline: " +
+      this.shareableSlackline +
       "\nactiveUsers " +
       this.activeUsers +
       "\ntotalUsers: " +

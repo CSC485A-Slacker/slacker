@@ -31,7 +31,7 @@ interface IPinPhoto {
 }
 
 interface IPinActivity {
-  checkIn: boolean;
+  shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
 }
@@ -48,7 +48,7 @@ interface IUser {
 interface IDatabase {
   addUser(user: IUser): void;
 
-  getUser(userID: string): Promise<User>
+  getUser(userID: string): Promise<IUserActionResult<IUser>>
 
   ChangeCheckInSpot(userID:string, newCheckInSpot:number): void
 
@@ -120,9 +120,19 @@ interface IPinActionResult<T> extends IDatabaseActionResult {
   data?: T;
 }
 
+/*
+ * Purpose: contains IDatabaseActionResult info (succeeded and message)
+ *
+ * data: contains data of specified type if succeeded, otherwise undefined
+ */
+interface IUserActionResult<T> extends IDatabaseActionResult {
+  data?: T;
+}
+
 export {
   IPin,
   IUser,
+  IUserActionResult,
   IPinDetails,
   IPinReview,
   IPinPhoto,
