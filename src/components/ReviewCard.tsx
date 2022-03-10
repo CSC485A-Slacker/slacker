@@ -27,7 +27,7 @@ const ReviewCard = (prop: { review: PinReview; key: string }) => {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 2,
-    marginHorizontal: 16,
+    marginHorizontal: 6,
     flex: 1,
   },
   ratingContainer: {

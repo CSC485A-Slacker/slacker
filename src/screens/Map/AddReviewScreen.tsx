@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Text, Input, FAB } from "react-native-elements";
+import { Text, Input, Button } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { updatePin } from "../../redux/PinSlice";
 import { AirbnbRating } from "react-native-ratings";
@@ -16,27 +16,35 @@ const database = new Database();
 export const AddReviewScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { pin } = route.params;
-  const [rating, setRating] = useState(3);
+  const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [buttomDisabled, setButtomDisabled] = useState(true);
+
+  useEffect(() => {
+    if (rating != 0 && comment != "") {
+      setButtomDisabled(false)
+    }
+  }, [rating, comment])
 
   const onSubmitPress = async () => {
-    const date = new Date().toJSON();
-    const key = comment + "-" + date;
-    pin.reviews.push(new PinReview(key, comment, rating, date));
-    dispatch(updatePin(pin));
-    navigation.navigate({
-      name: "Map",
-    });
     try {
-      const resp = await await database.editPinReviews(
+      const date = new Date().toJSON();
+      const key = comment + "-" + date;
+      pin.reviews.push(new PinReview(key, comment, rating, date));
+      navigation.navigate({
+        name: "Map",
+      });
+      const resp = await database.editPinReviews(
         pin.coordinate,
         pin.reviews
       );
       console.log(resp);
     } catch (error) {
-      console.log(
-        `Error updating pin when trying to save new review: ${error}`
-      );
+      console.log(`Error updating pin when trying to save new review: ${error}`);
+      alert("Review upload failed, sorry :( try again later");
+      navigation.navigate({
+            name: "Map",
+      });
     }
   };
 
@@ -73,14 +81,22 @@ export const AddReviewScreen = ({ route, navigation }) => {
             onChangeText={(comment) => setComment(comment)}
             value={comment}
           />
-          <FAB
-            containerStyle={{ margin: 20 }}
-            visible={true}
-            icon={{ name: "check", color: "white" }}
-            color="#219f94"
-            title="Submit"
+          <Button
+                title="Submit"
+                buttonStyle={{
+                  backgroundColor: "#219f94",
+                  borderWidth: 1,
+                  borderColor: "white",
+                  borderRadius: 30,
+                }}
+                containerStyle={{
+                  margin: 15,
+                }}
+                icon={{ name: "arrow-forward-ios", color: "white" }}
+                titleStyle={{ fontSize: 16}}
             onPress={onSubmitPress}
-          />
+            disabled={buttomDisabled}
+              />
         </View>
       </View>
     </TouchableWithoutFeedback>

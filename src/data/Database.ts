@@ -1,8 +1,8 @@
 import { firebaseApp } from "../config/FirebaseConfig"
 import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query } from 'firebase/firestore/lite';
-import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview } from "./Pin"
+import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto } from "./Pin"
 import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
-import { pinConverter, pinDetailsConverter, pinReviewsConverter } from "./DataConverters";
+import { pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
 import { onSnapshot } from "@firebase/firestore";
 import {
@@ -139,7 +139,7 @@ class Database implements IDatabase {
         return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
     }
   
-  // Edits pin details at coordinate
+  // Edits pin reviews at coordinate
   async editPinReviews(coordinate: LatLng, reviews: PinReview[]): Promise<IDatabaseActionResult> {
     try {
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
@@ -155,7 +155,7 @@ class Database implements IDatabase {
     } catch (error) {
       return new DatabaseActionResult(
         false,
-        `Failed: could not edit pin at coordinate ${coordinateToString(
+        `Failed: could not edit pin reviews at coordinate ${coordinateToString(
           coordinate
         )}. ${error}`
       );
@@ -163,7 +163,35 @@ class Database implements IDatabase {
 
     return new DatabaseActionResult(
       true,
-      `Succeeded: pin edited at ${coordinateToString(coordinate)}`
+      `Succeeded: pin reviews edited at ${coordinateToString(coordinate)}`
+    );
+  }
+
+  // Edits pin photos at coordinate
+  async editPinPhotos(coordinate: LatLng, photos: PinPhoto[]): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, {
+        photos: pinPhotosConverter.toFirestore(photos),
+      });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin photos at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin photos edited at ${coordinateToString(coordinate)}`
     );
   }
 

@@ -168,4 +168,5 @@ export {
   pinCoordinateConverter,
   pinDetailsConverter,
   pinReviewsConverter,
+  pinPhotosConverter
 };

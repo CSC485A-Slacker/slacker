@@ -309,6 +309,52 @@ async function TestEditPinReviews() {
   if (passed) passedCount++;
   totalCount++;
 }
+async function TestEditPinPhotos() {
+  console.log("Test edit pin photos\n");
+
+  await database.deletePin(pin1.coordinate);
+  await database.deletePin(pin2.coordinate);
+  await database.addPin(pin1);
+
+  console.log("edit existing pin photos");
+
+  var existingResult = await database.getPin(pin1.coordinate);
+  var existingPin = existingResult.data;
+
+  console.log(`pin before edit:\n${existingPin}`);
+
+  pin1.photos.push(
+    new PinPhoto("image1", new Date().toJSON())
+  );
+
+  var result = await database.editPinPhotos(pin1.coordinate, pin1.photos);
+
+  existingResult = await database.getPin(pin1.coordinate);
+  existingPin = existingResult.data;
+
+  console.log(`pin after edit:\n${existingPin}`);
+
+  var passed = result.succeeded == true;
+  console.log(`Passed: ${passed}. ${result.message}`);
+  console.log("\n");
+
+  if (passed) passedCount++;
+  totalCount++;
+
+  console.log("edit non-existent pin");
+
+  pin2.photos.push(
+    new PinPhoto("imageNotFound", new Date().toJSON())
+  );
+
+  result = await database.editPinPhotos(pin2.coordinate, pin2.photos);
+  passed = result.succeeded == false;
+  console.log(`Passed: ${passed}. ${result.message}`);
+  console.log("\n");
+
+  if (passed) passedCount++;
+  totalCount++;
+}
 
 async function TestAll() {
   console.log("TEST ALL");
@@ -323,6 +369,7 @@ async function TestAll() {
   await TestGetAllPinCoordinates();
   await TestEditPinDetails();
   await TestEditPinReviews();
+  await TestEditPinPhotos();
 
   console.log(`PASSED: ${passedCount}/${totalCount}`);
 }
@@ -335,5 +382,6 @@ export {
   TestGetAllPinCoordinates,
   TestEditPinDetails,
   TestEditPinReviews,
+  TestEditPinPhotos,
   TestAll,
 };

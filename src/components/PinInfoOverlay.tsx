@@ -8,10 +8,11 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text, Divider, Button } from "react-native-elements";
+import { Text, Divider, Button, Image } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
-import { Pin, PinReview } from "../data/Pin";
+import { Pin, PinPhoto, PinReview } from "../data/Pin";
+import PhotoItem from "./PhotoItem";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -21,6 +22,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const pin = prop.pin;
   const navigation = prop.navigation;
   const reviews = pin.reviews;
+  const photos = pin.photos;
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -34,6 +36,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
 
   const snappingPoints = [draggableRange.top, draggableRange.bottom];
   const panelRef = useRef<SlidingUpPanel | null>(null);
+  const [dragging, setDragging] = useState(true);
 
   const [panelPositionVal] = useState(
     new Animated.Value(draggableRange.bottom)
@@ -49,12 +52,12 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
       containerStyle={styles.panelContainer}
       showBackdrop={false}
       height={deviceHeight}
-      allowDragging={true}
+      allowDragging={dragging}
       friction={0.999}
     >
       <View style={styles.panelContent}>
         <View style={styles.container}>
-          <Text style={ styles.title }h4>{pin.details.title}</Text>
+          <Text h4>{pin.details.title}</Text>
           <Text>{pin.details.slacklineType}</Text>
           <Text>{pin.details.slacklineLength}m</Text>
           <View style={styles.buttonsContainer}>
@@ -112,14 +115,35 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 }}
                 titleStyle={{ fontSize: 14, color: "#219f94" }}
                 onPress={(e) => {
-                  navigation.navigate("Add a Photo");
+                  navigation.navigate("Add a Photo", {
+                    pin: pin,
+                  });
                 }}
               />
             </View>
           </View>
-          <View></View>
           <View>
-            <Divider />
+            <Divider style={styles.divider}/>
+            {photos.length != 0 ? (
+              <ScrollView
+                horizontal={true}
+              >
+                {photos.map((photo: PinPhoto) => (
+                   <PhotoItem photo={photo} key={photo.url} />
+                ))}
+              </ScrollView>
+            ) : (
+                <View>
+                  <Text style={styles.subTitle}>Photos</Text>
+                  <Text style={styles.text}>
+                    Share your photos using the buttom above!
+                  </Text>
+                </View>
+              
+            )}
+          </View>
+          <View>
+            <Divider style={styles.divider}/>
             <View style={styles.infoContainer}>
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{pin.details.description}</Text>
@@ -131,14 +155,18 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
 
             <Text style={styles.subTitle}>Reviews</Text>
             {reviews.length != 0 ? (
-              <ScrollView>
+              <ScrollView
+                onTouchStart={() => setDragging(false)}
+                onTouchEnd={() => setDragging(true)}
+                onTouchCancel={() => setDragging(true)}
+              >
                 {reviews.map((review: PinReview) => (
                   <ReviewCard review={review} key={review.key} />
                 ))}
               </ScrollView>
             ) : (
               <Text style={styles.text}>
-                No reviews yet... why not add the first one?
+                No reviews yet... want to add the first one?
               </Text>
             )}
           </View>
@@ -165,20 +193,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    margin: 10,
+    margin: 16,
   },
   buttonsContainer: {
     flexDirection: "row",
-    marginVertical: 10,
+    marginTop: 10,
   },
   buttonContainer: {
     flex: 1,
   },
   infoContainer: {
     paddingBottom: 10,
-  },
-  title: {
-    paddingTop: 10,
   },
   subTitle: {
     fontSize: 20,
