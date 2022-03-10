@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import MapView, { LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions, Alert } from "react-native";
-import { Marker, Callout } from "react-native-maps";
-import { FAB, Text, Chip } from "react-native-elements";
+import { View, StyleSheet } from "react-native";
+import { Marker } from "react-native-maps";
+import { FAB } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, store } from "../../redux/Store";
+import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
@@ -22,8 +22,6 @@ import {
 import { firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
-import SlidingUpPanel from "rn-sliding-up-panel";
-import BottomDrawer from "react-native-bottom-drawer-view";
 
 const database = new Database();
 
@@ -173,7 +171,6 @@ export const MapScreen = ({ route, navigation }) => {
   };
 
   const handlePinPress = (e, pin: Pin) => {
-    // check first if pin is saved
     if (pin.details.title != "") {
       e.stopPropagation();
       setPinInfoVisible(true);
@@ -264,36 +261,5 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-  },
-  callout: {
-    flex: 1,
-    maxWidth: 200,
-  },
-  title: {
-    fontSize: 20,
-    color: "#219f94",
-    paddingBottom: 2,
-  },
-  text: {
-    paddingBottom: 5,
-  },
-  description: {
-    fontSize: 10,
-    paddingBottom: 7,
-  },
-  infoContainer: {
-    flex: 1,
-    alignItems: "flex-start",
-    margin: 10,
-  },
-  buttonsContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    // justifyContent: 'center',
-    marginVertical: 10,
-  },
-  buttonContainer: {
-    flex: 1,
-  },
+  }
 });

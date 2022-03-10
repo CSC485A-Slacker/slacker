@@ -81,7 +81,7 @@ interface IDatabase {
    */
   editPinReviews(
     coordinate: LatLng,
-    details: IPinReview
+    details: IPinReview[]
   ): Promise<IDatabaseActionResult>;
 
   /* Purpose: attempts to delete a pin at the given coordinate.

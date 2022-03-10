@@ -26,16 +26,12 @@ const ReviewCard = (prop: { review: PinReview; key: string }) => {
 
 const styles = StyleSheet.create({
   container: {
-    //backgroundColor: '#f8f4f4',
-    // padding: 10,
     marginVertical: 2,
     marginHorizontal: 16,
     flex: 1,
   },
   ratingContainer: {
-    //flex: 1,
     flexDirection: "row",
-    // alignItems: "flex-start",
     marginVertical: 10,
   },
   text: {

@@ -11,8 +11,6 @@ import { updatePin } from "../../redux/PinSlice";
 import { AirbnbRating } from "react-native-ratings";
 import { PinReview } from "../../data/Pin";
 import { Database } from "../../data/Database";
-import { Timestamp } from "@firebase/firestore";
-
 const database = new Database();
 
 export const AddReviewScreen = ({ route, navigation }) => {
@@ -110,7 +108,6 @@ const styles = StyleSheet.create({
   },
   reviewTitle: {
     padding: 10,
-    // paddingLeft: 16,
     fontSize: 18,
     color: "#626264",
     alignItems: "center",
@@ -123,6 +120,5 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 12,
-    // padding: 10,
   },
 });
