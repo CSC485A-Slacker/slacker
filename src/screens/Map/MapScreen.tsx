@@ -117,6 +117,7 @@ export const MapScreen = ({ route, navigation }: any) => {
 
     // TODO: decide whether to show all pins or only pins
     // with people currently checked in there
+    
   }
 
   // Keeps track of the map region
@@ -217,6 +218,9 @@ export const MapScreen = ({ route, navigation }: any) => {
     setAddPinVisible(true);
   }
 
+  let pinsToRender = pins;
+  if (hotspotToggleColor == hotColor) pinsToRender = pins.filter(pin => pin.activity.activeUsers > 0);
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -233,7 +237,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         onMarkerPress={(e) => updateRegionCoordinates(e.nativeEvent.coordinate)}
         onPress={onMapPress}
       >
-        {pins.map((pin) => (
+        {pinsToRender.map((pin) => (
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
