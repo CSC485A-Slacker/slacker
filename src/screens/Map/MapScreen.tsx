@@ -200,6 +200,8 @@ export const MapScreen = ({ route, navigation }: any) => {
   const handlePinPress = (e, pin: Pin) => {
     if (pin.details.title != "") {
       e.stopPropagation();
+      setHotSpotToggleVisible(false);
+      setAddPinVisible(false);
       setPinInfoVisible(true);
       setSelectedPin((selectedPin) => ({
         ...selectedPin,
@@ -211,6 +213,8 @@ export const MapScreen = ({ route, navigation }: any) => {
   const onMapPress = () => {
     setPinInfoVisible(false);
     setSelectedPin(null)
+    setHotSpotToggleVisible(true);
+    setAddPinVisible(true);
   }
 
   return (
