@@ -184,7 +184,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
               iconStyle={{marginRight: 5, paddingTop: 15}}
             />
             
-            <Text style={{ paddingTop: 5, color: "#696969", textAlign: "center"}}> 
+            <Text style={{ paddingTop: 15, color: "#696969", textAlign: "center"}}> 
               Checking in lets others know someone is at this spot! {'\n'}But don't worry, your identity will not be made public.
             </Text>
           </View>
