@@ -73,8 +73,6 @@ export const MapScreen = ({ route, navigation }) => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         const pin = pinConverter.fromFirestore(change.doc);
-        // console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
-        console.log(`CHANGE: ${change.type} `)
         if (change.type === "added") {
           dispatch(addPin(pin));
         } else if (change.type === "modified") {

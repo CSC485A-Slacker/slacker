@@ -51,7 +51,6 @@ export const AddPinScreen = ({ route, navigation }) => {
       },
     });
     try {
-      console.log(confirmPin);
       const resp = await database.addPin(pinConverter.toFirestore(confirmPin));
       console.log(resp);
     } catch (error) {

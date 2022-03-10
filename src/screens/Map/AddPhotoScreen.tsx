@@ -39,6 +39,7 @@ export const AddPhotoScreen = ({ route, navigation }) => {
     }
   };
 
+  // Created using this: https://firebase.google.com/docs/storage/web/upload-files#full_example
   const onSubmitPress = async () => {
     try {
         const blob = await new Promise((resolve, reject) => {
