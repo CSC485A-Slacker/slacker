@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import MapView, { CalloutSubview, LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions, Alert } from "react-native";
-import { Marker, Callout } from "react-native-maps";
-import { FAB, Text } from "react-native-elements";
+import MapView, { LatLng } from "react-native-maps";
+import { View, StyleSheet } from "react-native";
+import { Marker } from "react-native-maps";
+import { FAB } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/Store";
 import {
@@ -12,11 +12,16 @@ import {
   updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
-import { Database} from "../../data/Database";
-import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
-import { firebaseApp, auth } from "../../config/FirebaseConfig";
+import { Database } from "../../data/Database";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  query,
+} from "@firebase/firestore";
+import { firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
-import { Button } from "react-native-elements/dist/buttons/Button";
+import PinInfoOverlay from "../../components/PinInfoOverlay";
 
 const database = new Database();
 
@@ -48,8 +53,8 @@ let newPin: Pin = {
   activity: {
     shareableSlackline: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
 export const MapScreen = ({ route, navigation }) => {
@@ -58,28 +63,26 @@ export const MapScreen = ({ route, navigation }) => {
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
-  const user = auth.currentUser
+  const [pinInfoVisible, setPinInfoVisible] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(pins[0]);
 
   const db = getFirestore(firebaseApp);
-  const q = query(collection(db, "pins"))
+  const q = query(collection(db, "pins"));
 
-  useEffect( () => { 
+  useEffect(() => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        
-      const pin = pinConverter.fromFirestore(change.doc)
-        //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
-            if(change.type === "added") {
-                dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                dispatch(removePin(pin));
-            }
+      snapshot.docChanges().forEach((change) => {
+        const pin = pinConverter.fromFirestore(change.doc);
+        if (change.type === "added") {
+          dispatch(addPin(pin));
+        } else if (change.type === "modified") {
+          dispatch(updatePin(pin));
+        } else if (change.type === "removed") {
+          dispatch(removePin(pin));
+        }
+      });
     });
-  }); }, [] )
-  
+  }, []);
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -122,8 +125,8 @@ export const MapScreen = ({ route, navigation }) => {
       activity: {
         shareableSlackline: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -152,8 +155,8 @@ export const MapScreen = ({ route, navigation }) => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
@@ -166,20 +169,20 @@ export const MapScreen = ({ route, navigation }) => {
     setAddPinVisible(true);
   };
 
-  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined) => {
-    if (userId) {
-      const userPromise = database.getUser(userId);
-      userPromise.then(result => {
-        const usr = result.data
-        if (usr?._checkInSpot == pinId) {
-          Alert.alert('You have already checked in here!')
-        } else {
-          navigation.navigate("Check-In Details", { pinId, pinCoords, usr })
-        }
-      })
-    } else {
-      Alert.alert('You must be signed in to use this feature!')
+  const handlePinPress = (e, pin: Pin) => {
+    if (pin.details.title != "") {
+      e.stopPropagation();
+      setPinInfoVisible(true);
+      setSelectedPin((selectedPin) => ({
+        ...selectedPin,
+        ...pin,
+      }));
     }
+  };
+
+  const onMapPress = () => {
+    setPinInfoVisible(false);
+    setSelectedPin(null)
   }
 
   return (
@@ -194,9 +197,11 @@ export const MapScreen = ({ route, navigation }) => {
         }}
         onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
+        showsPointsOfInterest={false}
+        onMarkerPress={(e) => updateRegionCoordinates(e.nativeEvent.coordinate)}
+        onPress={onMapPress}
       >
         {pins.map((pin) => (
-          
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
@@ -204,32 +209,10 @@ export const MapScreen = ({ route, navigation }) => {
             image={pin.activity.activeUsers ? require("../../assets/flame1.png") : null}
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
-          >
-            {pin.details.title ? (
-              <Callout style={styles.callout} tooltip={true}>
-                <View>
-                  <Text style={styles.title}>{pin.details.title}</Text>
-                  <Text style={styles.description}>{pin.details.description}</Text>
-                  <Text>{pin.details.slacklineType}</Text>
-                  <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
-                  <Text style={styles.text}>{pin.activity.activeUsers + " active slackliners"}</Text>
-                  <Text style={styles.text}>{pin.activity.totalUsers + " total slackliners"}</Text>
-                  <Text style={styles.text}>{pin.activity.shareableSlackline ? "Slacklining gear is available to share!" : "Please bring your own gear!"}</Text>
-                  <CalloutSubview onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid)}>
-                    <Button 
-                      title="Check-In"
-                      icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
-                      iconRight
-                      iconContainerStyle={{ marginLeft: 10 }}
-                      titleStyle={{ fontWeight: '500', fontSize: 12 }}
-                      buttonStyle={{ backgroundColor: 'rgba(4, 147, 114, 1)', borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
-                      containerStyle={{ width: "auto", flex: 1, padding: 10 }}
-                    />
-                </CalloutSubview>
-                </View>
-              </Callout>
-            ) : null}
-          </Marker>
+            onPress={(e) => {
+              handlePinPress(e, pin);
+            }}
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
@@ -259,6 +242,12 @@ export const MapScreen = ({ route, navigation }) => {
           placement="right"
         />
       ) : null}
+      {pinInfoVisible ? (
+        <PinInfoOverlay
+          pin={{ ...selectedPin }}
+          navigation={navigation}
+        ></PinInfoOverlay>
+      ) : null}
     </View>
   );
 };
@@ -269,34 +258,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-    zIndex: -1,
-  },
-  callout: {
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    maxWidth: 300,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    borderColor: "#000",
-    borderWidth: 1,
-    borderRadius: 25,
-  },
-  title: {
-    fontSize: 20,
-    color: "#219f94",
-    paddingBottom: 2,
-    paddingTop: 2,
-    paddingHorizontal: 5,
-  },
-  text: {
-    paddingBottom: 5,
-  },
-  description: {
-    fontSize: 10,
-    paddingBottom: 7,
-  },
+    ...StyleSheet.absoluteFillObject,
+  }
 });

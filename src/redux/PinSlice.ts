@@ -81,11 +81,9 @@ export const pinSlice = createSlice({
               color: "red",
               draggable: false,
             },
-            activity: {
-              shareableSlackline: action.payload.activity.shareableSlackline,
-              activeUsers: action.payload.activity.activeUsers,
-              totalUsers: action.payload.activity.totalUsers
-            }
+            reviews: action.payload.reviews,
+            photos: action.payload.photos,
+            activity: action.payload.activity
           };
         }
         return pin;

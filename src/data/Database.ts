@@ -1,18 +1,15 @@
 import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query, QuerySnapshot } from 'firebase/firestore/lite';
-import { Pin, PinDetails, coordinateToString, coordinateFromString, PinActivity } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IPinsState, IUserActionResult, IUser } from "./Interfaces"
-import { pinConverter, pinDetailsConverter, pinActivityConverter, userConverter } from "./DataConverters";
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query } from 'firebase/firestore/lite';
+import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto, PinActivity } from "./Pin"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IUser, IUserActionResult } from "./Interfaces"
+import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
-import { onSnapshot, Unsubscribe } from "@firebase/firestore";
-import { useDispatch } from "react-redux";
+import { onSnapshot } from "@firebase/firestore";
 import {
   addPin,
-  PinsState,
   removePin,
   updatePin,
 } from "../redux/PinSlice";
-import { createContext } from "react";
 import { store } from "../redux/Store"
 import { User } from "./User";
 
@@ -154,6 +151,62 @@ class Database implements IDatabase {
 
         return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
     }
+  
+  // Edits pin reviews at coordinate
+  async editPinReviews(coordinate: LatLng, reviews: PinReview[]): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, {
+        reviews: pinReviewsConverter.toFirestore(reviews),
+      });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin reviews at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin reviews edited at ${coordinateToString(coordinate)}`
+    );
+  }
+
+  // Edits pin photos at coordinate
+  async editPinPhotos(coordinate: LatLng, photos: PinPhoto[]): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, {
+        photos: pinPhotosConverter.toFirestore(photos),
+      });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin photos at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin photos edited at ${coordinateToString(coordinate)}`
+    );
+  }
 
     // Edits pin activity at coordinate
     async editPinActivity(coordinate: LatLng, activity: PinActivity): Promise<IDatabaseActionResult> {
@@ -321,9 +374,8 @@ class Database implements IDatabase {
             }
         })
     })
+  }
 }
-}
-
 
 // action result implementations
 
