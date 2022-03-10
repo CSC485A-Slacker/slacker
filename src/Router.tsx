@@ -32,7 +32,7 @@ export const MainStackScreen = () => {
 function MapStackScreen() {
   return (
     <MapStack.Navigator>
-      <MapStack.Screen name="Map" component={MapScreen} />
+      <MapStack.Screen name="Map" component={MapScreen} options={{title: ''}} />
       <MapStack.Screen name="Spot Details" component={PinDetailsScreen} />
       <MapStack.Screen name="Check-In Details" component={CheckInDetailsScreen} />
       <MapStack.Screen name="Add a Review" component={AddReviewScreen} />
