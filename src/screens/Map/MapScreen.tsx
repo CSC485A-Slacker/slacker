@@ -51,7 +51,7 @@ let newPin: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
   },
@@ -149,7 +149,7 @@ export const MapScreen = ({ route, navigation }: any) => {
       reviews: [],
       photos: [],
       activity: {
-        checkIn: false,
+        shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
       },
@@ -238,6 +238,7 @@ export const MapScreen = ({ route, navigation }: any) => {
             key={pin.key}
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
+            image={pin.activity.activeUsers ? require("../../assets/flame1.png") : null}
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
             onPress={(e) => {

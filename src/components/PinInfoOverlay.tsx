@@ -6,6 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button, Image } from "react-native-elements";
@@ -13,16 +14,21 @@ import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
 import { Pin, PinPhoto, PinReview } from "../data/Pin";
 import PhotoItem from "./PhotoItem";
+import { auth } from "../config/FirebaseConfig";
+import { LatLng } from "react-native-maps";
+import { Database } from "../data/Database";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
 const BOTTOM_NAV_BAR = 135;
+const database = new Database();
 
 function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const pin = prop.pin;
   const navigation = prop.navigation;
   const reviews = pin.reviews;
   const photos = pin.photos;
+  const user = auth.currentUser
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -41,6 +47,22 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const [panelPositionVal] = useState(
     new Animated.Value(draggableRange.bottom)
   );
+
+  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined) => {
+    if (userId) {
+      const userPromise = database.getUser(userId);
+      userPromise.then(result => {
+        const usr = result.data
+        if (usr?._checkInSpot == pinId) {
+          Alert.alert('You have already checked in here!')
+        } else {
+          navigation.navigate("Check-In Details", { pinId, pinCoords, usr })
+        }
+      })
+    } else {
+      Alert.alert('You must be signed in to use this feature!')
+    }
+  }
 
   return (
     <SlidingUpPanel
@@ -64,6 +86,8 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             <View style={styles.buttonContainer}>
               <Button
                 title="Check In"
+                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
+                iconRight
                 buttonStyle={{
                   backgroundColor: "#219f94",
                   borderWidth: 2,
@@ -74,9 +98,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={(e) => {
-                  navigation.navigate("Check In");
-                }}
+                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid)}
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -148,7 +170,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{pin.details.description}</Text>
               <Text style={styles.text}>
+                Active Slackliners: {pin.activity.activeUsers}
+              </Text>
+              <Text style={styles.text}>
                 Total People Visited: {pin.activity.totalUsers}
+              </Text>
+              <Text style={styles.text}>
+                {pin.activity.shareableSlackline ? 
+                "Slacklining gear is available to share!" : "Please bring your own gear!"}
               </Text>
             </View>
             <Divider />

@@ -1,8 +1,8 @@
 import { firebaseApp } from "../config/FirebaseConfig"
 import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query } from 'firebase/firestore/lite';
-import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase } from "./Interfaces"
-import { pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter } from "./DataConverters";
+import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto, PinActivity } from "./Pin"
+import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IUser, IUserActionResult } from "./Interfaces"
+import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
 import { onSnapshot } from "@firebase/firestore";
 import {
@@ -37,7 +37,7 @@ class Database implements IDatabase {
         
     }
 
-    async getUser(userID: string): Promise<User> {
+    async getUser(userID: string): Promise<IUserActionResult<IUser>> {
       const userDocRef = doc(this.database, "users", userID)
       try
       {
@@ -46,13 +46,26 @@ class Database implements IDatabase {
         {
           throw new Error(`User with ID ${userID} doesn\'t exist`)
         }
-        return new User(userDocSnap.get('userID'), userDocSnap.get('checkInSpot'))
         
-      }
-      catch (error)
-      {
-        console.log(`Get user fail: ${error}`)
-        return new User("not exist", 0)
+        // console.log(userDocSnap)
+        const usr = userConverter.fromFirestore(userDocSnap);
+        // console.log(usr)
+
+        return new UserActionResult<IUser>(
+          new DatabaseActionResult(
+            true,
+            `Succeeded: user ${userDocSnap.get('userID')}`
+          ),
+          usr
+        );
+      } catch (error) {
+        return new UserActionResult<IUser>(
+          new DatabaseActionResult(
+            false,
+            `Failed: user ${userID} could not be retrieved from the database. ${error}`
+          ),
+          undefined
+        );
       }
     }
 
@@ -193,6 +206,26 @@ class Database implements IDatabase {
       true,
       `Succeeded: pin photos edited at ${coordinateToString(coordinate)}`
     );
+  }
+
+    // Edits pin activity at coordinate
+    async editPinActivity(coordinate: LatLng, activity: PinActivity): Promise<IDatabaseActionResult> {
+      try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+          throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, { activity: pinActivityConverter.toFirestore(activity) });
+      } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin activity at coordinate ${coordinateToString(coordinate)}. ${error}`);
+      }
+
+      return new DatabaseActionResult(true, `Succeeded: pin activity edited at ${coordinateToString(coordinate)}`);
   }
 
     // Deletes pin at given coordinate
@@ -368,4 +401,17 @@ class PinActionResult<T> implements IPinActionResult<T> {
     }
 }
 
+class UserActionResult<T> implements IUserActionResult<T> {
+    succeeded: boolean;
+    message: string;
+    data?: T;
+
+    constructor(result: IDatabaseActionResult, data?: T) {
+        this.succeeded = result.succeeded;
+        this.message = result.message;
+        this.data = data;
+    }
+}
+
  export { Database };
+

@@ -23,7 +23,7 @@ const examplePin1: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
   }
@@ -46,7 +46,7 @@ const examplePin2: Pin = {
   reviews: [],
   photos: [],
   activity: {
-    checkIn: false,
+    shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
   }

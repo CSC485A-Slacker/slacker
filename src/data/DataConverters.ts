@@ -8,6 +8,7 @@ import {
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
 import { LatLng } from "react-native-maps";
+import { User } from "./User";
 
 // data converters to transform data to and from json objects for firestore use
 const pinCoordinateConverter = {
@@ -125,7 +126,7 @@ const pinPhotosConverter = {
 const pinActivityConverter = {
   toFirestore: (activity: IPinActivity) => {
     return {
-      checkIn: activity.checkIn,
+      shareableSlackline: activity.shareableSlackline,
       activeUsers: activity.activeUsers,
       totalUsers: activity.totalUsers,
     };
@@ -133,7 +134,7 @@ const pinActivityConverter = {
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     const activity = snapshot.get("activity");
     return new PinActivity(
-      activity.checkIn,
+      activity.shareableSlackline,
       activity.activeUsers,
       activity.totalUsers
     );
@@ -163,10 +164,21 @@ const pinConverter = {
   },
 };
 
+const userConverter = {
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    return new User(
+      snapshot.get('userID'),
+      snapshot.get('checkInSpot')
+    );
+  },
+};
+
 export {
   pinConverter,
   pinCoordinateConverter,
   pinDetailsConverter,
   pinReviewsConverter,
-  pinPhotosConverter
+  pinPhotosConverter,
+  pinActivityConverter,
+  userConverter
 };
