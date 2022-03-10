@@ -99,14 +99,6 @@ export const MapScreen = ({ route, navigation }: any) => {
     }
   });
 
-
-  // effect hook for when the hotspot toggle button changes visibility
-  // this might not be necessary, consider deleting later
-  useEffect(() => {
-    
-  }, [hotspotToggleVisible]);
-
-
   // change color of hotspot toggle button and show appropriate pins
   // button is red -> only pins with people currently checked in
   // button is aqua -> all pins
@@ -114,10 +106,6 @@ export const MapScreen = ({ route, navigation }: any) => {
     let newColor:string = defaultColor;
     if(hotspotToggleColor == defaultColor) newColor = hotColor;
     setHotspotToggleColor(newColor);
-
-    // TODO: decide whether to show all pins or only pins
-    // with people currently checked in there
-    
   }
 
   // Keeps track of the map region
