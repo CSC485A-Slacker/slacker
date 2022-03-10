@@ -1,99 +1,43 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { 
-  Platform, Animated, ScrollView, StyleSheet,
-  useWindowDimensions, View, Dimensions,
-  PanResponderGestureState, NativeSyntheticEvent,
-  NativeScrollEvent, FlatList
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, Chip, Divider } from "react-native-elements";
-import SlidingUpPanel, { SlidingUpPanelAnimationConfig } from 'rn-sliding-up-panel';
+import React, { useRef, useState } from "react";
+import {
+  Platform,
+  Animated,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Text, Divider, Button } from "react-native-elements";
+import SlidingUpPanel from "rn-sliding-up-panel";
+import ReviewCard from "./ReviewCard";
+import { Pin, PinReview } from "../data/Pin";
 
-const ios = Platform.OS === 'ios';
+const ios = Platform.OS === "ios";
+const TOP_NAV_BAR = 100;
+const BOTTOM_NAV_BAR = 135;
 
-
-function PinInfoOverlay(prop) {
+function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const pin = prop.pin;
   const navigation = prop.navigation;
+  const reviews = pin.reviews;
 
   // strange calculation here to get the top of the draggable range correct
-  // 35 accounts for the nav bar
   const insets = useSafeAreaInsets();
   const statusBarHeight: number = ios ? insets.bottom : insets.top;
-  const deviceHeight = useWindowDimensions().height - statusBarHeight - 100
+  const deviceHeight =
+    useWindowDimensions().height - statusBarHeight - TOP_NAV_BAR;
   const draggableRange = {
     top: deviceHeight - statusBarHeight,
-    bottom: deviceHeight / 5
+    bottom: BOTTOM_NAV_BAR,
   };
 
-  const snappingPoints = [
-    draggableRange.top,
-    draggableRange.bottom
-  ];
-
-  const [scrollEnabled, setScrollEnabled] = useState(false);
-  const [allowDragging, setAllowDragging] = useState(true);
-  const [atTop, setAtTop] = useState(true);
-
+  const snappingPoints = [draggableRange.top, draggableRange.bottom];
   const panelRef = useRef<SlidingUpPanel | null>(null);
 
-  const [panelPositionVal] = useState(new Animated.Value(draggableRange.bottom));
-
-  const DATA = [
-  {
-    id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "First Item",
-  },
-  {
-    id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "Second Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title: "Third Item",
-    },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d721",
-    title: "Third Item",
-    },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d722",
-    title: "Third Item",
-    },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d723",
-    title: "Third Item",
-    },
-   {
-    id: "58694a0f-3da1-471f-bd96-145571e29d7235",
-    title: "Third Item",
-    },
-    {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72355",
-    title: "Third Item",
-    },
-    {
-    id: "58694a0f-3da1-471f-bd96-145571e29d7235534",
-    title: "Third Item",
-    },
-    {
-    id: "58694a0f-3da1-471f-bd96-145571e29d723553443",
-    title: "Third Item",
-    },
-    {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72355e33e",
-    title: "Third Item",
-  },
-];
-
-
-const Item = ({ title }) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
-);
-
-const renderItem = ({ item }) => <Item title={item.title} />;
+  const [panelPositionVal] = useState(
+    new Animated.Value(draggableRange.bottom)
+  );
 
   return (
     <SlidingUpPanel
@@ -102,109 +46,158 @@ const renderItem = ({ item }) => <Item title={item.title} />;
       draggableRange={draggableRange}
       snappingPoints={snappingPoints}
       backdropOpacity={0}
+      containerStyle={styles.panelContainer}
       showBackdrop={false}
       height={deviceHeight}
-      allowDragging={allowDragging}
+      allowDragging={true}
       friction={0.999}
     >
       <View style={styles.panelContent}>
         <View style={styles.container}>
-        <Text h4>{pin.details.title}</Text>
-        <Text>{pin.details.slacklineType} </Text>
-        <Text>{pin.details.slacklineLength}m</Text>
-        <View style={styles.buttonsContainer}>
-          <View style={styles.buttonContainer}>
-              <Chip
-
-              title="Check In"
-              containerStyle={{ marginRight: 10 }}
-              onPress={(e) => console.log("check")}
-            />
+          <Text style={ styles.title }h4>{pin.details.title}</Text>
+          <Text>{pin.details.slacklineType}</Text>
+          <Text>{pin.details.slacklineLength}m</Text>
+          <View style={styles.buttonsContainer}>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Check In"
+                buttonStyle={{
+                  backgroundColor: "#219f94",
+                  borderWidth: 2,
+                  borderColor: "white",
+                  borderRadius: 30,
+                }}
+                containerStyle={{
+                  marginRight: 10,
+                }}
+                titleStyle={{ fontSize: 14 }}
+                onPress={(e) => {
+                  navigation.navigate("Check In");
+                }}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Add Review"
+                buttonStyle={{
+                  backgroundColor: "white",
+                  borderWidth: 1,
+                  borderColor: "#219f94",
+                  borderRadius: 30,
+                }}
+                type="outline"
+                containerStyle={{
+                  marginRight: 10,
+                }}
+                titleStyle={{ fontSize: 14, color: "#219f94" }}
+                onPress={(e) => {
+                  navigation.navigate("Add a Review", {
+                    pin: pin,
+                  });
+                }}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Add Photos"
+                buttonStyle={{
+                  backgroundColor: "white",
+                  borderWidth: 1,
+                  borderColor: "#219f94",
+                  borderRadius: 30,
+                }}
+                type="outline"
+                containerStyle={{
+                  marginRight: 10,
+                }}
+                titleStyle={{ fontSize: 14, color: "#219f94" }}
+                onPress={(e) => {
+                  navigation.navigate("Add a Photo");
+                }}
+              />
+            </View>
           </View>
-          <View style={styles.buttonContainer}>
-            <Chip
-              title="Add Review"
-              type="outline"
-              containerStyle={{ marginHorizontal: 10 }}
-              onPress={(e) => {
-                navigation.navigate("Add a Review", {
-                  pin: pin,
-                });
-              }}
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-            <Chip
-              title="Add Photos"
-              type="outline"
-              containerStyle={{ marginHorizontal: 10 }}
-              onPress={(e) => {
-                navigation.navigate("Spot Details", {
-                  newPin: pin,
-                });
-              }}
-            />
-          </View>
-        </View>
+          <View></View>
           <View>
-          </View>
-          <View>
-          <Divider />
+            <Divider />
+            <View style={styles.infoContainer}>
+              <Text style={styles.subTitle}>Details</Text>
+              <Text style={styles.text}>{pin.details.description}</Text>
+              <Text style={styles.text}>
+                Total People Visited: {pin.activity.totalUsers}
+              </Text>
+            </View>
+            <Divider />
 
-          <Text style={styles.reviewTitle}>Reviews</Text>
-          <FlatList
-            data={DATA}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
-        {/* <ScrollView
-          scrollEnabled={scrollEnabled}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          onMomentumScrollEnd={onMomentumScrollEnd}
-        >
-        </ScrollView> */}
+            <Text style={styles.subTitle}>Reviews</Text>
+            {reviews.length != 0 ? (
+              <ScrollView>
+                {reviews.map((review: PinReview) => (
+                  <ReviewCard review={review} key={review.key} />
+                ))}
+              </ScrollView>
+            ) : (
+              <Text style={styles.text}>
+                No reviews yet... why not add the first one?
+              </Text>
+            )}
+          </View>
+          <Divider style={styles.divider}/>
         </View>
       </View>
     </SlidingUpPanel>
   );
-};
+}
 
 const styles = StyleSheet.create({
   panelContent: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'white'
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
+  },
+  panelContainer: {
+    borderRadius: 25,
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   container: {
     flex: 1,
     margin: 10,
   },
   buttonsContainer: {
-    //flex: 1,
     flexDirection: "row",
-    // alignItems: "flex-start",
     marginVertical: 10,
   },
   buttonContainer: {
     flex: 1,
   },
-  button: {
-    color: "#219f94"
+  infoContainer: {
+    paddingBottom: 10,
   },
-  item: {
-    //backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+  title: {
+    paddingTop: 10,
   },
-  reviewTitle: {
+  subTitle: {
     fontSize: 20,
     color: "#219f94",
-    padding: 10
+    padding: 10,
+    paddingBottom: 4,
+    paddingLeft: 4,
   },
+  smallText: {
+    fontSize: 12,
+    paddingVertical: 4,
+  },
+  text: {
+    padding: 2,
+    paddingLeft: 4,
+  },
+  divider: {
+    paddingBottom: 14,
+  }
 });
 
 export default PinInfoOverlay;

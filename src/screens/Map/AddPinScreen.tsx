@@ -23,7 +23,6 @@ export const AddPinScreen = ({ route, navigation }) => {
   const [slacklineLength, onChangeLength] = useState("");
   const [slacklineType, onChangeType] = useState("");
 
-
   const onConfirmPress = async () => {
     const confirmPin: Pin = {
       key: newPin.key,
@@ -55,9 +54,8 @@ export const AddPinScreen = ({ route, navigation }) => {
       console.log(confirmPin);
       const resp = await database.addPin(pinConverter.toFirestore(confirmPin));
       console.log(resp);
-      
-    } catch(error) {
-        console.log(`error adding pin: ${error}`);
+    } catch (error) {
+      console.log(`error adding pin: ${error}`);
     }
   };
 

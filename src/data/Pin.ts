@@ -67,8 +67,8 @@ class PinDetails implements IPinDetails {
     description: string,
     slacklineLength: number,
     slacklineType: string,
-    color: string, 
-    draggable: boolean,
+    color: string,
+    draggable: boolean
   ) {
     this.title = title;
     this.description = description;
@@ -100,10 +100,10 @@ class PinReview implements IPinReview {
   key: string;
   comment: string;
   rating: number;
-  date: Date;
+  date: string;
 
-  constructor(key: string, comment: string, rating: number, date: Date) {
-    this.key = key
+  constructor(key: string, comment: string, rating: number, date: string) {
+    this.key = key;
     this.comment = comment;
     this.rating = rating;
     this.date = date;
@@ -125,9 +125,9 @@ class PinReview implements IPinReview {
 
 class PinPhoto implements IPinPhoto {
   url: string;
-  date: Date;
+  date: string;
 
-  constructor(url: string, date: Date) {
+  constructor(url: string, date: string) {
     this.url = url;
     this.date = date;
   }
@@ -165,7 +165,7 @@ function coordinateFromString(coordinateString: string): LatLng {
   const splitCoordinate: string[] = coordinateString.split(",", 2);
   return {
     latitude: Number(splitCoordinate[0]),
-    longitude: Number(splitCoordinate[1])
+    longitude: Number(splitCoordinate[1]),
   };
 }
 

@@ -12,12 +12,17 @@ import {
   updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
-import { Database} from "../../data/Database";
-import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
+import { Database } from "../../data/Database";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  query,
+} from "@firebase/firestore";
 import { firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
-import SlidingUpPanel from 'rn-sliding-up-panel';
+import SlidingUpPanel from "rn-sliding-up-panel";
 import BottomDrawer from "react-native-bottom-drawer-view";
 
 const database = new Database();
@@ -64,25 +69,23 @@ export const MapScreen = ({ route, navigation }) => {
   const [selectedPin, setSelectedPin] = useState(pins[0]);
 
   const db = getFirestore(firebaseApp);
-  const q = query(collection(db, "pins"))
+  const q = query(collection(db, "pins"));
 
-useEffect( () => { 
+  useEffect(() => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        
-      const pin = pinConverter.fromFirestore(change.doc)
+      snapshot.docChanges().forEach((change) => {
+        const pin = pinConverter.fromFirestore(change.doc);
         //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
-            if(change.type === "added") {
-                dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                dispatch(removePin(pin));
-            }
+        if (change.type === "added") {
+          dispatch(addPin(pin));
+        } else if (change.type === "modified") {
+          dispatch(updatePin(pin));
+        } else if (change.type === "removed") {
+          dispatch(removePin(pin));
+        }
+      });
     });
-  }); }, [] )
-  
+  }, []);
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -155,8 +158,8 @@ useEffect( () => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
@@ -170,7 +173,6 @@ useEffect( () => {
   };
 
   const handlePinPress = (e, pin: Pin) => {
-    console.log(pin)
     // check first if pin is saved
     if (pin.details.title != "") {
       e.stopPropagation();
@@ -180,7 +182,6 @@ useEffect( () => {
         ...pin,
       }));
     }
-    
   };
 
   function onMapPress(): void {
@@ -204,7 +205,6 @@ useEffect( () => {
         onPress={onMapPress}
       >
         {pins.map((pin) => (
-          
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
@@ -212,18 +212,9 @@ useEffect( () => {
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
             onPress={(e) => {
-              if (
-                e.nativeEvent.action === "marker-inside-overlay-press" ||
-                e.nativeEvent.action === "callout-inside-press"
-              ) {
-                return;
-              }
-
-              console.log("Pin Pressed");
               handlePinPress(e, pin);
             }}
-          >
-          </Marker>
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (

@@ -1,220 +1,260 @@
-import { firebaseApp } from "../config/FirebaseConfig"
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query, QuerySnapshot } from 'firebase/firestore/lite';
-import { Pin, PinDetails, PinReview, coordinateToString, coordinateFromString } from "./Pin"
-import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IPinsState } from "./Interfaces"
-import { pinConverter, pinDetailsConverter, pinReviewsConverter } from "./DataConverters";
+import { firebaseApp } from "../config/FirebaseConfig";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  Firestore,
+  query,
+  QuerySnapshot,
+} from "firebase/firestore/lite";
+import {
+  Pin,
+  PinDetails,
+  PinReview,
+  coordinateToString,
+  coordinateFromString,
+} from "./Pin";
+import {
+  IPin,
+  IDatabaseActionResult,
+  IPinActionResult,
+  IDatabase,
+  IPinsState,
+} from "./Interfaces";
+import {
+  pinConverter,
+  pinDetailsConverter,
+  pinReviewsConverter,
+} from "./DataConverters";
 import { LatLng } from "react-native-maps";
 import { onSnapshot, Unsubscribe } from "@firebase/firestore";
 import { useDispatch } from "react-redux";
-import {
-  addPin,
-  PinsState,
-  removePin,
-  updatePin,
-} from "../redux/PinSlice";
+import { addPin, PinsState, removePin, updatePin } from "../redux/PinSlice";
 import { createContext } from "react";
-import { store } from "../redux/Store"
+import { store } from "../redux/Store";
 import { User } from "./User";
 
-
 class Database implements IDatabase {
-    database: Firestore;
+  database: Firestore;
 
-    constructor() {
-        this.database = getFirestore(firebaseApp);
-    }
+  constructor() {
+    this.database = getFirestore(firebaseApp);
+  }
 
-    async addUser(user: IUser) {
-      const userDocRef = doc(this.database, "users", user._userID)
-        try
-        {
-          const userSnap =await getDoc(userDocRef)
-          if(userSnap.exists())
-          {
-            throw new Error(`User already existed with ID ${user._userID}`)
-          }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
-        } catch (e) {
-          console.log("Error adding user: ", e);
-        }
-        
-    }
-
-    async getUser(userID: string): Promise<User> {
-      const userDocRef = doc(this.database, "users", userID)
-      try
-      {
-        const userDocSnap = await getDoc(userDocRef)
-        if (!userDocSnap.exists())
-        {
-          throw new Error(`User with ID ${userID} doesn\'t exist`)
-        }
-        return new User(userDocSnap.get('userID'), userDocSnap.get('checkInSpot'))
-        
+  async addUser(user: IUser) {
+    const userDocRef = doc(this.database, "users", user._userID);
+    try {
+      const userSnap = await getDoc(userDocRef);
+      if (userSnap.exists()) {
+        throw new Error(`User already existed with ID ${user._userID}`);
       }
-      catch (error)
-      {
-        console.log(`Get user fail: ${error}`)
-        return new User("not exist", 0)
+      await setDoc(userDocRef, {
+        userID: user._userID,
+        checkInSpot: user._checkInSpot,
+      });
+    } catch (e) {
+      console.log("Error adding user: ", e);
+    }
+  }
+
+  async getUser(userID: string): Promise<User> {
+    const userDocRef = doc(this.database, "users", userID);
+    try {
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        throw new Error(`User with ID ${userID} doesn\'t exist`);
       }
+      return new User(
+        userDocSnap.get("userID"),
+        userDocSnap.get("checkInSpot")
+      );
+    } catch (error) {
+      console.log(`Get user fail: ${error}`);
+      return new User("not exist", 0);
     }
+  }
 
-    async ChangeCheckInSpot(userID:string, newCheckInSpot:number)
-    {
-        const userDocRef = doc(this.database, "users", userID)
-        try
-        {
-          const userDocSnap = await getDoc(userDocRef)
-          if(!userDocSnap.exists())
-          {
-            throw new Error("User doesn't exist")
-          }
-          updateDoc(userDocRef, {checkInSpot: newCheckInSpot})
-        }
-        catch(error)
-        {
-          console.log(`change check in spot failed for user ${userID}: ${error}`)
-        }
-        
-    }
-
-    async deleteUser(userID: string) {
-      const userDocRef = doc(this.database, "users", userID)
-      try
-      {
-        const userDocSnap = await getDoc(userDocRef)
-        if (!userDocSnap.exists())
-        {
-          throw new Error(`User with ID ${userID} doesn\'t exist`)
-        }
-        await deleteDoc(userDocRef)
+  async ChangeCheckInSpot(userID: string, newCheckInSpot: number) {
+    const userDocRef = doc(this.database, "users", userID);
+    try {
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        throw new Error("User doesn't exist");
       }
-      catch(error)
-      {
-        console.log(`delete user failed: ${error}`)
+      updateDoc(userDocRef, { checkInSpot: newCheckInSpot });
+    } catch (error) {
+      console.log(`change check in spot failed for user ${userID}: ${error}`);
+    }
+  }
+
+  async deleteUser(userID: string) {
+    const userDocRef = doc(this.database, "users", userID);
+    try {
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+        throw new Error(`User with ID ${userID} doesn\'t exist`);
       }
+      await deleteDoc(userDocRef);
+    } catch (error) {
+      console.log(`delete user failed: ${error}`);
+    }
+  }
+
+  // Adds a pin to the database
+  async addPin(pin: IPin): Promise<IDatabaseActionResult> {
+    const pinRef = doc(
+      this.database,
+      "pins",
+      coordinateToString(pin.coordinate)
+    );
+
+    try {
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (pinDocSnap.exists()) {
+        throw new Error(`Pin already exists.`);
+      }
+
+      await setDoc(pinRef, pinConverter.toFirestore(pin));
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not place pin at coordinate: ${coordinateToString(
+          pin.coordinate
+        )}. ${error}`
+      );
     }
 
-    // Adds a pin to the database
-    async addPin(pin: IPin): Promise<IDatabaseActionResult> {
-        const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin added at ${coordinateToString(pin.coordinate)}`
+    );
+  }
 
-        try {
-            const pinDocSnap = await getDoc(pinRef);
-
-            if (pinDocSnap.exists()) {
-                throw new Error(`Pin already exists.`);
-            }
-
-            await setDoc(pinRef, pinConverter.toFirestore(pin));
-        } catch (error) {
-        return new DatabaseActionResult(
-          false,
-          `Failed: could not place pin at coordinate: ${coordinateToString(
-            pin.coordinate
-          )}. ${error}`
-        );
-        }
-
-        return new DatabaseActionResult(
-          true,
-          `Succeeded: pin added at ${coordinateToString(pin.coordinate)}`
-        );
-    }
-
-    // Edits pin details at coordinate
-    async editPinDetails(coordinate: LatLng,details: PinDetails): Promise<IDatabaseActionResult> {
-        try {
-        const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
-        const pinDocSnap = await getDoc(pinRef);
-
-        if (!pinDocSnap.exists()) {
-            throw new Error(`Pin could not be found.`);
-        }
-
-        await updateDoc(pinRef, { details: pinDetailsConverter.toFirestore(details) });
-        } catch (error) {
-        return new DatabaseActionResult(
-          false,
-          `Failed: could not edit pin at coordinate ${coordinateToString(coordinate)}. ${error}`);
-        }
-
-        return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
-    }
-  
   // Edits pin details at coordinate
-    async editPinReviews(coordinate: LatLng, reviews: PinReview[]): Promise<IDatabaseActionResult> {
-        try {
-        const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
-        const pinDocSnap = await getDoc(pinRef);
+  async editPinDetails(
+    coordinate: LatLng,
+    details: PinDetails
+  ): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
 
-        if (!pinDocSnap.exists()) {
-            throw new Error(`Pin could not be found.`);
-        }
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
 
-        await updateDoc(pinRef, { reviews: pinReviewsConverter.toFirestore(reviews) });
-        } catch (error) {
-        return new DatabaseActionResult(
+      await updateDoc(pinRef, {
+        details: pinDetailsConverter.toFirestore(details),
+      });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin edited at ${coordinateToString(coordinate)}`
+    );
+  }
+
+  // Edits pin details at coordinate
+  async editPinReviews(
+    coordinate: LatLng,
+    reviews: PinReview[]
+  ): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, {
+        reviews: pinReviewsConverter.toFirestore(reviews),
+      });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin edited at ${coordinateToString(coordinate)}`
+    );
+  }
+
+  // Deletes pin at given coordinate
+  async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+      await deleteDoc(pinRef);
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not delete pin at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin deleted at: ${coordinateToString(coordinate)}`
+    );
+  }
+
+  // Get the pin at a given coordinate
+  async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found`);
+      }
+
+      const pin = pinConverter.fromFirestore(pinDocSnap);
+
+      return new PinActionResult<IPin>(
+        new DatabaseActionResult(
+          true,
+          `Succeeded: pin retrieved from ${coordinateToString(coordinate)}`
+        ),
+        pin
+      );
+    } catch (error) {
+      return new PinActionResult<IPin>(
+        new DatabaseActionResult(
           false,
-          `Failed: could not edit pin at coordinate ${coordinateToString(coordinate)}. ${error}`);
-        }
-
-        return new DatabaseActionResult(true, `Succeeded: pin edited at ${coordinateToString(coordinate)}`);
+          `Failed: pin could not be retrieved from ${coordinateToString(
+            coordinate
+          )}. ${error}`
+        ),
+        undefined
+      );
     }
-
-    // Deletes pin at given coordinate
-    async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
-        try {
-            const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
-            const pinDocSnap = await getDoc(pinRef);
-
-            if (!pinDocSnap.exists()) {
-                throw new Error(`Pin could not be found.`);
-            }
-            await deleteDoc(pinRef);
-
-        } catch (error) {
-
-        return new DatabaseActionResult(false, `Failed: could not delete pin at coordinate ${coordinateToString(coordinate)}. ${error}`);
-
-        }
-
-        return new DatabaseActionResult(
-        true,
-        `Succeeded: pin deleted at: ${coordinateToString(coordinate)}`
-        );
-    }
-
-    // Get the pin at a given coordinate
-    async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
-        try {
-        const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
-
-        const pinDocSnap = await getDoc(pinRef);
-
-        if (!pinDocSnap.exists()) {
-            throw new Error(`Pin could not be found`);
-        }
-
-        const pin = pinConverter.fromFirestore(pinDocSnap);
-
-        return new PinActionResult<IPin>(
-          new DatabaseActionResult(
-            true,
-            `Succeeded: pin retrieved from ${coordinateToString(coordinate)}`
-          ),
-          pin
-        );
-        } catch (error) {
-        return new PinActionResult<IPin>(
-            new DatabaseActionResult(
-            false,
-            `Failed: pin could not be retrieved from ${coordinateToString(coordinate)}. ${error}`
-            ),
-            undefined
-        );
-        }
-    }
+  }
 
   // Get a pin[] of all pins from the database
   async getAllPins(): Promise<IPinActionResult<IPin[]>> {
@@ -233,10 +273,7 @@ class Database implements IDatabase {
       });
 
       return new PinActionResult<IPin[]>(
-        new DatabaseActionResult(
-          true,
-          `Succeeded: pins retrieved`
-        ),
+        new DatabaseActionResult(true, `Succeeded: pins retrieved`),
         pinsList
       );
     } catch (error) {
@@ -267,10 +304,7 @@ class Database implements IDatabase {
       });
 
       return new PinActionResult<LatLng[]>(
-        new DatabaseActionResult(
-          true,
-          `Succeeded: pin coordinates retrieved.`
-        ),
+        new DatabaseActionResult(true, `Succeeded: pin coordinates retrieved.`),
         pinCoordinatesList
       );
     } catch (error) {
@@ -284,57 +318,53 @@ class Database implements IDatabase {
     }
   }
 
-// creates a listener for changes to the db
-// should update the state of the store dependent on changes
-// returns a subscriber that can be called to unsubcribe from changes
-// https://firebase.google.com/docs/firestore/query-data/listen
- async monitorDatabaseChanges() {
+  // creates a listener for changes to the db
+  // should update the state of the store dependent on changes
+  // returns a subscriber that can be called to unsubcribe from changes
+  // https://firebase.google.com/docs/firestore/query-data/listen
+  async monitorDatabaseChanges() {
     const pinsCollection = collection(this.database, "pins");
     const pinSnapshot = await getDocs(pinsCollection);
     const q = query(pinsCollection);
 
     return onSnapshot(pinsCollection, (snapshot) => {
-
-        snapshot.docChanges().forEach((change) => {
-            const pin = pinConverter.fromFirestore(change.doc); 
-            console.log(`change: ${change}`);
-            if(change.type === "added") {
-                store.dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                store.dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                store.dispatch(removePin(pin));
-            }
-        })
-    })
+      snapshot.docChanges().forEach((change) => {
+        const pin = pinConverter.fromFirestore(change.doc);
+        console.log(`change: ${change}`);
+        if (change.type === "added") {
+          store.dispatch(addPin(pin));
+        } else if (change.type === "modified") {
+          store.dispatch(updatePin(pin));
+        } else if (change.type === "removed") {
+          store.dispatch(removePin(pin));
+        }
+      });
+    });
+  }
 }
-}
-
 
 // action result implementations
 
 class DatabaseActionResult implements IDatabaseActionResult {
-    readonly succeeded: boolean;
-    readonly message: string;
+  readonly succeeded: boolean;
+  readonly message: string;
 
-    constructor(succeeded: boolean, message: string) {
-        this.succeeded = succeeded;
-        this.message = message;
-    }
+  constructor(succeeded: boolean, message: string) {
+    this.succeeded = succeeded;
+    this.message = message;
+  }
 }
 
 class PinActionResult<T> implements IPinActionResult<T> {
-    succeeded: boolean;
-    message: string;
-    data?: T;
+  succeeded: boolean;
+  message: string;
+  data?: T;
 
-    constructor(result: IDatabaseActionResult, data?: T) {
-        this.succeeded = result.succeeded;
-        this.message = result.message;
-        this.data = data;
-    }
+  constructor(result: IDatabaseActionResult, data?: T) {
+    this.succeeded = result.succeeded;
+    this.message = result.message;
+    this.data = data;
+  }
 }
 
- export { Database };
-
+export { Database };
