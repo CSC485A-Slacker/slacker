@@ -6,8 +6,9 @@
 //import {...} from "firebase/storage";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-import { initializeApp, getApps } from "firebase/app";
-import {getAuth} from "firebase/auth"
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "",
@@ -19,7 +20,10 @@ const firebaseConfig = {
     appId: ""
 };
 
-const firebaseApp = initializeApp(firebaseConfig)
+const firebaseApp = initializeApp(firebaseConfig);
 
-const auth = getAuth()
-export { firebaseApp, auth }
+const auth = getAuth();
+
+const storage = getStorage(firebaseApp);
+
+export { firebaseApp, auth, storage };

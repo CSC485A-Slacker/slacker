@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import MapView, { LatLng } from "react-native-maps";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { Marker, Callout } from "react-native-maps";
-import { FAB, Text } from "react-native-elements";
+import { View, StyleSheet } from "react-native";
+import { Marker } from "react-native-maps";
+import { FAB } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, store } from "../../redux/Store";
+import { RootState } from "../../redux/Store";
 import {
   addPin,
   generateRandomKey,
@@ -12,10 +12,16 @@ import {
   updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
-import { Database} from "../../data/Database";
-import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
+import { Database } from "../../data/Database";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  query,
+} from "@firebase/firestore";
 import { firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
+import PinInfoOverlay from "../../components/PinInfoOverlay";
 
 const database = new Database();
 
@@ -47,8 +53,8 @@ let newPin: Pin = {
   activity: {
     checkIn: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
 export const MapScreen = ({ route, navigation }) => {
@@ -57,27 +63,26 @@ export const MapScreen = ({ route, navigation }) => {
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+  const [pinInfoVisible, setPinInfoVisible] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(pins[0]);
 
   const db = getFirestore(firebaseApp);
-  const q = query(collection(db, "pins"))
+  const q = query(collection(db, "pins"));
 
-useEffect( () => { 
+  useEffect(() => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        
-      const pin = pinConverter.fromFirestore(change.doc)
-        //console.log(`PIN COOR: ${pin.coordinate.latitude} ${pin.coordinate.longitude}`)
-            if(change.type === "added") {
-                dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                dispatch(removePin(pin));
-            }
+      snapshot.docChanges().forEach((change) => {
+        const pin = pinConverter.fromFirestore(change.doc);
+        if (change.type === "added") {
+          dispatch(addPin(pin));
+        } else if (change.type === "modified") {
+          dispatch(updatePin(pin));
+        } else if (change.type === "removed") {
+          dispatch(removePin(pin));
+        }
+      });
     });
-  }); }, [] )
-  
+  }, []);
 
   // If pin was added, reset to original view
   useEffect(() => {
@@ -120,8 +125,8 @@ useEffect( () => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -150,8 +155,8 @@ useEffect( () => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-       }
+        totalUsers: 0,
+      },
     };
     navigation.navigate("Spot Details", {
       newPin: pinToAdd,
@@ -163,6 +168,23 @@ useEffect( () => {
     setConfirmCancelVisible(false);
     setAddPinVisible(true);
   };
+
+  const handlePinPress = (e, pin: Pin) => {
+    if (pin.details.title != "") {
+      e.stopPropagation();
+      setPinInfoVisible(true);
+      setSelectedPin((selectedPin) => ({
+        ...selectedPin,
+        ...pin,
+      }));
+    }
+  };
+
+  const onMapPress = () => {
+    setPinInfoVisible(false);
+    setSelectedPin(null)
+  }
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
@@ -175,27 +197,21 @@ useEffect( () => {
         }}
         onRegionChangeComplete={(e) => updateRegionCoordinates(e)}
         provider={"google"}
+        showsPointsOfInterest={false}
+        onMarkerPress={(e) => updateRegionCoordinates(e.nativeEvent.coordinate)}
+        onPress={onMapPress}
       >
         {pins.map((pin) => (
-          
           <Marker
             key={pin.key}
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
-          >
-            {pin.details.title ? (
-              <Callout style={styles.callout}>
-                <View>
-                  <Text style={styles.title}>{pin.details.title}</Text>
-                  <Text style={styles.description}>{pin.details.description}</Text>
-                  <Text>{pin.details.slacklineType}</Text>
-                  <Text style={styles.text}>{pin.details.slacklineLength + "m"}</Text>
-                </View>
-              </Callout>
-            ) : null}
-          </Marker>
+            onPress={(e) => {
+              handlePinPress(e, pin);
+            }}
+          ></Marker>
         ))}
       </MapView>
       {confirmCancelVisible ? (
@@ -225,6 +241,12 @@ useEffect( () => {
           placement="right"
         />
       ) : null}
+      {pinInfoVisible ? (
+        <PinInfoOverlay
+          pin={{ ...selectedPin }}
+          navigation={navigation}
+        ></PinInfoOverlay>
+      ) : null}
     </View>
   );
 };
@@ -235,25 +257,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-    zIndex: -1,
-  },
-  callout: {
-    maxWidth: 200,
-  },
-  title: {
-    fontSize: 20,
-    color: "#219f94",
-    paddingBottom: 2,
-  },
-  text: {
-    paddingBottom: 5,
-  },
-  description: {
-    fontSize: 10,
-    paddingBottom: 7,
-  },
+    ...StyleSheet.absoluteFillObject,
+  }
 });

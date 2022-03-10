@@ -80,7 +80,10 @@ export const pinSlice = createSlice({
               slacklineType: action.payload.details.slacklineType,
               color: "red",
               draggable: false,
-            }
+            },
+            reviews: action.payload.reviews,
+            photos: action.payload.photos,
+            activity: action.payload.activity
           };
         }
         return pin;

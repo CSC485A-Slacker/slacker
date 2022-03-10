@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Text, Input, FAB } from "react-native-elements";
 import { useDispatch } from "react-redux";
-import { removePin, updatePin } from "../../redux/PinSlice";
+import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
@@ -23,14 +23,13 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const [slacklineLength, onChangeLength] = useState("");
   const [slacklineType, onChangeType] = useState("");
 
-
   const onConfirmPress = async () => {
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-      color: "red",
+        color: "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
@@ -41,8 +40,8 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       activity: {
         checkIn: false,
         activeUsers: 0,
-        totalUsers:  0,
-      }
+        totalUsers: 0,
+      },
     };
     dispatch(removePin(confirmPin));
     navigation.navigate({
@@ -52,12 +51,10 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       },
     });
     try {
-      console.log(confirmPin);
       const resp = await database.addPin(pinConverter.toFirestore(confirmPin));
       console.log(resp);
-      
-    } catch(error) {
-        console.log(`error adding pin: ${error}`);
+    } catch (error) {
+      console.log(`error adding pin: ${error}`);
     }
   };
 
