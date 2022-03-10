@@ -12,17 +12,30 @@ const Tab = createBottomTabNavigator();
 
 const MapStack = createNativeStackNavigator();
 
+const MainStack = createNativeStackNavigator();
+
+export const MainStackScreen = () => {
+    return(
+    <MainStack.Navigator
+        screenOptions={{
+            headerShown: false,
+        }}>
+        <MainStack.Screen name="Login" component = {LoginScreen} options={{ headerLeft: ()=> null, headerBackVisible: false }}/>
+        <MainStack.Screen name="Main" component={NavTabs}  options={{ headerLeft: ()=> null, headerBackVisible: false }}/>
+    </MainStack.Navigator>
+    );
+}
+
 function MapStackScreen() {
   return (
     <MapStack.Navigator>
-      <MapStack.Screen name="Login" component = {LoginScreen} />
       <MapStack.Screen name="Map" component={MapScreen} />
       <MapStack.Screen name="Spot Details" component={PinDetailsScreen} />
     </MapStack.Navigator>
   );
 }
 
-export const NavTabs = () => {
+function NavTabs (){
   return (
     <Tab.Navigator
       screenOptions={{

@@ -14,7 +14,7 @@ import {
 import { Pin } from "../../data/Pin";
 import { Database} from "../../data/Database";
 import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
-import { firebaseApp } from "../../config/FirebaseConfig";
+import { auth, firebaseApp } from "../../config/FirebaseConfig";
 import { pinConverter } from "../../data/DataConverters";
 
 const database = new Database();
@@ -60,6 +60,16 @@ export const MapScreen = ({ route, navigation }) => {
 
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"))
+
+  // navigate to login screen if user is not logged in
+  useEffect( () => {
+    const user = auth.currentUser;
+    console.log(`user in map: ${user}`);
+    if(!user) {
+        console.log(`should navigate to login`);
+        navigation.navigate("Login");
+    }
+  }, [])
 
 useEffect( () => { 
     const unsubscribe = onSnapshot(q, (snapshot) => {

@@ -8,14 +8,26 @@ import { IUser } from '../../data/Interfaces';
 import { User } from '../../data/User';
 
 export const LoginScreen = ({navigation}) => {
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const db = new Database()
 
+  // navigate to main screen if user is logged in
+  useEffect( () => {
+    const user = auth.currentUser;
+    console.log(`user in login: ${user}`);
+    if(auth.currentUser) {
+        navigation.navigate("Main");
+    }
+  },);
+
+  
+  
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("Map")
+        navigation.navigate("Main");
       }
     })
 
@@ -37,7 +49,7 @@ export const LoginScreen = ({navigation}) => {
       signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        navigation.navigate("Map")
+        navigation.navigate("Main")
       })
       .catch(error => alert(error.message))
   }
