@@ -2,7 +2,7 @@
   "expo": {
     "name": "Slacker",
     "slug": "csc485a-slacker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -20,7 +20,9 @@
       "bundleIdentifier": "com.slacker.slacker",
       "buildNumber": "1.0.0",
       "supportsTablet": true,
-      "googleMapsApiKey": "AIzaSyAf7gDwXKzx2al4nG7ir5Vi7RnqAUlKD5U"
+      "config": {
+        "googleMapsApiKey": "AIzaSyAf7gDwXKzx2al4nG7ir5Vi7RnqAUlKD5U"
+        } 
     },
     "android": {
       "package": "com.yourcompany.yourappname",
