@@ -58,3 +58,6 @@ This milestone focuses on more of the *nice-to-have's* than the previous two, ho
 - [ ] Points system to reward users for participating with the app. This could also be used as a pseudo skill classifier, rather than outright specifying the difficulty of the `hotspot`.
 - [ ] Public/Private pins: Drop a pin that only your frieds/followers can see, or make it open to everyone, or just yourself for future reference.
 - [ ] Marketplace where users can purchase affiliated slackline merch (slacklines, clothing etc). This could be an avenue for sponsorships, advertisements and affiliations to make this profitable.
+  
+### Download the App
+Currently, the app is available to download as an APK on Android, and available to use through the [TestFlight](https://developer.apple.com/testflight/) app on IOS. For either or these, send us a message in the CSC 485A slack and we will send you a link :)
