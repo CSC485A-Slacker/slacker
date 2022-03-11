@@ -19,7 +19,8 @@
     "ios": {
       "bundleIdentifier": "com.slacker.slacker",
       "buildNumber": "1.0.0",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "googleMapsApiKey": "AIzaSyAf7gDwXKzx2al4nG7ir5Vi7RnqAUlKD5U"
     },
     "android": {
       "package": "com.yourcompany.yourappname",
