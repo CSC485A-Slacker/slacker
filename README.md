@@ -1,4 +1,4 @@
-<img src="Slacker_logo.png" alt="drawing" width="400"/>
+<img src="Slacker-Logo.png" alt="drawing" width="400"/>
 
 # Slacker - A Slackliner's Every day Solution
 📝 **Authors**:
@@ -12,7 +12,7 @@
 ## 🗺 Overview
 We propose to create a mobile application where users can quickly and easily see where fellow slackliners are setting up their slacklines, and have the option to announce where they are via placing a pin on our map.
 
-[Checkout out our product page](https://sites.google.com/view/csc485a-slacker/home)
+Checkout out our product page [here](https://sites.google.com/view/csc485a-slacker/home)
 
 ### ✔ Decisions Made
 * Real-time view of slackliners on the map
