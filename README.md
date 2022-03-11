@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Slacker-Logo.png" alt="drawing" width="600"/>
+  <img src="Slacker-Logo.png" alt="drawing" width="400"/>
 <p align="center">
 
 
