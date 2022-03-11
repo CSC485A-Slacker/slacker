@@ -1,4 +1,7 @@
-<img src="Slacker-Logo.png" alt="drawing" width="400"/>
+<p align="center">
+  <img src="Slacker-Logo.png" alt="drawing" width="600"/>
+<p align="center">
+
 
 # Slacker - A Slackliner's Every day Solution
 📝 **Authors**:
