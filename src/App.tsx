@@ -4,8 +4,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { MainStackScreen } from "./Router";
 import { store } from "./redux/Store";
 import { Provider } from "react-redux";
+import { LogBox } from "react-native";
 
 export default function App() {
+  // hides yellow box warnings on screen - useful for demos
+  // LogBox.ignoreAllLogs() 
   return (
     <Provider store={store}>
       <SafeAreaProvider>

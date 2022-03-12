@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MapScreen } from "./screens/Map/MapScreen";
+import { defaultColor, MapScreen } from "./screens/Map/MapScreen";
 import { PinDetailsScreen } from "./screens/Map/PinDetailsScreen";
 import { LoginScreen } from "./screens/Login/LoginScreen";
 import { ProfileScreen } from "./screens/Profile/ProfileScreen";
@@ -45,7 +45,7 @@ function NavTabs (){
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#219f94",
+        tabBarActiveTintColor: defaultColor,
         headerShown: false,
       }}
     >

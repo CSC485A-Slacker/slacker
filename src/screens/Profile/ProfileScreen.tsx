@@ -1,7 +1,7 @@
 import { signOut } from "firebase/auth";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { auth } from "../../config/FirebaseConfig";
-import { MapStackScreen } from "../../Router";
+import { defaultColor } from "../Map/MapScreen";
 
 export const ProfileScreen = ({navigation}) => {
     const user = auth.currentUser
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
-    backgroundColor: '#0782F9',
+    backgroundColor: defaultColor,
     width: '100%',
     padding: 15,
     borderRadius: 10,

@@ -52,7 +52,8 @@ let newPin: Pin = {
   },
 };
 
-const defaultColor:string = "#219f94";
+export const defaultColor: string = "#219f94";
+export const greyColor: string = "#696969";
 const hotColor:string = "#D2042D";
 
 export const MapScreen = ({ route, navigation }: any) => {

@@ -9,6 +9,7 @@ import { PinPhoto } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
+import { defaultColor, greyColor } from "./MapScreen";
 
 const IMAGE_FOLDER = "images/"
 
@@ -119,8 +120,8 @@ export const AddPhotoScreen = ({ route, navigation }) => {
   return (
       <View style={styles.view}>
         <View style={styles.container}>
-          <Text style={styles.title} h4>
-            Add a Photo for {pin.details.title}
+          <Text style={styles.title} h3>
+            Photo of {pin.details.title}
           </Text>
           <Text style={styles.subTitle}>
             {pin.details.slacklineType} - {pin.details.slacklineLength}m
@@ -137,16 +138,18 @@ export const AddPhotoScreen = ({ route, navigation }) => {
               <Button
                 title="Select Photo"
                 buttonStyle={{
-                  backgroundColor: "#219f94",
+                  backgroundColor: defaultColor,
                   borderWidth: 1,
                   borderColor: "white",
                   borderRadius: 30,
+                  padding: 10,
+                  width: 150,
                 }}
                 containerStyle={{
                   margin: 15,
                 }}
-                icon={{ name: "my-library-add", color: "white" }}
-                titleStyle={{ fontSize: 14}}
+                icon={{ name: "my-library-add", size: 20, color: "white" }}
+                titleStyle={{ fontSize: 16}}
                 onPress={pickPhoto}
               />
             </View>
@@ -154,16 +157,18 @@ export const AddPhotoScreen = ({ route, navigation }) => {
               <Button
                 title="Submit"
                 buttonStyle={{
-                  backgroundColor: "#219f94",
+                  backgroundColor: defaultColor,
                   borderWidth: 1,
                   borderColor: "white",
                   borderRadius: 30,
+                  padding: 10,
+                  width: 150,
                 }}
                 containerStyle={{
                   margin: 15,
                 }}
-                icon={{ name: "arrow-forward-ios", color: "white"}}
-                titleStyle={{ fontSize: 14, color: "white" }}
+                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
+                titleStyle={{ fontSize: 16}}
                 onPress={onSubmitPress}
                 disabled={submitButtonDisabled}
               />
@@ -177,9 +182,9 @@ export const AddPhotoScreen = ({ route, navigation }) => {
               }}
             >
               <View style={styles.container}>
-              <Text style={styles.title}>Uploading Image</Text>
+              <Text style={styles.loadingTitle}>Uploading Image</Text>
                 <Text style={styles.loadingText}>Please hang tight</Text>
-            <ActivityIndicator size="large" color="#219f94" />
+            <ActivityIndicator size="large" color={defaultColor} />
               </View>
             </Overlay>
             
@@ -201,18 +206,13 @@ const styles = StyleSheet.create({
   title: {
     padding: 40,
     paddingBottom: 10,
-    fontSize: 18,
-    color: "#219f94",
+    color: defaultColor,
+    textAlign: "center"
   },
   subTitle: {
-    color: "#18857b",
+    color: defaultColor,
     paddingBottom: 20,
-  },
-  reviewTitle: {
-    padding: 10,
-    fontSize: 18,
-    color: "#626264",
-    alignItems: "center",
+    fontSize: 16,
   },
   buttonsContainer: {
     flexDirection: "row",
@@ -226,12 +226,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     fontSize: 12,
-    color: "#626264",
+    color: greyColor,
+  },
+  loadingTitle: {
+    padding: 40,
+    paddingBottom: 10,
+    color: defaultColor,
+    fontSize: 18,
   },
   loadingText: {
     alignItems: "center",
     marginBottom: 20,
-    fontSize: 14,
-    color: "#626264",
+    fontSize: 12,
+    color: greyColor,
   },
 });

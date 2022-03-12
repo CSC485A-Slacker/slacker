@@ -11,13 +11,14 @@ import { useDispatch } from "react-redux";
 import { Database } from "../../data/Database";
 import { Pin, PinActivity } from "../../data/Pin";
 import { updatePin } from "../../redux/PinSlice";
+import { defaultColor, greyColor } from "./MapScreen";
 
 const database = new Database();
 
 export const CheckInDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
 
-  const { pinId, pinCoords, usr } = route.params;
+  const { pinId, pinCoords, usr, pinTitle } = route.params;
   const [timeValue, setTimeValue] = useState(0);
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
@@ -100,9 +101,10 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.view}>
-        <Text style={styles.text} h3> Going to this spot?</Text>
-
-        <Text style={styles.questionText} h4> How long are you staying? </Text>
+        <View style={styles.container}>
+          <Text style={styles.title} h3> Going to {pinTitle}?</Text>
+        </View>
+        <Text style={styles.questionTitle}> How long are you staying?</Text>
 
         <View style={styles.contentView}>
           <Slider
@@ -128,25 +130,28 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             }}
           />
 
-          <Text style={{ paddingTop: 15, color: "#696969" }}>Duration: {timeValue} hours</Text>
+          <Text style={{ paddingTop: 15, color: greyColor, fontSize: 12 }}>Duration: {timeValue} hours</Text>
         </View>
-          <Text style={styles.questionText} h4> Are you bringing a slackline? </Text>
+          <Text style={styles.questionTitle}> Are you bringing a slackline? </Text>
           
           <View style={styles.contentView}>
             <CheckBox
               title="Yes - I can share with others"
               checked={sharingSlackline}
               onPress={handleSharingSlackline}
+              checkedColor={defaultColor}
             />
             <CheckBox
               title="Yes - I'm flying solo"
               checked={notSharingSlackline}
               onPress={handleNotSharingSlackline}
+              checkedColor={defaultColor}
             />
             <CheckBox
               title="No"
               checked={noSlackline}
               onPress={handleNoSlackline}
+              checkedColor={defaultColor}
             />
           </View>
 
@@ -157,7 +162,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
               iconRight
               iconContainerStyle={{ marginLeft: 10 }}
               titleStyle={{ fontWeight: '500', fontSize: 15 }}
-              buttonStyle={{ backgroundColor: 'rgba(4, 147, 114, 1)', borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
+              buttonStyle={{ backgroundColor: defaultColor, borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
               containerStyle={{ width: "auto", flex: 1, padding: 10 }}
               onPress={handleCancelPress}
             />
@@ -168,23 +173,23 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
               iconRight
               iconContainerStyle={{ marginLeft: 10 }}
               titleStyle={{ fontWeight: '500', fontSize: 15 }}
-              buttonStyle={{ backgroundColor: 'rgba(4, 147, 114, 1)', borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
+              buttonStyle={{ backgroundColor: defaultColor, borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
               containerStyle={{ width: "auto", flex: 1, padding: 10 }}
               onPress={handleConfirmPress}
             />
           </View>
           
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+          <View style={{ flexDirection: 'row', marginTop: 10}}>
             <Icon
               name="info-circle"
               type="font-awesome"
-              color={"#696969"}
+              color={greyColor}
               size={30}
               underlayColor="clear"
-              iconStyle={{marginRight: 5, paddingTop: 15}}
+              iconStyle={{marginRight: 10}}
             />
             
-            <Text style={{ paddingTop: 15, color: "#696969", textAlign: "center"}}> 
+            <Text style={styles.subText}> 
               Checking in lets others know someone is at this spot! {'\n'}But don't worry, your identity will not be made public.
             </Text>
           </View>
@@ -198,13 +203,31 @@ const styles = StyleSheet.create({
   view: {
     margin: 10,
     flex: 1,
-    alignItems: "flex-start",
     justifyContent: "flex-start",
+  },
+    container: {
+    alignItems: "center",
+  },
+  title: {
+    padding: 40,
+    paddingBottom: 20,
+    color: defaultColor,
+    textAlign: "center"
+  },
+  questionTitle: {
+    padding: 10,
+    fontSize: 20,
+    color: greyColor,
   },
   text: {
     padding: 50,
-    paddingLeft: 70,
-    color: "#219f94",
+    paddingLeft: 60,
+    color: defaultColor,
+  },
+  subText: {
+    textAlign: "justify",
+    fontSize: 12,
+    color: greyColor,
   },
   input: {
     fontSize: 14,
@@ -212,12 +235,12 @@ const styles = StyleSheet.create({
   },
   contentView: {
     padding: 20,
+    paddingTop:  10,
     width: '100%',
     justifyContent: 'center',
     alignItems: 'stretch',
   },
   questionText: {
-    textAlign: "left",
     paddingTop: 10,
     color: "#696969",
   }

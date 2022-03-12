@@ -6,15 +6,14 @@ import {
   Keyboard,
 } from "react-native";
 import { Text, Input, Button } from "react-native-elements";
-import { useDispatch } from "react-redux";
-import { updatePin } from "../../redux/PinSlice";
 import { AirbnbRating } from "react-native-ratings";
 import { PinReview } from "../../data/Pin";
 import { Database } from "../../data/Database";
+import { defaultColor, greyColor } from "./MapScreen";
+
 const database = new Database();
 
 export const AddReviewScreen = ({ route, navigation }) => {
-  const dispatch = useDispatch();
   const { pin } = route.params;
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -56,7 +55,7 @@ export const AddReviewScreen = ({ route, navigation }) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.view}>
         <View style={styles.container}>
-          <Text style={styles.title} h4>
+          <Text style={styles.title} h3>
             {pin.details.title}
           </Text>
           <Text style={styles.subTitle}>
@@ -81,22 +80,26 @@ export const AddReviewScreen = ({ route, navigation }) => {
             onChangeText={(comment) => setComment(comment)}
             value={comment}
           />
-          <Button
+          <View style={styles.container}>
+            <Button
                 title="Submit"
                 buttonStyle={{
-                  backgroundColor: "#219f94",
+                  backgroundColor: defaultColor,
                   borderWidth: 1,
                   borderColor: "white",
                   borderRadius: 30,
+                  padding: 10,
+                  width: 150,
                 }}
                 containerStyle={{
                   margin: 15,
                 }}
-                icon={{ name: "arrow-forward-ios", color: "white" }}
+                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
                 titleStyle={{ fontSize: 16}}
-            onPress={onSubmitPress}
-            disabled={buttomDisabled}
+                onPress={onSubmitPress}
+                disabled={buttomDisabled}
               />
+          </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -112,27 +115,28 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
-  reviewContainer: {},
   title: {
     padding: 40,
     paddingBottom: 10,
-    color: "#219f94",
+    color: defaultColor,
+    textAlign: "center"
   },
   subTitle: {
-    color: "#18857b",
+    color: defaultColor,
     paddingBottom: 20,
+    fontSize: 16,
   },
   reviewTitle: {
     padding: 10,
-    fontSize: 18,
-    color: "#626264",
+    fontSize: 20,
+    color: greyColor,
     alignItems: "center",
   },
   subText: {
     alignItems: "center",
     padding: 10,
     fontSize: 12,
-    color: "#626264",
+    color: greyColor,
   },
   input: {
     fontSize: 12,
