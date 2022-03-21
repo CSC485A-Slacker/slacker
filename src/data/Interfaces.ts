@@ -44,6 +44,7 @@ interface IPinsState {
 interface IUser {
   _userID: string;
   _checkInSpot: number;
+  _username: string;
 }
 
 interface IDatabase {

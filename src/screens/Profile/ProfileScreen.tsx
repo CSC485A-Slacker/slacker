@@ -1,10 +1,17 @@
 import { signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { auth } from "../../config/FirebaseConfig";
 import { MapStackScreen } from "../../Router";
 
 export const ProfileScreen = ({navigation}) => {
-    const user = auth.currentUser
+    const [email, setEmail] = useState(auth.currentUser?.email)
+    useEffect(()=>{
+      auth.onAuthStateChanged(user => {
+        if(user)
+          setEmail(auth.currentUser?.email)
+      })
+    },[email])
 
     const handleLogout = () => {
       signOut(auth)
@@ -16,7 +23,7 @@ export const ProfileScreen = ({navigation}) => {
     <View style={styles.container}>
         <Text>Profile is under construction!</Text>
       <Text></Text>
-      <Text>Email: {auth.currentUser?.email}</Text>
+      <Text>Email: {email}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
         onPress={handleLogout}

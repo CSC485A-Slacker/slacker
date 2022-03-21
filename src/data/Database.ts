@@ -30,7 +30,7 @@ class Database implements IDatabase {
           {
             throw new Error(`User already existed with ID ${user._userID}`)
           }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, username:user._username})
         } catch (e) {
           console.log("Error adding user: ", e);
         }
