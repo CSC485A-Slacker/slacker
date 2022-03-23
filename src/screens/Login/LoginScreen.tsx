@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, firebaseApp } from '../../config/FirebaseConfig'
-import { Database } from '../../data/Database';
-import { collection, addDoc, getFirestore } from "firebase/firestore"
-import { Button } from 'react-native-elements/dist/buttons/Button';
 
 export const LoginScreen = ({navigation}) => {
 
@@ -55,9 +52,9 @@ export const LoginScreen = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
+          style={[ styles.buttonOutline]}
         >
-          <Text style={styles.buttonOutlineText}>Not a user? Register</Text>
+          <Text style={styles.buttonTextRegister}>Not a user? Register</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -97,7 +94,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginTop: 5,
     borderColor: '#0782F9',
-    borderWidth: 2,
   },
   buttonText: {
     color: 'white',
@@ -108,5 +104,10 @@ const styles = StyleSheet.create({
     color: '#0782F9',
     fontWeight: '700',
     fontSize: 16,
+  },
+  buttonTextRegister: {
+    color: '#0782F9',
+    fontWeight: '700',
+    fontSize: 14,
   },
 })
