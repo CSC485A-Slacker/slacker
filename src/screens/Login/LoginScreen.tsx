@@ -13,8 +13,7 @@ export const LoginScreen = ({navigation}) => {
   }
 
   const handleLogin = () => {
-    
-      signInWithEmailAndPassword(auth, email, password)
+      signInWithEmailAndPassword(auth, email.trimEnd(), password)
       .then(userCredentials => {
         const user = userCredentials.user;
         navigation.navigate("Main")
@@ -31,12 +30,14 @@ export const LoginScreen = ({navigation}) => {
         <TextInput
           placeholder="Email"
           value={email}
+          autoCapitalize='none'
           onChangeText={text => setEmail(text)}
           style={styles.input}
         />
         <TextInput
           placeholder="Password"
           value={password}
+          autoCapitalize='none'
           onChangeText={text => setPassword(text)}
           style={styles.input}
           secureTextEntry

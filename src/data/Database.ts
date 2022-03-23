@@ -36,6 +36,37 @@ class Database implements IDatabase {
         }
         
     }
+    async getAllUsers(): Promise<IUserActionResult<IUser[]>>
+    {
+      try {
+        const pinsCollection = collection(this.database, "users").withConverter(userConverter)
+  
+        const pinSnapshot = await getDocs(pinsCollection);
+  
+        const userList: User[] = [];
+  
+        // converts each document into a pin object
+        pinSnapshot.forEach((user) => {
+          userList.push(user.data());
+        });
+  
+        return new UserActionResult<IUser[]>(
+          new DatabaseActionResult(
+            true,
+            `Succeeded: users retrieved`
+          ),
+          userList
+        );
+      } catch (error) {
+        return new UserActionResult<IUser[]>(
+          new DatabaseActionResult(
+            false,
+            `Failed: users could not be retrieved. ${error}`
+          ),
+          undefined
+        );
+      }
+    }
 
     async getUser(userID: string): Promise<IUserActionResult<IUser>> {
       const userDocRef = doc(this.database, "users", userID)

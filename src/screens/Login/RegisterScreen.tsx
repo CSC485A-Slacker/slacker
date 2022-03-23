@@ -6,7 +6,6 @@ import { Database } from '../../data/Database';
 import { collection, addDoc, getFirestore } from "firebase/firestore"
 import { IUser } from '../../data/Interfaces';
 import { User } from '../../data/User';
-import { Button } from 'react-native-elements/dist/buttons/Button';
 
 export const RegisterScreen = ({navigation}) => {
 
@@ -16,9 +15,26 @@ export const RegisterScreen = ({navigation}) => {
   const db = new Database()
 
 
-  const handleSignUp = () => {
-
-      createUserWithEmailAndPassword(auth, email, password)
+  const handleSignUp = async () => {
+    try
+    {
+      const allUsers = await db.getAllUsers()
+      if(allUsers.data != undefined)
+      {
+        allUsers.data?.forEach(user => {
+          if(user._username == username)
+          {
+            alert("username already existed!")
+            throw new Error("")
+          }
+        })
+      }
+    }
+    catch(error)
+    {
+      return
+    }
+      createUserWithEmailAndPassword(auth, email.trimEnd(), password)
       .then(async userCredentials => {
         const user = userCredentials.user;
         db.addUser(new User(user.uid, 0, username))
@@ -37,18 +53,21 @@ export const RegisterScreen = ({navigation}) => {
         <TextInput
           placeholder="Email"
           value={email}
+          autoCapitalize='none'
           onChangeText={text => setEmail(text)}
           style={styles.input}
         />
         <TextInput
           placeholder="Username"
           value={username}
+          autoCapitalize='none'
           onChangeText={text => setUsername(text)}
           style={styles.input}
         />
         <TextInput
           placeholder="Password"
           value={password}
+          autoCapitalize='none'
           onChangeText={text => setPassword(text)}
           style={styles.input}
           secureTextEntry

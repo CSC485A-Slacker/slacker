@@ -7,7 +7,7 @@ interface IPin {
   details: IPinDetails;
   reviews: IPinReview[];
   photos: IPinPhoto[];
-  activity: IPinActivity;
+  activity: IPinActivity; 
 }
 
 interface IPinDetails {
@@ -55,6 +55,8 @@ interface IDatabase {
   ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
 
   deleteUser(userID: string): void;
+
+  getAllUsers(): Promise<IUserActionResult<IUser[]>>
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
    *

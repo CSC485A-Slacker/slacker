@@ -4,6 +4,7 @@ import {
   IPinReview,
   IPinPhoto,
   IPinActivity,
+  IUser,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
@@ -165,6 +166,13 @@ const pinConverter = {
 };
 
 const userConverter = {
+  toFirestore: (user: IUser) => {
+    return {
+      userID: user._userID,
+      checkInSpot: user._checkInSpot,
+      username: user._username
+    };
+  },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
       snapshot.get('userID'),
