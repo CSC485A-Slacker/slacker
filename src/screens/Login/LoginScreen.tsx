@@ -39,7 +39,7 @@ export const LoginScreen = ({navigation}) => {
       createUserWithEmailAndPassword(auth, email, password)
       .then(async userCredentials => {
         const user = userCredentials.user;
-        db.addUser(new User(user.uid, 0))
+        db.addUser(new User(user.uid, 0, []));
       })
       .catch(error => alert(error.message))
   }

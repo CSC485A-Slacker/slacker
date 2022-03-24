@@ -168,7 +168,8 @@ const userConverter = {
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
       snapshot.get('userID'),
-      snapshot.get('checkInSpot')
+      snapshot.get('checkInSpot'),
+      snapshot.get('friends')
     );
   },
 };

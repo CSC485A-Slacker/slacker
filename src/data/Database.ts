@@ -47,9 +47,7 @@ class Database implements IDatabase {
           throw new Error(`User with ID ${userID} doesn\'t exist`)
         }
         
-        // console.log(userDocSnap)
         const usr = userConverter.fromFirestore(userDocSnap);
-        // console.log(usr)
 
         return new UserActionResult<IUser>(
           new DatabaseActionResult(
@@ -102,6 +100,19 @@ class Database implements IDatabase {
       catch(error)
       {
         console.log(`delete user failed: ${error}`)
+      }
+    }
+  
+  async addFriend(userID: string, newFriends: string[]) {
+    const userDocRef = doc(this.database, "users", userID)
+      try {
+        const userDocSnap = await getDoc(userDocRef)
+        if(!userDocSnap.exists()) {
+          throw new Error("User doesn't exist")
+        }
+        updateDoc(userDocRef, {friends: newFriends})
+      } catch(error) {
+        console.log(`adding friend failed for user ${userID}: ${error}`)
       }
     }
 
