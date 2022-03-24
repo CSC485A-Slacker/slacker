@@ -5,12 +5,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Text, Input, FAB } from "react-native-elements";
+import { Text, Input, FAB, Switch } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
+import { auth } from "../../config/FirebaseConfig";
 
 const database = new Database();
 
@@ -22,14 +23,20 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const [description, onChangeDescription] = useState("");
   const [slacklineLength, onChangeLength] = useState("");
   const [slacklineType, onChangeType] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+
+  const togglePrivate = () => {
+    setIsPrivate((previousState) => !previousState);
+  };
 
   const onConfirmPress = async () => {
+    const userId = auth.currentUser?.uid || 0;
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-        color: "red",
+        color: isPrivate ? "green" : "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
@@ -42,6 +49,11 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         activeUsers: 0,
         totalUsers: 0,
       },
+      privateViewers: isPrivate
+        ? userId
+          ? [userId]
+          : ([] as string[])
+        : ([] as string[]),
     };
     dispatch(removePin(confirmPin));
     navigation.navigate({
@@ -64,7 +76,6 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         <Text style={styles.text} h4>
           Add Information
         </Text>
-
         <Input
           style={styles.input}
           placeholder="Name"
@@ -90,6 +101,21 @@ export const PinDetailsScreen = ({ route, navigation }) => {
           value={slacklineLength}
           keyboardType="number-pad"
         />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text>Is this a private pin?</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#219f94" }}
+            thumbColor={"#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={togglePrivate}
+            value={isPrivate}
+          />
+        </View>
         <FAB
           containerStyle={{ margin: 20 }}
           visible={true}

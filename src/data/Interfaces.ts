@@ -1,5 +1,4 @@
 import { LatLng } from "react-native-maps";
-import { User } from "./User";
 
 interface IPin {
   key: number;
@@ -8,6 +7,7 @@ interface IPin {
   reviews: IPinReview[];
   photos: IPinPhoto[];
   activity: IPinActivity;
+  privateViewers: string[];
 }
 
 interface IPinDetails {
@@ -49,7 +49,7 @@ interface IUser {
 interface IDatabase {
   addUser(user: IUser): void;
 
-  getUser(userID: string): Promise<IUserActionResult<IUser>>
+  getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
   ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
 
