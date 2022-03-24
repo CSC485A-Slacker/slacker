@@ -44,15 +44,28 @@ interface IPinsState {
 interface IUser {
   _userID: string;
   _checkInSpot: number;
-  _friends: string[];
+  _friends: IFriend[];
+}
+
+enum Status {
+  active = "ACTIVE",
+  blocked = "BLOCKED",
+  // other would be requested, received
+}
+
+interface IFriend {
+  _friendID: string;
+  _status: Status;
 }
 
 interface IDatabase {
   addUser(user: IUser): void;
 
-  getUser(userID: string): Promise<IUserActionResult<IUser>>
+  getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
   ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
+
+  // Add interfaces for Friends
 
   deleteUser(userID: string): void;
   /* Purpose: attempts to add a pin to the database.
@@ -145,6 +158,7 @@ interface IUserActionResult<T> extends IDatabaseActionResult {
 export {
   IPin,
   IUser,
+  IFriend,
   IUserActionResult,
   IPinDetails,
   IPinReview,
@@ -154,4 +168,5 @@ export {
   IPinsState,
   IDatabase,
   IDatabaseActionResult,
+  Status,
 };

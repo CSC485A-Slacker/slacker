@@ -4,11 +4,12 @@ import {
   IPinReview,
   IPinPhoto,
   IPinActivity,
+  IFriend,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
 import { LatLng } from "react-native-maps";
-import { User } from "./User";
+import { Friend, User } from "./User";
 
 // data converters to transform data to and from json objects for firestore use
 const pinCoordinateConverter = {
@@ -161,6 +162,40 @@ const pinConverter = {
       pinPhotosConverter.fromFirestore(snapshot),
       pinActivityConverter.fromFirestore(snapshot)
     );
+  },
+};
+
+const friendConverter = {
+  toFirestore: (friend: IFriend) => {
+    return {
+      friendID: friend._friendID,
+      status: friend._status,
+    };
+  },
+  fromFirestore: (friend: any) => {
+    return new Friend(friend.friendID, friend.status);
+  },
+};
+
+const userFriendsConverter = {
+  toFirestore: (friends: IFriend[]) => {
+    const friendsArray: any = [];
+
+    friends.forEach((friend) => {
+      friendsArray.push(friendConverter.toFirestore(friend));
+    });
+
+    return friendsArray;
+  },
+  fromFirestore: (snapshot: any) => {
+    const friends = snapshot.get("friends");
+
+    const friendsArray: Friend[] = [];
+    friends.forEach((friend: any) => {
+      friendsArray.push(friendConverter.fromFirestore(friend));
+    });
+
+    return friendsArray;
   },
 };
 
