@@ -74,7 +74,7 @@ export const MapScreen = ({ route, navigation }: any) => {
   // navigate to login screen if user is not logged in
   useEffect( () => {
     const user = auth.currentUser;
-    console.log(`user in map: ${user}`);
+    console.log(`user in map: ${user?.uid}`);
     if(!user) {
         console.log(`should navigate to login`);
         navigation.navigate("Login");
