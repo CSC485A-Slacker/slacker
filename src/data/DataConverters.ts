@@ -4,7 +4,10 @@ import {
   IPinReview,
   IPinPhoto,
   IPinActivity,
+<<<<<<< HEAD
   IFriend,
+=======
+>>>>>>> 5af90ca95dc149f6cb834bfdd29ef6c3f5154bac
   IUser,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
@@ -205,13 +208,15 @@ const userConverter = {
     return {
       userID: user._userID,
       checkInSpot: user._checkInSpot,
+      username: user._username,
       friends: user._friends,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
-      snapshot.get("userID"),
-      snapshot.get("checkInSpot"),
+      snapshot.get('userID'),
+      snapshot.get('checkInSpot'),
+      snapshot.get('username'),
       userFriendsConverter.fromFirestore(snapshot)
     );
   },

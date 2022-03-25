@@ -28,5 +28,13 @@ async function testUser() {
   console.log(retrievedUser._checkInSpot, UpdatedCheckInSPot);
 }
 
+async function testGetAllUsers()
+{
+    const db = new Database()
+    const allUsers = await db.getAllUsers()
+    allUsers.data?.forEach(user => {
+        console.log(user)
+    })
+}
 
-export default testUser
+export default testGetAllUsers

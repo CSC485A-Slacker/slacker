@@ -30,11 +30,42 @@ class Database implements IDatabase {
           {
             throw new Error(`User already existed with ID ${user._userID}`)
           }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, username:user._username})
         } catch (e) {
           console.log("Error adding user: ", e);
         }
         
+    }
+    async getAllUsers(): Promise<IUserActionResult<IUser[]>>
+    {
+      try {
+        const pinsCollection = collection(this.database, "users").withConverter(userConverter)
+  
+        const pinSnapshot = await getDocs(pinsCollection);
+  
+        const userList: User[] = [];
+  
+        // converts each document into a pin object
+        pinSnapshot.forEach((user) => {
+          userList.push(user.data());
+        });
+  
+        return new UserActionResult<IUser[]>(
+          new DatabaseActionResult(
+            true,
+            `Succeeded: users retrieved`
+          ),
+          userList
+        );
+      } catch (error) {
+        return new UserActionResult<IUser[]>(
+          new DatabaseActionResult(
+            false,
+            `Failed: users could not be retrieved. ${error}`
+          ),
+          undefined
+        );
+      }
     }
 
     async getUser(userID: string): Promise<IUserActionResult<IUser>> {

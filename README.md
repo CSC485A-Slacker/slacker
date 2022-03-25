@@ -51,7 +51,7 @@ This milestone focuses on more of the *nice-to-have's* than the previous two, ho
 
 - [ ] Add/delete your favorite spots in a list where you can click on any one of them to take you right to that location for viewing information.
 - [ ] Any spots that are on the map which are also a part of the user's `favorites` list will be highlighted.
-- [ ] Send a URL invite for a particular spot to anybody, and if the recipient doesn't have the app, they will be directed to the appropriate location to download it.
+- [ ] ~~Send a URL invite for a particular spot to anybody, and if the recipient doesn't have the app, they will be directed to the appropriate location to download it.~~
 
 ## Possible Future Extensions
 - [ ] See a list of friends or followers and what spots they are currently checked in at.

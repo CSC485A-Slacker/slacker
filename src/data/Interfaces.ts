@@ -7,7 +7,7 @@ interface IPin {
   details: IPinDetails;
   reviews: IPinReview[];
   photos: IPinPhoto[];
-  activity: IPinActivity;
+  activity: IPinActivity; 
 }
 
 interface IPinDetails {
@@ -44,13 +44,15 @@ interface IPinsState {
 interface IUser {
   _userID: string;
   _checkInSpot: number;
+  _username: string;
   _friends: IFriend[];
 }
 
 enum Status {
-  active = "ACTIVE",
-  blocked = "BLOCKED",
-  // other would be requested, received
+  accepted = "ACCEPTED",
+  blocked = "BLOCKED",  
+  recieved = "RECEIVED", 
+  sent = "SENT"
 }
 
 interface IFriend {
@@ -68,6 +70,8 @@ interface IDatabase {
   // Add interfaces for Friends
 
   deleteUser(userID: string): void;
+
+  getAllUsers(): Promise<IUserActionResult<IUser[]>>
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
    *
