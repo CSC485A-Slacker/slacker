@@ -87,7 +87,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             <View style={styles.buttonContainer}>
               <Button
                 title="Check In"
-                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
+                icon={{name: "angle-double-right",  type: "font-awesome", size: 20, color: "white",}}
                 iconRight
                 buttonStyle={{
                   backgroundColor: defaultColor,
@@ -146,27 +146,24 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             </View>
           </View>
           <View>
-            <Divider style={styles.divider}/>
+            <Divider style={styles.divider} />
             {photos.length != 0 ? (
-              <ScrollView
-                horizontal={true}
-              >
+              <ScrollView horizontal={true}>
                 {photos.map((photo: PinPhoto) => (
-                   <PhotoItem photo={photo} key={photo.url} />
+                  <PhotoItem photo={photo} key={photo.url} />
                 ))}
               </ScrollView>
             ) : (
-                <View>
-                  <Text style={styles.subTitle}>Photos</Text>
-                  <Text style={styles.text}>
-                    Share your photos using the buttom above!
-                  </Text>
-                </View>
-              
+              <View>
+                <Text style={styles.subTitle}>Photos</Text>
+                <Text style={styles.text}>
+                  Share your photos using the buttom above!
+                </Text>
+              </View>
             )}
           </View>
           <View>
-            <Divider style={styles.divider}/>
+            <Divider style={styles.divider} />
             <View style={styles.infoContainer}>
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{pin.details.description}</Text>
@@ -177,8 +174,9 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 Total People Visited: {pin.activity.totalUsers}
               </Text>
               <Text style={styles.text}>
-                {pin.activity.shareableSlackline ? 
-                "Slacklining gear is available to share!" : "Please bring your own gear!"}
+                {pin.activity.shareableSlackline
+                  ? "Slacklining gear is available to share!"
+                  : "Please bring your own gear!"}
               </Text>
             </View>
             <Divider />
@@ -200,7 +198,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
               </Text>
             )}
           </View>
-          <Divider style={styles.divider}/>
+          <Divider style={styles.divider} />
         </View>
       </View>
     </SlidingUpPanel>
