@@ -15,7 +15,7 @@ async function testUser() {
     await db.deleteUser(userID1);
   }
 
-  await db.addUser(new User(userID1, 0, "user" []));
+  await db.addUser(new User(userID1, 0, "user", []));
 
   var retrievedUser = await db.getUser(userID1);
 
