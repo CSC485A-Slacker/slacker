@@ -23,6 +23,7 @@ import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
 import { defaultColor, hotColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -73,6 +74,8 @@ export const MapScreen = ({ route, navigation }: any) => {
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"));
 
+  const toast = useToast(); // toast notifications
+
   // navigate to login screen if user is not logged in
   useEffect(() => {
     const user = auth.currentUser;
@@ -103,6 +106,9 @@ export const MapScreen = ({ route, navigation }: any) => {
       setHotSpotToggleVisible(true);
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
+      toast.show("Pin added successfuly!", {
+        type: "success",
+      });
     }
   });
 
