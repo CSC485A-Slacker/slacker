@@ -5,6 +5,7 @@ import {
   IPinPhoto,
   IPinActivity,
   IFriend,
+  IUser,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
@@ -200,11 +201,18 @@ const userFriendsConverter = {
 };
 
 const userConverter = {
+  toFirestore: (user: IUser) => {
+    return {
+      userID: user._userID,
+      checkInSpot: user._checkInSpot,
+      friends: user._friends,
+    };
+  },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
-      snapshot.get('userID'),
-      snapshot.get('checkInSpot'),
-      snapshot.get('friends')
+      snapshot.get("userID"),
+      snapshot.get("checkInSpot"),
+      userFriendsConverter.fromFirestore(snapshot)
     );
   },
 };

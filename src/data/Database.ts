@@ -11,7 +11,7 @@ import {
   updatePin,
 } from "../redux/PinSlice";
 import { store } from "../redux/Store"
-import { User } from "./User";
+import { Friend, User } from "./User";
 
 
 class Database implements IDatabase {
@@ -103,18 +103,19 @@ class Database implements IDatabase {
       }
     }
   
-  async addFriend(userID: string, newFriends: string[]) {
+  async editFriends(userID: string, newFriends: Friend[]) {
     const userDocRef = doc(this.database, "users", userID)
-      try {
-        const userDocSnap = await getDoc(userDocRef)
-        if(!userDocSnap.exists()) {
-          throw new Error("User doesn't exist")
-        }
-        updateDoc(userDocRef, {friends: newFriends})
-      } catch(error) {
-        console.log(`adding friend failed for user ${userID}: ${error}`)
+    try {
+      const userDocSnap = await getDoc(userDocRef)
+      if(!userDocSnap.exists()) {
+        throw new Error("User doesn't exist")
       }
+      updateDoc(userDocRef, {friends: newFriends})
+    } catch(error) {
+      console.log(`Editing friends failed for user ${userID}: ${error}`)
     }
+  }
+   
 
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {
