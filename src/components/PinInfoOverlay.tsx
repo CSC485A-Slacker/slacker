@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text, Divider, Button, Image } from "react-native-elements";
+import { Text, Divider, Button } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
 import { Pin, PinPhoto, PinReview } from "../data/Pin";
@@ -17,6 +17,7 @@ import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
+import { defaultColor } from "../style/styles";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -48,7 +49,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
     new Animated.Value(draggableRange.bottom)
   );
 
-  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined) => {
+  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined, pinTitle: string) => {
     if (userId) {
       const userPromise = database.getUser(userId);
       userPromise.then(result => {
@@ -56,7 +57,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
         if (usr?._checkInSpot == pinId) {
           Alert.alert('You have already checked in here!')
         } else {
-          navigation.navigate("Check-In Details", { pinId, pinCoords, usr })
+          navigation.navigate("Check-In Details", { pinId, pinCoords, usr, pinTitle })
         }
       })
     } else {
@@ -89,7 +90,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
                 iconRight
                 buttonStyle={{
-                  backgroundColor: "#219f94",
+                  backgroundColor: defaultColor,
                   borderWidth: 2,
                   borderColor: "white",
                   borderRadius: 30,
@@ -98,7 +99,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid)}
+                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid, pin.details.title)}
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -107,14 +108,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 buttonStyle={{
                   backgroundColor: "white",
                   borderWidth: 1,
-                  borderColor: "#219f94",
+                  borderColor: defaultColor,
                   borderRadius: 30,
                 }}
                 type="outline"
                 containerStyle={{
                   marginRight: 10,
                 }}
-                titleStyle={{ fontSize: 14, color: "#219f94" }}
+                titleStyle={{ fontSize: 14, color: defaultColor }}
                 onPress={(e) => {
                   navigation.navigate("Add a Review", {
                     pin: pin,
@@ -128,14 +129,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 buttonStyle={{
                   backgroundColor: "white",
                   borderWidth: 1,
-                  borderColor: "#219f94",
+                  borderColor: defaultColor,
                   borderRadius: 30,
                 }}
                 type="outline"
                 containerStyle={{
                   marginRight: 10,
                 }}
-                titleStyle={{ fontSize: 14, color: "#219f94" }}
+                titleStyle={{ fontSize: 14, color: defaultColor }}
                 onPress={(e) => {
                   navigation.navigate("Add a Photo", {
                     pin: pin,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontSize: 20,
-    color: "#219f94",
+    color: defaultColor,
     padding: 10,
     paddingBottom: 4,
     paddingLeft: 4,

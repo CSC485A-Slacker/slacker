@@ -155,6 +155,7 @@ const pinConverter = {
       reviews: pinReviewsConverter.toFirestore(pin.reviews),
       photos: pinPhotosConverter.toFirestore(pin.photos),
       activity: pinActivityConverter.toFirestore(pin.activity),
+      privateViewers: pin.privateViewers,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -164,7 +165,8 @@ const pinConverter = {
       pinDetailsConverter.fromFirestore(snapshot),
       pinReviewsConverter.fromFirestore(snapshot),
       pinPhotosConverter.fromFirestore(snapshot),
-      pinActivityConverter.fromFirestore(snapshot)
+      pinActivityConverter.fromFirestore(snapshot),
+      snapshot.get("privateViewers") || []
     );
   },
 };
@@ -209,15 +211,24 @@ const userConverter = {
       userID: user._userID,
       checkInSpot: user._checkInSpot,
       username: user._username,
+<<<<<<< HEAD
       friends: user._friends,
+=======
+>>>>>>> 22ea116226d420576d6296a4871f7b9cc976a4d5
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
+<<<<<<< HEAD
       snapshot.get('userID'),
       snapshot.get('checkInSpot'),
       snapshot.get('username'),
       userFriendsConverter.fromFirestore(snapshot)
+=======
+      snapshot.get("userID"),
+      snapshot.get("checkInSpot"),
+      snapshot.get("username")
+>>>>>>> 22ea116226d420576d6296a4871f7b9cc976a4d5
     );
   },
 };
@@ -229,5 +240,5 @@ export {
   pinReviewsConverter,
   pinPhotosConverter,
   pinActivityConverter,
-  userConverter
+  userConverter,
 };

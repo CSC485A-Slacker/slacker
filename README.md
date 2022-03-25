@@ -3,7 +3,7 @@
 <p align="center">
 
 
-# Slacker - A Slackliner's Every day Solution
+# Slacker - Connecting Slackliners One Rope at a Time
 📝 **Authors**:
 - Dianna Borinaga (DiannaBanana)
 - Brendan Micetich (brendanmicetich)
@@ -56,7 +56,7 @@ This milestone focuses on more of the *nice-to-have's* than the previous two, ho
 ## Possible Future Extensions
 - [ ] See a list of friends or followers and what spots they are currently checked in at.
 - [ ] Points system to reward users for participating with the app. This could also be used as a pseudo skill classifier, rather than outright specifying the difficulty of the `hotspot`.
-- [ ] Public/Private pins: Drop a pin that only your frieds/followers can see, or make it open to everyone, or just yourself for future reference.
+- [x] Public/Private pins: Drop a pin that only your frieds/followers can see, or make it open to everyone, or just yourself for future reference.
 - [ ] Marketplace where users can purchase affiliated slackline merch (slacklines, clothing etc). This could be an avenue for sponsorships, advertisements and affiliations to make this profitable.
   
 ### Download the App

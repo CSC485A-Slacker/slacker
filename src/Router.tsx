@@ -12,6 +12,7 @@ import { CheckInDetailsScreen } from "./screens/Map/CheckInDetailsScreen";
 import { AddPhotoScreen } from "./screens/Map/AddPhotoScreen";
 import { RegisterScreen } from "./screens/Login/RegisterScreen";
 import { HomeScreen } from "./screens/Home/HomeScreen";
+import { defaultColor } from "./style/styles";
 
 
 const Tab = createBottomTabNavigator();
@@ -50,7 +51,7 @@ function NavTabs (){
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#219f94",
+        tabBarActiveTintColor: defaultColor,
         headerShown: false,
       }}
     >
