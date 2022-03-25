@@ -25,8 +25,8 @@ const examplePin1: Pin = {
   activity: {
     shareableSlackline: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
 const examplePin2: Pin = {
@@ -34,7 +34,7 @@ const examplePin2: Pin = {
   coordinate: {
     latitude: 48.459405,
     longitude: -123.327318,
-  }, 
+  },
   details: {
     title: "Mt Tomie",
     description: "Its pretty cool, nice views.",
@@ -48,8 +48,8 @@ const examplePin2: Pin = {
   activity: {
     shareableSlackline: false,
     activeUsers: 0,
-    totalUsers:  0,
-  }
+    totalUsers: 0,
+  },
 };
 
 export interface PinsState {
@@ -65,9 +65,9 @@ export const pinSlice = createSlice({
   initialState,
   reducers: {
     addPin: (state, action: PayloadAction<Pin>) => {
-        if(!state.pins.find((pin) => pin.key == action.payload.key)) {
-            state.pins.push(action.payload);
-        }
+      if (!state.pins.find((pin) => pin.key == action.payload.key)) {
+        state.pins.push(action.payload);
+      }
     },
     updatePin: (state, action: PayloadAction<Pin>) => {
       state.pins = state.pins.map((pin) => {
@@ -85,7 +85,8 @@ export const pinSlice = createSlice({
             },
             reviews: action.payload.reviews,
             photos: action.payload.photos,
-            activity: action.payload.activity
+            activity: action.payload.activity,
+            privateViewers: action.payload.privateViewers,
           };
         }
         return pin;

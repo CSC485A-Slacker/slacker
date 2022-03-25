@@ -5,12 +5,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Text, Input, Button } from "react-native-elements";
+import { Text, Input, FAB, Switch, Button } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
+import { auth } from "../../config/FirebaseConfig";
 import { defaultColor } from "../../style/styles";
 
 const database = new Database();
@@ -23,21 +24,32 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const [description, onChangeDescription] = useState("");
   const [slacklineLength, onChangeLength] = useState("");
   const [slacklineType, onChangeType] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+
+  const togglePrivate = () => {
+    setIsPrivate((previousState) => !previousState);
+  };
   const [buttomDisabled, setButtomDisabled] = useState(true);
 
   useEffect(() => {
-    if (name != "" &&  description != "" && slacklineType != "" && slacklineLength != "") {
-      setButtomDisabled(false)
+    if (
+      name != "" &&
+      description != "" &&
+      slacklineType != "" &&
+      slacklineLength != ""
+    ) {
+      setButtomDisabled(false);
     }
-  }, [name, description, slacklineType, slacklineLength])
+  }, [name, description, slacklineType, slacklineLength]);
 
   const onConfirmPress = async () => {
+    const userId = auth.currentUser?.uid || 0;
     const confirmPin: Pin = {
       key: newPin.key,
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-        color: "red",
+        color: isPrivate ? "green" : "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
@@ -50,6 +62,11 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         activeUsers: 0,
         totalUsers: 0,
       },
+      privateViewers: isPrivate
+        ? userId
+          ? [userId]
+          : ([] as string[])
+        : ([] as string[]),
     };
     dispatch(removePin(confirmPin));
     navigation.navigate({
@@ -72,7 +89,6 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         <Text style={styles.text} h4>
           Add Information
         </Text>
-
         <Input
           style={styles.input}
           placeholder="Name"
@@ -98,6 +114,21 @@ export const PinDetailsScreen = ({ route, navigation }) => {
           value={slacklineLength}
           keyboardType="number-pad"
         />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text>Is this a private pin?</Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#219f94" }}
+            thumbColor={"#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={togglePrivate}
+            value={isPrivate}
+          />
+        </View>
         <Button
           title="Submit"
           buttonStyle={{
@@ -111,8 +142,13 @@ export const PinDetailsScreen = ({ route, navigation }) => {
           containerStyle={{
             margin: 15,
           }}
-          icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
-          titleStyle={{ fontSize: 16}}
+          icon={{
+            name: "angle-double-right",
+            type: "font-awesome",
+            size: 20,
+            color: "white",
+          }}
+          titleStyle={{ fontSize: 16 }}
           onPress={onConfirmPress}
           disabled={buttomDisabled}
         />
