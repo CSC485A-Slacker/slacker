@@ -11,8 +11,7 @@ import { useDispatch } from "react-redux";
 import { Database } from "../../data/Database";
 import { Pin, PinActivity } from "../../data/Pin";
 import { updatePin } from "../../redux/PinSlice";
-import { defaultColor, greyColor } from "./MapScreen";
-
+import { defaultColor, greyColor } from "../../style/styles";
 const database = new Database();
 
 export const CheckInDetailsScreen = ({ route, navigation }) => {

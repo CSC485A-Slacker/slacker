@@ -11,7 +11,7 @@ import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
-import { defaultColor } from "./MapScreen";
+import { defaultColor } from "../../style/styles";
 
 const database = new Database();
 

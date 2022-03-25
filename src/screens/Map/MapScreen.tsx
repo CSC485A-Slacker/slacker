@@ -17,6 +17,7 @@ import { auth, firebaseApp } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
+import { defaultColor, hotColor } from "../../style/styles";
 
 const database = new Database();
 
@@ -52,9 +53,7 @@ let newPin: Pin = {
   },
 };
 
-export const defaultColor: string = "#219f94";
-export const greyColor: string = "#696969";
-const hotColor:string = "#D2042D";
+
 
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);

@@ -9,7 +9,7 @@ import { Text, Input, Button } from "react-native-elements";
 import { AirbnbRating } from "react-native-ratings";
 import { PinReview } from "../../data/Pin";
 import { Database } from "../../data/Database";
-import { defaultColor, greyColor } from "./MapScreen";
+import { defaultColor, greyColor } from "../../style/styles";
 
 const database = new Database();
 

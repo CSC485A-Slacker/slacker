@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { defaultColor, MapScreen } from "./screens/Map/MapScreen";
+import { MapScreen } from "./screens/Map/MapScreen";
 import { PinDetailsScreen } from "./screens/Map/PinDetailsScreen";
 import { LoginScreen } from "./screens/Login/LoginScreen";
 import { ProfileScreen } from "./screens/Profile/ProfileScreen";
@@ -12,6 +12,7 @@ import { CheckInDetailsScreen } from "./screens/Map/CheckInDetailsScreen";
 import { AddPhotoScreen } from "./screens/Map/AddPhotoScreen";
 import { RegisterScreen } from "./screens/Login/RegisterScreen";
 import { HomeScreen } from "./screens/Home/HomeScreen";
+import { defaultColor } from "./style/styles";
 
 
 const Tab = createBottomTabNavigator();

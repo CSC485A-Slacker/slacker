@@ -17,7 +17,7 @@ import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
-import { defaultColor } from "../screens/Map/MapScreen";
+import { defaultColor } from "../style/styles";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;

@@ -9,7 +9,7 @@ import { PinPhoto } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
-import { defaultColor, greyColor } from "./MapScreen";
+import { defaultColor, greyColor } from "../../style/styles";
 
 const IMAGE_FOLDER = "images/"
 
