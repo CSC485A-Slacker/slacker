@@ -2,24 +2,47 @@ import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, firebaseApp } from '../../config/FirebaseConfig'
+import { Database } from '../../data/Database';
+import { collection, addDoc, getFirestore } from "firebase/firestore"
+import { IUser } from '../../data/Interfaces';
+import { User } from '../../data/User';
 
-export const LoginScreen = ({navigation}) => {
+export const RegisterScreen = ({navigation}) => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const db = new Database()
 
-  const handleSignUp = () => {
-    navigation.navigate("Register")
-  }
 
-  const handleLogin = () => {
-      signInWithEmailAndPassword(auth, email.trimEnd(), password)
-      .then(userCredentials => {
+  const handleSignUp = async () => {
+    try
+    {
+      const allUsers = await db.getAllUsers()
+      if(allUsers.data != undefined)
+      {
+        allUsers.data?.forEach(user => {
+          if(user._username == username)
+          {
+            alert("username already existed!")
+            throw new Error("")
+          }
+        })
+      }
+    }
+    catch(error)
+    {
+      return
+    }
+      createUserWithEmailAndPassword(auth, email.trimEnd(), password)
+      .then(async userCredentials => {
         const user = userCredentials.user;
+        db.addUser(new User(user.uid, 0, username))
         navigation.navigate("Main")
       })
       .catch(error => alert(error.message))
   }
+ 
 
   return (
     <KeyboardAvoidingView
@@ -35,6 +58,13 @@ export const LoginScreen = ({navigation}) => {
           style={styles.input}
         />
         <TextInput
+          placeholder="Username"
+          value={username}
+          autoCapitalize='none'
+          onChangeText={text => setUsername(text)}
+          style={styles.input}
+        />
+        <TextInput
           placeholder="Password"
           value={password}
           autoCapitalize='none'
@@ -46,16 +76,10 @@ export const LoginScreen = ({navigation}) => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           onPress={handleSignUp}
-          style={[ styles.buttonOutline]}
+          style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonTextRegister}>Not a user? Register</Text>
+          <Text style={styles.buttonOutlineText}>Register</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -95,6 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginTop: 5,
     borderColor: '#0782F9',
+    borderWidth: 2,
   },
   buttonText: {
     color: 'white',
@@ -105,10 +130,5 @@ const styles = StyleSheet.create({
     color: '#0782F9',
     fontWeight: '700',
     fontSize: 16,
-  },
-  buttonTextRegister: {
-    color: '#0782F9',
-    fontWeight: '700',
-    fontSize: 14,
   },
 })
