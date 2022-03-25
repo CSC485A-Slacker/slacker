@@ -3,7 +3,7 @@
 <p align="center">
 
 
-# Slacker - A Slackliner's Every day Solution
+# Slacker - Connecting Slackliners One Rope at a Time
 📝 **Authors**:
 - Dianna Borinaga (DiannaBanana)
 - Brendan Micetich (brendanmicetich)
