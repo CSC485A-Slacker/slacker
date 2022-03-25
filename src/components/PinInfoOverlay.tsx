@@ -99,7 +99,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid, pin.title)}
+                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid, pin.details.title)}
               />
             </View>
             <View style={styles.buttonContainer}>
