@@ -59,9 +59,6 @@ let newPin: Pin = {
   privateViewers: [],
 };
 
-const defaultColor: string = "#219f94";
-const hotColor: string = "#D2042D";
-
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
