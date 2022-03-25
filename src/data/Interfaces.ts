@@ -51,7 +51,7 @@ interface IUser {
 enum Status {
   accepted = "ACCEPTED",
   blocked = "BLOCKED",  
-  recieved = "RECEIVED", 
+  received = "RECEIVED", 
   sent = "SENT"
 }
 
