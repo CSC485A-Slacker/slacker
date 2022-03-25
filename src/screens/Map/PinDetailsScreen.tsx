@@ -129,13 +129,6 @@ export const PinDetailsScreen = ({ route, navigation }) => {
             value={isPrivate}
           />
         </View>
-        <FAB
-          containerStyle={{ margin: 20 }}
-          visible={true}
-          icon={{ name: "check", color: "white" }}
-          color="#219f94"
-          title="Confirm"
-        />
         <Button
           title="Submit"
           buttonStyle={{
