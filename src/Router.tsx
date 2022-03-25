@@ -10,6 +10,10 @@ import { AddReviewScreen } from "./screens/Map/AddReviewScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CheckInDetailsScreen } from "./screens/Map/CheckInDetailsScreen";
 import { AddPhotoScreen } from "./screens/Map/AddPhotoScreen";
+import { RegisterScreen } from "./screens/Login/RegisterScreen";
+import { HomeScreen } from "./screens/Home/HomeScreen";
+import { defaultColor } from "./style/styles";
+
 
 const Tab = createBottomTabNavigator();
 
@@ -21,10 +25,12 @@ export const MainStackScreen = () => {
     return(
     <MainStack.Navigator
         screenOptions={{
-            headerShown: false,
+            headerShown: true,
         }}>
-        <MainStack.Screen name="Login" component = {LoginScreen} options={{ headerLeft: ()=> null, headerBackVisible: false }}/>
-        <MainStack.Screen name="Main" component={NavTabs}  options={{ headerLeft: ()=> null, headerBackVisible: false }}/>
+        <MainStack.Screen name="Home" component = {HomeScreen} options={{ headerLeft: ()=> null, headerShown: false, headerBackVisible: false }}/>
+        <MainStack.Screen name="Login" component = {LoginScreen} options={{ headerLeft: ()=> null, headerShown: false, headerBackVisible: false }}/>
+        <MainStack.Screen name="Register" component = {RegisterScreen} options={{ headerLeft: ()=> null, headerBackVisible: true }}/>
+        <MainStack.Screen name="Main" component={NavTabs}  options={{ headerLeft: ()=> null, headerShown: false, headerBackVisible: false }}/>
     </MainStack.Navigator>
     );
 }
@@ -45,7 +51,7 @@ function NavTabs (){
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#219f94",
+        tabBarActiveTintColor: defaultColor,
         headerShown: false,
       }}
     >

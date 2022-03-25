@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Text, Input, FAB, Switch } from "react-native-elements";
+import { Text, Input, FAB, Switch, Button } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import { auth } from "../../config/FirebaseConfig";
+import { defaultColor } from "../../style/styles";
 
 const database = new Database();
 
@@ -28,6 +29,18 @@ export const PinDetailsScreen = ({ route, navigation }) => {
   const togglePrivate = () => {
     setIsPrivate((previousState) => !previousState);
   };
+  const [buttomDisabled, setButtomDisabled] = useState(true);
+
+  useEffect(() => {
+    if (
+      name != "" &&
+      description != "" &&
+      slacklineType != "" &&
+      slacklineLength != ""
+    ) {
+      setButtomDisabled(false);
+    }
+  }, [name, description, slacklineType, slacklineLength]);
 
   const onConfirmPress = async () => {
     const userId = auth.currentUser?.uid || 0;
@@ -122,7 +135,29 @@ export const PinDetailsScreen = ({ route, navigation }) => {
           icon={{ name: "check", color: "white" }}
           color="#219f94"
           title="Confirm"
+        />
+        <Button
+          title="Submit"
+          buttonStyle={{
+            backgroundColor: defaultColor,
+            borderWidth: 1,
+            borderColor: "white",
+            borderRadius: 30,
+            padding: 10,
+            width: 150,
+          }}
+          containerStyle={{
+            margin: 15,
+          }}
+          icon={{
+            name: "angle-double-right",
+            type: "font-awesome",
+            size: 20,
+            color: "white",
+          }}
+          titleStyle={{ fontSize: 16 }}
           onPress={onConfirmPress}
+          disabled={buttomDisabled}
         />
       </View>
     </TouchableWithoutFeedback>
@@ -138,7 +173,7 @@ const styles = StyleSheet.create({
   },
   text: {
     padding: 40,
-    color: "#219f94",
+    color: defaultColor,
   },
   input: {
     fontSize: 14,

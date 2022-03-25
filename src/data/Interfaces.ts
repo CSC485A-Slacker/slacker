@@ -44,6 +44,7 @@ interface IPinsState {
 interface IUser {
   _userID: string;
   _checkInSpot: number;
+  _username: string;
 }
 
 interface IDatabase {
@@ -54,6 +55,8 @@ interface IDatabase {
   ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
 
   deleteUser(userID: string): void;
+
+  getAllUsers(): Promise<IUserActionResult<IUser[]>>;
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
    *

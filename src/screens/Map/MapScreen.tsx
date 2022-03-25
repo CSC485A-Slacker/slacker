@@ -22,6 +22,7 @@ import { auth, firebaseApp } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
+import { defaultColor, hotColor } from "../../style/styles";
 
 const database = new Database();
 

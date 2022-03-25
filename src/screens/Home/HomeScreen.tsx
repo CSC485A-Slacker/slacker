@@ -1,7 +1,23 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import { auth } from "../../config/FirebaseConfig";
 
-export default function HomeScreen() {
+export const HomeScreen=({navigation}) => {
+  // navigate to main screen if user is logged in
+  useEffect(() => {
+    setTimeout( () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          navigation.navigate("Main");
+        }
+        else
+        {
+            navigation.navigate("Login")
+        }
+      })
+    }, 2000)
+  }, [])
   return (
     <View style={styles.container}>
       <Text style={{ color: "white" }}>
