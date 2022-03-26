@@ -1,5 +1,6 @@
 import { LatLng } from "react-native-maps";
 import { IUser } from "./Interfaces";
+import { coordinateToString } from "./Pin";
 
 class User implements IUser
 {
@@ -15,7 +16,13 @@ class User implements IUser
         this._checkOutTime = checkOutTime
         this._username = username
     }
-
 }
 
-export {User}
+function userIsCheckedIntoSpot(user: IUser, coordinate: LatLng): boolean {
+        if(user._checkInSpot == null || coordinate == null) {
+            return false;
+        }
+        return coordinateToString(user._checkInSpot).localeCompare(coordinateToString(coordinate)) == 0
+    }
+
+export {User, userIsCheckedIntoSpot}

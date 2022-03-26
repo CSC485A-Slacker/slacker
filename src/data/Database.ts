@@ -11,7 +11,7 @@ import {
   updatePin,
 } from "../redux/PinSlice";
 import { store } from "../redux/Store"
-import { User } from "./User";
+import { User, userIsCheckedIntoSpot } from "./User";
 
 class Database implements IDatabase {
     database: Firestore;
@@ -116,7 +116,7 @@ class Database implements IDatabase {
 
             if(previousLocation) {
                 // exit if user is already checked into new spot
-                if(coordinateToString(previousLocation).localeCompare(coordinateToString(newLocation)) == 0) {
+                if(userIsCheckedIntoSpot(user, newLocation)) {
                     alert(`You are already checked in here!`);
                     throw new Error(`User already checked into spot ${coordinateToString(newLocation)}.`);
                 }

@@ -12,12 +12,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
-import { coordinateToString, Pin, PinPhoto, PinReview } from "../data/Pin";
+import { Pin, PinPhoto, PinReview } from "../data/Pin";
 import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
 import { defaultColor } from "../style/styles";
+import { userIsCheckedIntoSpot } from "../data/User";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -55,7 +56,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
       userPromise.then(result => {
         const usr = result.data
         if (usr?._checkInSpot) {
-            if(coordinateToString(usr?._checkInSpot).localeCompare(coordinateToString(pinCoords)) == 0) {
+            if(userIsCheckedIntoSpot(usr, pinCoords)) {
                 Alert.alert('You are already checked in here!')
                 navigation.navigate("Map")
                 return
