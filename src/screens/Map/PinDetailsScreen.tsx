@@ -52,7 +52,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-        color: isPrivate ? "green" : "red",
+        color: isPrivate ? "blue" : "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
