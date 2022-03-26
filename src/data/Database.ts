@@ -13,7 +13,6 @@ import {
 import { store } from "../redux/Store"
 import { User } from "./User";
 
-
 class Database implements IDatabase {
     database: Firestore;
 
@@ -30,7 +29,7 @@ class Database implements IDatabase {
           {
             throw new Error(`User already existed with ID ${user._userID}`)
           }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot})
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, checkOutTime: user._checkOutTime, username:user._username})
         } catch (e) {
           console.log("Error adding user: ", e);
         }
@@ -75,7 +74,7 @@ class Database implements IDatabase {
         const userDocSnap = await getDoc(userDocRef)
         if (!userDocSnap.exists())
         {
-          throw new Error(`User with ID ${userID} doesn\'t exist`)
+          throw new Error(`User with ID ${userID} doesn't exist`)
         }
         
         // console.log(userDocSnap)
@@ -118,7 +117,7 @@ class Database implements IDatabase {
             if(previousLocation) {
                 // exit if user is already checked into new spot
                 if(coordinateToString(previousLocation).localeCompare(coordinateToString(newLocation)) == 0) {
-                    // alert(`You are already checked in here!`);
+                    alert(`You are already checked in here!`);
                     throw new Error(`User already checked into spot ${coordinateToString(newLocation)}.`);
                 }
 
@@ -142,7 +141,7 @@ class Database implements IDatabase {
 
     // checks a user out from a pin
     async checkoutFromSpot(userID: string, location: LatLng) {
-        console.log(`attempt checkoutFromSpot`);
+        console.log(`attempt checkoutFromSpot for user ${userID} at location ${coordinateToString(location)}`);
         try {
             const userDocRef = doc(this.database, "users", userID)
             const pinResult = await this.getPin(location);
@@ -169,7 +168,7 @@ class Database implements IDatabase {
             }
 
             // update the user's checkout info
-            updateDoc(userDocRef, {checkInSpot: null})
+            await updateDoc(userDocRef, {checkInSpot: null})
             console.log(`end of checkout`);
         }
         catch(error) {
@@ -179,7 +178,7 @@ class Database implements IDatabase {
 
     // checks a user into a pin
     async checkIntoSpot(userID: string, location: LatLng, hoursToCheckinFor: number) {
-        console.log(`attempt checkIntoSpot`);
+        console.log(`attempt checkIntoSpot for user ${userID} at location ${coordinateToString(location)}`);
         try {
             const userDocRef = doc(this.database, "users", userID)
             const pinResult = await this.getPin(location);
@@ -209,15 +208,17 @@ class Database implements IDatabase {
             }
 
             // update the user's checkin info
-            updateDoc(userDocRef, {checkInSpot: location, checkoutTime: checkoutDate});
+            await updateDoc(userDocRef, {checkInSpot: location, checkOutTime: checkoutDate});
         }
         catch(error) {
             throw new Error(`check into spot failed for user ${userID} at location ${coordinateToString(location)}: ${error}`)
         }
-        await this.getCheckoutOfUser(userID);
+        // can remove after testing
+        await this.getCheckInOfUser(userID);
     }
 
     async checkoutAllExpiredCheckins() {
+        console.log(`attempt checkoutAllExpiredCheckins`);
         try {
             const usersResult = await this.getAllUsers();
             const users = usersResult.data;
@@ -240,16 +241,17 @@ class Database implements IDatabase {
 
     // will try to checkout all expired checkins as often as specified by intervalInMinutes
     async checkoutAllExpiredCheckinsTask(intervalInMinutes: number) {
-        setInterval(() => this.checkoutAllExpiredCheckins(), 1000 * intervalInMinutes)
+        setInterval(() => this.checkoutAllExpiredCheckins(), 1000 * 60 * intervalInMinutes)
     }
 
-    async getCheckoutOfUser(userID: string) {
+    // to test checkin
+    async getCheckInOfUser(userID: string) {
         const userResult = await this.getUser(userID);
         const user = userResult.data;
 
         if(user) {
-            const checkoutTime =  user._checkOutTime;
-            console.log(`userID: ${user._userID}, checkout time: ${checkoutTime}`);
+            const checkOutTime =  user._checkOutTime;
+            console.log(`userID: ${user._userID}, checkout time: ${checkOutTime}`);
             if(user._checkInSpot) {
                  console.log(`checkinSpot: ${coordinateToString(user._checkInSpot)}`);
             } else {

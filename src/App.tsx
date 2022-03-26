@@ -9,8 +9,14 @@ import { Database } from "./data/Database";
 
 const database = new Database();
 
+import { LogBox } from "react-native";
+
 export default function App() {
-    // database.checkoutAllExpiredCheckinsTask(1);
+  // hides yellow box warnings on screen - useful for demos
+  // LogBox.ignoreAllLogs() 
+
+  // runs checkout task
+  // database.checkoutAllExpiredCheckinsTask(1);
   return (
     <Provider store={store}>
       <SafeAreaProvider>

@@ -1,6 +1,9 @@
-<img src="Slacker_logo.png" alt="drawing" width="400"/>
+<p align="center">
+  <img src="Slacker-Logo.png" alt="drawing" width="400"/>
+<p align="center">
 
-# Slacker - A Slackliner's Every day Solution
+
+# Slacker - Connecting Slackliners One Rope at a Time
 📝 **Authors**:
 - Dianna Borinaga (DiannaBanana)
 - Brendan Micetich (brendanmicetich)
@@ -11,6 +14,8 @@
 
 ## 🗺 Overview
 We propose to create a mobile application where users can quickly and easily see where fellow slackliners are setting up their slacklines, and have the option to announce where they are via placing a pin on our map.
+
+Checkout out our product page [here](https://sites.google.com/view/csc485a-slacker/home)
 
 ### ✔ Decisions Made
 * Real-time view of slackliners on the map
@@ -46,10 +51,13 @@ This milestone focuses on more of the *nice-to-have's* than the previous two, ho
 
 - [ ] Add/delete your favorite spots in a list where you can click on any one of them to take you right to that location for viewing information.
 - [ ] Any spots that are on the map which are also a part of the user's `favorites` list will be highlighted.
-- [ ] Send a URL invite for a particular spot to anybody, and if the recipient doesn't have the app, they will be directed to the appropriate location to download it.
+- [ ] ~~Send a URL invite for a particular spot to anybody, and if the recipient doesn't have the app, they will be directed to the appropriate location to download it.~~
 
 ## Possible Future Extensions
 - [ ] See a list of friends or followers and what spots they are currently checked in at.
 - [ ] Points system to reward users for participating with the app. This could also be used as a pseudo skill classifier, rather than outright specifying the difficulty of the `hotspot`.
-- [ ] Public/Private pins: Drop a pin that only your frieds/followers can see, or make it open to everyone, or just yourself for future reference.
+- [x] Public/Private pins: Drop a pin that only your frieds/followers can see, or make it open to everyone, or just yourself for future reference.
 - [ ] Marketplace where users can purchase affiliated slackline merch (slacklines, clothing etc). This could be an avenue for sponsorships, advertisements and affiliations to make this profitable.
+  
+### Download the App
+Currently, the app is available to download as an APK on Android, and available to use through the [TestFlight](https://developer.apple.com/testflight/) app on IOS. For either or these, send us a message in the CSC 485A slack and we will send you a link :)

@@ -14,6 +14,7 @@ class Pin implements IPin {
   reviews: IPinReview[];
   photos: IPinPhoto[];
   activity: IPinActivity;
+  privateViewers: string[];
 
   constructor(
     key: number,
@@ -21,7 +22,8 @@ class Pin implements IPin {
     details: PinDetails,
     reviews: PinReview[],
     photos: IPinPhoto[],
-    activity: PinActivity
+    activity: PinActivity,
+    privateViewers: string[] = []
   ) {
     this.key = key;
     this.coordinate = coordinate;
@@ -29,6 +31,7 @@ class Pin implements IPin {
     this.reviews = reviews;
     this.photos = photos;
     this.activity = activity;
+    this.privateViewers = privateViewers;
   }
 
   toString(): string {
