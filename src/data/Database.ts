@@ -187,6 +187,10 @@ class Database implements IDatabase {
             const checkoutDate = new Date();
             console.log(`current date: ${checkoutDate}`);
 
+            // use minutes for testing
+            // checkoutDate.setMinutes(checkoutDate.getMinutes() + hoursToCheckinFor);
+
+            // use hours for production
             checkoutDate.setHours(checkoutDate.getHours() + hoursToCheckinFor);
             console.log(`checkout date: ${checkoutDate}`);
         
@@ -218,24 +222,29 @@ class Database implements IDatabase {
     }
 
     async checkoutAllExpiredCheckins() {
-        console.log(`attempt checkoutAllExpiredCheckins`);
+        const currentDate = new Date();
+        let usersWereCheckedOut = false;
+        console.log(`attempt checkoutAllExpiredCheckins at ${currentDate}`);
         try {
             const usersResult = await this.getAllUsers();
             const users = usersResult.data;
-            const currentDate = new Date();
-
+            
             if(!users) {
                 throw new Error(`${usersResult.message}`);
             }
 
             users.forEach(user => {
-                if(user._checkInSpot && currentDate.getTime > user._checkOutTime.getTime) {
+                if(user._checkInSpot && currentDate.getTime() > user._checkOutTime.getTime()) {
+                    usersWereCheckedOut = true;
                     console.log(`checking out user: ${user._userID}, from spot: ${coordinateToString(user._checkInSpot)}, with checkout time: ${user._checkOutTime}.`);
                     this.checkoutFromSpot(user._userID, user._checkInSpot);
                 }
             });
         } catch (error) {
             console.log(`could not checkout all expired checkins: ${error}`)
+        }
+        if(!usersWereCheckedOut) {
+            console.log(`no users were checked out`);
         }
     }
 

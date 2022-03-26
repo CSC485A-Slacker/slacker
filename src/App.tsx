@@ -15,8 +15,11 @@ export default function App() {
   // hides yellow box warnings on screen - useful for demos
   // LogBox.ignoreAllLogs() 
 
-  // runs checkout task
+  // runs checkout task every n minutes
   // database.checkoutAllExpiredCheckinsTask(1);
+
+  // runs checkout task on load
+  // database.checkoutAllExpiredCheckins();
   return (
     <Provider store={store}>
       <SafeAreaProvider>
