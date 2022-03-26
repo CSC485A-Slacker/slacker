@@ -46,7 +46,7 @@ let newPin: Pin = {
     description: "",
     slacklineLength: 0,
     slacklineType: "",
-    color: "blue",
+    color: "green",
     draggable: true,
   },
   reviews: [],
@@ -135,7 +135,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: regionLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",
@@ -166,7 +166,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: newPinLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",
