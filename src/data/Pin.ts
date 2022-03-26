@@ -141,11 +141,13 @@ class PinActivity implements IPinActivity {
   shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
+  checkedInUserIds: string[];
 
-  constructor(shareableSlackline: boolean, activeUsers: number, totalUsers: number) {
+  constructor(shareableSlackline: boolean, activeUsers: number, totalUsers: number, checkedInUserIds: string[]) {
     this.shareableSlackline = shareableSlackline;
     this.activeUsers = activeUsers;
     this.totalUsers = totalUsers;
+    this.checkedInUserIds = checkedInUserIds;
   }
 
   toString(): string {

@@ -26,6 +26,7 @@ const examplePin1: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
+    checkedInUserIds: []
   }
 };
 
@@ -49,6 +50,7 @@ const examplePin2: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers:  0,
+    checkedInUserIds: []
   }
 };
 

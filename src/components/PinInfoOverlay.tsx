@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button, Image } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
-import { Pin, PinPhoto, PinReview } from "../data/Pin";
+import { coordinateToString, Pin, PinPhoto, PinReview } from "../data/Pin";
 import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
@@ -48,16 +48,19 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
     new Animated.Value(draggableRange.bottom)
   );
 
-  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined) => {
+  const handleCheckIn = (pinCoords: LatLng, userId: string|undefined) => {
     if (userId) {
       const userPromise = database.getUser(userId);
       userPromise.then(result => {
         const usr = result.data
-        if (usr?._checkInSpot == pinId) {
-          Alert.alert('You have already checked in here!')
-        } else {
-          navigation.navigate("Check-In Details", { pinId, pinCoords, usr })
+        if (usr?._checkInSpot) {
+            if(coordinateToString(usr?._checkInSpot).localeCompare(coordinateToString(pinCoords)) == 0) {
+                Alert.alert('You have already checked in here!')
+                navigation.navigate("Map")
+                return
+            }
         }
+        navigation.navigate("Check-In Details", { pinCoords, usr })
       })
     } else {
       Alert.alert('You must be signed in to use this feature!')
@@ -98,7 +101,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid)}
+                onPress={() => handleCheckIn(pin.coordinate, user?.uid)}
               />
             </View>
             <View style={styles.buttonContainer}>

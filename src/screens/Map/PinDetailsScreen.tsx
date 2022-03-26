@@ -41,6 +41,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
     };
     dispatch(removePin(confirmPin));

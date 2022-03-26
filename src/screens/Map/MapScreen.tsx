@@ -49,6 +49,7 @@ let newPin: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
+    checkedInUserIds: []
   },
 };
 
@@ -68,7 +69,6 @@ export const MapScreen = ({ route, navigation }: any) => {
   const [hotspotToggleColor, setHotspotToggleColor] = useState(defaultColor);
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"));
-
 
   // navigate to login screen if user is not logged in
   useEffect( () => {
@@ -147,6 +147,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
     };
     newPinLatitude = regionLatitude;
@@ -178,6 +179,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         checkIn: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
     };
     navigation.navigate("Spot Details", {
