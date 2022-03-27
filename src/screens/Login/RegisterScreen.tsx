@@ -36,8 +36,8 @@ export const RegisterScreen = ({ navigation }) => {
     createUserWithEmailAndPassword(auth, email.trimEnd(), password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
-        db.addUser(new User(user.uid, 0, username));
-        navigation.navigate("Main");
+        db.addUser(new User(user.uid, 0, username))
+        navigation.push("Main")
       })
       .catch((error) => alert(error.message));
   };
