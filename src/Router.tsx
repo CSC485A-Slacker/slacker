@@ -13,6 +13,8 @@ import { AddPhotoScreen } from "./screens/Map/AddPhotoScreen";
 import { RegisterScreen } from "./screens/Login/RegisterScreen";
 import { HomeScreen } from "./screens/Home/HomeScreen";
 import { defaultColor } from "./style/styles";
+import { SearchFriendsScreen } from "./screens/Friends/SearchScreen";
+import { FriendRequestsScreen } from "./screens/Friends/FriendRequestsScreen";
 
 
 const Tab = createBottomTabNavigator();
@@ -20,6 +22,8 @@ const Tab = createBottomTabNavigator();
 const MapStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
+
+const FriendsStack = createNativeStackNavigator();
 
 export const MainStackScreen = () => {
     return(
@@ -43,6 +47,16 @@ function MapStackScreen() {
       <MapStack.Screen name="Check-In Details" component={CheckInDetailsScreen} />
       <MapStack.Screen name="Add a Review" component={AddReviewScreen} />
       <MapStack.Screen name="Add a Photo" component={AddPhotoScreen} />
+    </MapStack.Navigator>
+  );
+}
+
+function FriendsStackScreen() {
+  return (
+    <MapStack.Navigator>
+      <MapStack.Screen name="All Friends" component={FriendsScreen} options={{ title: "" }} />
+      <MapStack.Screen name="Search Friends" component={SearchFriendsScreen} options={{ title: "" }} />
+      <MapStack.Screen name="Friend Requests" component={FriendRequestsScreen} options={{ title: "" }} />
     </MapStack.Navigator>
   );
 }
@@ -77,7 +91,7 @@ function NavTabs (){
       />
       <Tab.Screen
         name="Friends"
-        component={FriendsScreen}
+        component={FriendsStackScreen}
         options={{
           tabBarLabel: "Friends",
           tabBarIcon: ({ color, size }) => (

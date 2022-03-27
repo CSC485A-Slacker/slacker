@@ -2,19 +2,11 @@ import { View, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-elements";
 import { Database } from "../../data/Database";
 
-const db = new Database();
-
-export const FriendsScreen = ({ navigation }: any) => {
+export const FriendRequestsScreen = ({ navigation }: any) => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Friends is under construction!</Text>
+      <Text>Request is under construction!</Text>
       <Text>No friends yet 😢</Text>
-      <Button
-        title={"Find friends to add"}
-        onPress={(e) => {
-          navigation.navigate("Search Friends");
-        }}
-      />
     </View>
   );
 };

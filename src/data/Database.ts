@@ -144,8 +144,15 @@ class Database implements IDatabase {
       
       updateDoc(userDocRef, {friends: userFriendsConverter.toFirestore(newFriends)})
     } catch(error) {
-      console.log(`Editing friends failed for user ${userID}: ${error}`)
+      return new DatabaseActionResult(
+          false,
+          `Failed: could not add friend to user: ${userID}. ${error}`
+        );
     }
+    return new DatabaseActionResult(
+          true,
+          `Succeeded: friend added to user: ${userID}`
+        );
   }
    
 
