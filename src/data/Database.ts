@@ -2,7 +2,7 @@ import { firebaseApp } from "../config/FirebaseConfig"
 import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query } from 'firebase/firestore/lite';
 import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto, PinActivity } from "./Pin"
 import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IUser, IUserActionResult } from "./Interfaces"
-import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter } from "./DataConverters";
+import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter, userFriendsConverter } from "./DataConverters";
 import { LatLng } from "react-native-maps";
 import { onSnapshot } from "@firebase/firestore";
 import {
@@ -30,7 +30,7 @@ class Database implements IDatabase {
           {
             throw new Error(`User already existed with ID ${user._userID}`)
           }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, username:user._username})
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, username:user._username, friends: user._friends})
         } catch (e) {
           console.log("Error adding user: ", e);
         }
@@ -141,7 +141,8 @@ class Database implements IDatabase {
       if(!userDocSnap.exists()) {
         throw new Error("User doesn't exist")
       }
-      updateDoc(userDocRef, {friends: newFriends})
+      
+      updateDoc(userDocRef, {friends: userFriendsConverter.toFirestore(newFriends)})
     } catch(error) {
       console.log(`Editing friends failed for user ${userID}: ${error}`)
     }

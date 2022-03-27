@@ -1,11 +1,12 @@
-<<<<<<< HEAD
-import React, { useState } from 'react'
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../config/FirebaseConfig'
-=======
-import React, {  useState } from 'react'
-import { KeyboardAvoidingView, StyleSheet, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image,
+} from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Text } from "react-native-elements";
 import {
@@ -14,7 +15,6 @@ import {
   defaultStyles,
 } from "../../style/styles";
 import { auth } from "../../config/FirebaseConfig";
->>>>>>> 22ea116226d420576d6296a4871f7b9cc976a4d5
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");

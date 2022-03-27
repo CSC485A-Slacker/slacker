@@ -4,10 +4,7 @@ import {
   IPinReview,
   IPinPhoto,
   IPinActivity,
-<<<<<<< HEAD
   IFriend,
-=======
->>>>>>> 5af90ca95dc149f6cb834bfdd29ef6c3f5154bac
   IUser,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
@@ -197,9 +194,15 @@ const userFriendsConverter = {
     const friends = snapshot.get("friends");
 
     const friendsArray: Friend[] = [];
-    friends.forEach((friend: any) => {
+
+    if (friends == undefined) {
+      return []
+    } else {
+      friends.forEach((friend: any) => {
       friendsArray.push(friendConverter.fromFirestore(friend));
-    });
+      });
+    }
+    
 
     return friendsArray;
   },
@@ -211,24 +214,15 @@ const userConverter = {
       userID: user._userID,
       checkInSpot: user._checkInSpot,
       username: user._username,
-<<<<<<< HEAD
       friends: user._friends,
-=======
->>>>>>> 22ea116226d420576d6296a4871f7b9cc976a4d5
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
-<<<<<<< HEAD
       snapshot.get('userID'),
       snapshot.get('checkInSpot'),
       snapshot.get('username'),
-      userFriendsConverter.fromFirestore(snapshot)
-=======
-      snapshot.get("userID"),
-      snapshot.get("checkInSpot"),
-      snapshot.get("username")
->>>>>>> 22ea116226d420576d6296a4871f7b9cc976a4d5
+      userFriendsConverter.fromFirestore(snapshot) || []
     );
   },
 };
@@ -241,4 +235,5 @@ export {
   pinPhotosConverter,
   pinActivityConverter,
   userConverter,
+  userFriendsConverter,
 };
