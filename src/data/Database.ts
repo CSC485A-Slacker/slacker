@@ -221,25 +221,50 @@ class Database implements IDatabase {
         await this.getCheckInOfUser(userID);
     }
 
-    async checkoutAllExpiredCheckins() {
+    // will perform checkout task every minutesBetweenCheckoutTask minutes
+    async checkoutAllExpiredCheckins(minutesBetweenCheckoutTask: number) {
         const currentDate = new Date();
         let usersWereCheckedOut = false;
+
         console.log(`attempt checkoutAllExpiredCheckins at ${currentDate}`);
         try {
-            const usersResult = await this.getAllUsers();
-            const users = usersResult.data;
-            
-            if(!users) {
-                throw new Error(`${usersResult.message}`);
+            const checkInRef = doc(this.database, "tasks", "checkIn");
+            const checkInDocSnap = await getDoc(checkInRef);
+
+            if (!checkInDocSnap.exists()) {
+                throw new Error(`Could not get checkIn task doc`);
             }
 
-            users.forEach(user => {
-                if(user._checkInSpot && currentDate.getTime() > user._checkOutTime.getTime()) {
-                    usersWereCheckedOut = true;
-                    console.log(`checking out user: ${user._userID}, from spot: ${coordinateToString(user._checkInSpot)}, with checkout time: ${user._checkOutTime}.`);
-                    this.checkoutFromSpot(user._userID, user._checkInSpot);
+            let lastCheckoutAllExpiredCheckins: Date = checkInDocSnap.data().lastCheckoutAllExpiredCheckins.toDate();
+            console.log(`last checkoutAllExpiredCheckins: ${lastCheckoutAllExpiredCheckins}`);
+
+            lastCheckoutAllExpiredCheckins.setMinutes(lastCheckoutAllExpiredCheckins.getMinutes() + minutesBetweenCheckoutTask);
+            console.log(`next checkoutAllExpiredUsers in ${minutesBetweenCheckoutTask} minutes, at ${lastCheckoutAllExpiredCheckins}`)
+
+            // only reads the users from the db once every minutesBetweenCheckoutTask minutes
+            if(currentDate.getTime() > lastCheckoutAllExpiredCheckins.getTime()) {
+                console.log(`running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
+
+                const usersResult = await this.getAllUsers();
+                const users = usersResult.data;
+
+                updateDoc(checkInRef, {lastCheckoutAllExpiredCheckins: currentDate});
+                
+                if(!users) {
+                    throw new Error(`${usersResult.message}`);
                 }
-            });
+
+                users.forEach(user => {
+                    if(user._checkInSpot && currentDate.getTime() > user._checkOutTime.getTime()) {
+                        usersWereCheckedOut = true;
+                        console.log(`checking out user: ${user._userID}, from spot: ${coordinateToString(user._checkInSpot)}, with checkout time: ${user._checkOutTime}.`);
+                        this.checkoutFromSpot(user._userID, user._checkInSpot);
+                    }
+                });
+            } else {
+                console.log(`NOT running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
+            }
+           
         } catch (error) {
             console.log(`could not checkout all expired checkins: ${error}`)
         }
@@ -249,8 +274,10 @@ class Database implements IDatabase {
     }
 
     // will try to checkout all expired checkins as often as specified by intervalInMinutes
-    async checkoutAllExpiredCheckinsTask(intervalInMinutes: number) {
-        setInterval(() => this.checkoutAllExpiredCheckins(), 1000 * 60 * intervalInMinutes)
+    // intervalBetweenTasks: how often to run the checkout task (minutes)
+    // intervalBetweenRunningCheckoutAllExpiredCheckins: how often to check the checkout status of all users (minutes)
+    async checkoutAllExpiredCheckinsTask(minutesBetweenTasks: number, minutesBetweenRunningCheckoutAllExpiredCheckins: number) {
+        setInterval(() => this.checkoutAllExpiredCheckins(minutesBetweenRunningCheckoutAllExpiredCheckins), 1000 * 60 * minutesBetweenTasks)
     }
 
     // to test checkin
