@@ -16,11 +16,13 @@ export default function App() {
   // hides yellow box warnings on screen - useful for demos
   // LogBox.ignoreAllLogs() 
 
-  // runs checkout task every n minutes
-  // database.checkoutAllExpiredCheckinsTask(1);
-
   // runs checkout task on load
-  // database.checkoutAllExpiredCheckins();
+  database.checkoutAllExpiredCheckins(5);
+
+  // runs the task every 1 min
+  // loops through all users if it has been 5 mins since last loop
+  database.checkoutAllExpiredCheckinsTask(1, 5);
+
   return (
     <ToastProvider
       successColor="green"
