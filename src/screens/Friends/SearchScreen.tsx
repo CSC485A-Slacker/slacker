@@ -138,10 +138,9 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
       <SearchBar
         placeholder="Search by username"
         onChangeText={(text) => searchFilter(text)}
-        onClear={(text) => searchFilter("")}
+        onClear={() => searchFilter("")}
         value={search}
         autoCapitalize="none"
-        // platform={platform}
         containerStyle={{
           backgroundColor: "white",
           borderTopColor: "white",
