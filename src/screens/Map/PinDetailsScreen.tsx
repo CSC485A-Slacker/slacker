@@ -13,6 +13,7 @@ import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import { auth } from "../../config/FirebaseConfig";
 import { defaultColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -30,6 +31,8 @@ export const PinDetailsScreen = ({ route, navigation }) => {
     setIsPrivate((previousState) => !previousState);
   };
   const [buttomDisabled, setButtomDisabled] = useState(true);
+
+  const toast = useToast(); // toast notifications
 
   useEffect(() => {
     if (
@@ -49,7 +52,7 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       coordinate: newPin.coordinate,
       details: {
         draggable: false,
-        color: isPrivate ? "green" : "red",
+        color: isPrivate ? "blue" : "red",
         title: name,
         description: description,
         slacklineType: slacklineType,
@@ -81,6 +84,9 @@ export const PinDetailsScreen = ({ route, navigation }) => {
       console.log(resp);
     } catch (error) {
       console.log(`error adding pin: ${error}`);
+      toast.show("Whoops! Pin failed to add", {
+        type: "danger",
+      });
     }
   };
 

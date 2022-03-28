@@ -10,6 +10,7 @@ import { Database } from "./data/Database";
 const database = new Database();
 
 import { LogBox } from "react-native";
+import { ToastProvider } from "react-native-toast-notifications";
 
 export default function App() {
   // hides yellow box warnings on screen - useful for demos
@@ -21,12 +22,21 @@ export default function App() {
   // runs checkout task on load
   // database.checkoutAllExpiredCheckins();
   return (
-    <Provider store={store}>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <MainStackScreen />
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </Provider>
+    <ToastProvider
+      successColor="green"
+      duration={4000}
+      offset={90}
+      placement="top"
+      animationType="slide-in"
+      swipeEnabled={true}
+    >
+      <Provider store={store}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <MainStackScreen />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </Provider>
+    </ToastProvider>
   );
 }

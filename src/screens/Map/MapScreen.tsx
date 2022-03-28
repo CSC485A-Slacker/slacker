@@ -23,6 +23,7 @@ import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
 import { defaultColor, hotColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -46,7 +47,7 @@ let newPin: Pin = {
     description: "",
     slacklineLength: 0,
     slacklineType: "",
-    color: "blue",
+    color: "green",
     draggable: true,
   },
   reviews: [],
@@ -73,6 +74,8 @@ export const MapScreen = ({ route, navigation }: any) => {
   const [hotspotToggleColor, setHotspotToggleColor] = useState(defaultColor);
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"));
+
+  const toast = useToast(); // toast notifications
 
   // navigate to login screen if user is not logged in
   useEffect(() => {
@@ -104,6 +107,9 @@ export const MapScreen = ({ route, navigation }: any) => {
       setHotSpotToggleVisible(true);
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
+      toast.show("Pin added successfuly!", {
+        type: "success",
+      });
     }
   });
 
@@ -136,7 +142,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: regionLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",
@@ -169,7 +175,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: newPinLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",

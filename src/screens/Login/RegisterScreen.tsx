@@ -37,7 +37,7 @@ export const RegisterScreen = ({ navigation }) => {
       .then(async (userCredentials) => {
         const user = userCredentials.user;
         db.addUser(new User(user.uid, null, new Date(), username));
-        navigation.navigate("Main");
+        navigation.push("Main")
       })
       .catch((error) => alert(error.message));
   };
