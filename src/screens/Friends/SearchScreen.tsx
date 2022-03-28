@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  SectionList,
+} from "react-native";
 import {
   Text,
   SearchBar,
@@ -25,26 +31,24 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
-      if (userDB.data) {
+      if (userDB.succeeded) {
         setCurrentUser(userDB.data);
+        getAllUsers(userDB.data);
       } // TODO: add an else saying can't get current user
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
     }
   };
 
-  const getAllUsers = async () => {
-    if (!currentUser) {
-      getCurrentUser();
-    }
+  const getAllUsers = async (currUser: User) => {
     try {
       const response = await db.getAllUsers();
-      if (response.data && currentUser) {
+      if (response.data) {
         // exclude the currents user's id and their friend's ids
-        const excludedIds = currentUser?._friends.map(
+        const excludedIds = currUser?._friends.map(
           ({ _friendID }) => _friendID
         );
-        excludedIds.push(currentUser._userID);
+        excludedIds.push(currUser._userID);
         const filterAllUsers = response.data.filter(
           (user) => !excludedIds.includes(user._userID)
         );
@@ -58,19 +62,29 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
 
   useEffect(() => {
     getCurrentUser();
-    getAllUsers();
   }, []);
 
   // add
   const searchFilter = (text) => {
     if (text) {
+      const newData = allUsers.filter(function (item) {
+        const itemData = item._username
+          ? item._username.toUpperCase()
+          : "".toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredUsers(newData);
       setSearch(text);
-      getAllUsers();
+    } else {
+      // Inserted text is blank
+      // Update FilteredDataSource with masterDataSource
+      setFilteredUsers(allUsers);
+      setSearch(text);
     }
   };
 
-  const addFriend = async (friend: User) => {
-    console.log(currentUser);
+  const sendFriendRequest = async (friend: User) => {
     try {
       if (currentUser) {
         // update current user to show that they have sent a friend request
@@ -87,7 +101,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         );
 
         if (respUser.succeeded && respFriend.succeeded) {
-          getAllUsers();
+          getAllUsers(currentUser);
         }
       }
     } catch (error) {
@@ -109,7 +123,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
           title="Add Friend"
           type="clear"
           titleStyle={{ color: "#1b4557" }}
-          onPress={() => addFriend(user)}
+          onPress={() => sendFriendRequest(user)}
         />
       </View>
     </View>
@@ -129,7 +143,9 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
       <SearchBar
         placeholder="Search by username"
         onChangeText={(text) => searchFilter(text)}
+        onClear={(text) => searchFilter("")}
         value={search}
+        autoCapitalize="none"
         // platform={platform}
         containerStyle={{
           backgroundColor: "white",
@@ -140,24 +156,8 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         inputContainerStyle={{ backgroundColor: "white" }}
         inputStyle={{ fontSize: 14 }}
       />
+
       <View>
-        <Text style={defaultStyles.title}>Request Sent</Text>
-        <FlatList
-          data={allUsers}
-          renderItem={renderItem}
-          keyExtractor={(user) => user._username}
-        />
-      </View>
-      <View>
-        <Text style={defaultStyles.title}>Request Received</Text>
-        <FlatList
-          data={allUsers}
-          renderItem={renderItem}
-          keyExtractor={(user) => user._username}
-        />
-      </View>
-      <View>
-        <Text style={defaultStyles.title}>Friends Pendings</Text>
         <FlatList
           data={filteredUsers}
           renderItem={renderItem}

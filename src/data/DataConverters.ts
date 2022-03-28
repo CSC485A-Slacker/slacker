@@ -174,7 +174,6 @@ const pinConverter = {
   },
 };
 
-<<<<<<< HEAD
 const friendConverter = {
   toFirestore: (friend: IFriend) => {
     return {
@@ -214,17 +213,6 @@ const userFriendsConverter = {
     return friendsArray;
   },
 };
-=======
-// const userConverter = {
-//   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-//     return new User(
-//       snapshot.get('userID'),
-//       snapshot.get('checkInSpot'),
-//       snapshot.get('checkOutTime')
-//     );
-//   },
-// };
->>>>>>> 6de07751272d01499d26e1c598a2c2bfb46daa87
 
 const userConverter = {
   toFirestore: (user: IUser) => {
@@ -240,13 +228,9 @@ const userConverter = {
     return new User(
       snapshot.get('userID'),
       snapshot.get('checkInSpot'),
-<<<<<<< HEAD
-      snapshot.get('username'),
-      userFriendsConverter.fromFirestore(snapshot) || []
-=======
       snapshot.get('checkOutTime').toDate(),
-      snapshot.get("username")
->>>>>>> 6de07751272d01499d26e1c598a2c2bfb46daa87
+      snapshot.get("username"),
+      userFriendsConverter.fromFirestore(snapshot) || []
     );
   },
 };

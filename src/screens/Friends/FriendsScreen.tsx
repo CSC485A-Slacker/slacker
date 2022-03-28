@@ -13,6 +13,12 @@ export const FriendsScreen = ({ navigation }: any) => {
           navigation.navigate("Search Friends");
         }}
       />
+      <Button
+        title={"Handle your request"}
+        onPress={(e) => {
+          navigation.navigate("Friend Request");
+        }}
+      />
     </View>
   );
 };
