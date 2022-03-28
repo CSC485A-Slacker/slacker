@@ -61,7 +61,6 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
     getCurrentUser();
   }, []);
 
-  // add
   const searchFilter = (text) => {
     if (text) {
       const newData = allUsers.filter(function (item) {
@@ -74,8 +73,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
       setFilteredUsers(newData);
       setSearch(text);
     } else {
-      // Inserted text is blank
-      // Update FilteredDataSource with masterDataSource
+      // Inserted text is blank, set to all useers
       setFilteredUsers(allUsers);
       setSearch(text);
     }
