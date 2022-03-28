@@ -69,7 +69,7 @@ interface IDatabase {
 
   ChangeCheckInSpot(userID: string, newLocation: LatLng, hoursToCheckInFor: number): void;
 
-  // Add interfaces for Friends
+  editFriends(userID: string, newFriends: IFriend[]): Promise<IDatabaseActionResult>;
 
   deleteUser(userID: string): void;
 

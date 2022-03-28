@@ -20,7 +20,6 @@ class User implements IUser
     }
 }
   
-  
 class Friend implements IFriend {
   _friendID: string;
   _status: Status;

@@ -5,7 +5,7 @@ import { User } from "../data/User";
 
 const userID1 = "1"
 const UpdatedCheckInSPot = 27
-const user1 = new User(userID1, 0, "user", []);
+const user1 = new User(userID1, { latitude: 0, longitude: 1 }, new Date(), "user", []);
 
 async function testUser() {
   const db = new Database();
@@ -15,7 +15,7 @@ async function testUser() {
     await db.deleteUser(userID1);
   }
 
-  await db.addUser(new User(userID1, 0, "user", []));
+  await db.addUser(new User(userID1, { latitude: 0, longitude: 1 }, new Date(), "user", []));
 
   var retrievedUser = await db.getUser(userID1);
 

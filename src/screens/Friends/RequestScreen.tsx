@@ -1,27 +1,13 @@
 import { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-  SectionList,
-} from "react-native";
-import {
-  Text,
-  SearchBar,
-  Avatar,
-  Button,
-  Tab,
-  TabView,
-} from "react-native-elements";
+import { View, StyleSheet, FlatList, Alert } from "react-native";
+import { Text, Avatar, Button } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
-import { Friend, User } from "../../data/User";
+import { User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
 import {
   darkBlueColor,
   defaultColor,
-  defaultStyles,
   greyColor,
   hotColor,
 } from "../../style/styles";
@@ -36,12 +22,17 @@ export const RequestScreen = ({ navigation }: any) => {
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
-      if (userDB.succeeded) {
+      if (userDB.succeeded && userDB.data) {
         setCurrentUser(userDB.data);
         getAllUsers(userDB.data);
-      } // TODO: add an else saying can't get current user
+      } else {
+        Alert.alert("We have an error on our side. Please try again later.");
+        navigation.navigate("All Friends");
+      }
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
+      Alert.alert("We have an error on our side. Please try again later.");
+      navigation.navigate("All Friends");
     }
   };
 
@@ -57,9 +48,14 @@ export const RequestScreen = ({ navigation }: any) => {
         );
         getFriendRequests(currUser, filterAllUsers);
         getFriendInvites(currUser, filterAllUsers);
-      } // add an else saying can't get current users
+      } else {
+        Alert.alert("We have an error on our side. Please try again later.");
+        navigation.navigate("All Friends");
+      }
     } catch (error) {
       console.log(`Error getting to retrieve all users: ${error}`);
+      Alert.alert("We have an error on our side. Please try again later.");
+      navigation.navigate("All Friends");
     }
   };
 
