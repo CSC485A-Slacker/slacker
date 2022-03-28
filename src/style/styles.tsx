@@ -5,6 +5,8 @@ export const greyColor: string = "#696969";
 export const blueColor: string = "#219f94";
 export const backgroundColor: string = "#f2f2f2";
 export const hotColor: string = "#D2042D";
+export const darkBlueColor: string = "#1b4557";
+
 
 export const defaultStyles = StyleSheet.create({
   subTitle: {

@@ -18,7 +18,7 @@ import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
-import { defaultStyles } from "../../style/styles";
+import { darkBlueColor, defaultStyles } from "../../style/styles";
 
 const db = new Database();
 
@@ -115,14 +115,14 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         size={36}
         rounded
         title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: "#1b4557" }}
+        containerStyle={{ backgroundColor: darkBlueColor }}
       />
       <Text style={styles.subText}>{user._username}</Text>
       <View style={styles.itemContainer}>
         <Button
           title="Add Friend"
           type="clear"
-          titleStyle={{ color: "#1b4557" }}
+          titleStyle={{ color: darkBlueColor, fontSize: 16 }}
           onPress={() => sendFriendRequest(user)}
         />
       </View>

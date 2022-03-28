@@ -18,22 +18,25 @@ import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
-import { defaultStyles } from "../../style/styles";
+import {
+  darkBlueColor,
+  defaultColor,
+  defaultStyles,
+  greyColor,
+  hotColor,
+} from "../../style/styles";
 
 const db = new Database();
 
 export const RequestScreen = ({ navigation }: any) => {
-  const [search, setSearch] = useState("");
   const [friendRequest, setFriendRequest] = useState<User[]>([]);
   const [friendInvites, setFriendInvites] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const [allUsers, setAllUsers] = useState<User[]>([]);
 
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
       if (userDB.succeeded) {
-        console.log("got user");
         setCurrentUser(userDB.data);
         getAllUsers(userDB.data);
       } // TODO: add an else saying can't get current user
@@ -52,8 +55,6 @@ export const RequestScreen = ({ navigation }: any) => {
         const filterAllUsers = response.data.filter((user) =>
           friendIds.includes(user._userID)
         );
-        console.log("got all users");
-        setAllUsers(filterAllUsers);
         getFriendRequests(currUser, filterAllUsers);
         getFriendInvites(currUser, filterAllUsers);
       } // add an else saying can't get current users
@@ -70,7 +71,6 @@ export const RequestScreen = ({ navigation }: any) => {
     const filterAllUsers = allCurrUsers.filter((user) =>
       requestIds.includes(user._userID)
     );
-    console.log(filterAllUsers);
     setFriendRequest(filterAllUsers);
   };
 
@@ -82,61 +82,12 @@ export const RequestScreen = ({ navigation }: any) => {
     const filterAllUsers = allCurrUsers.filter((user) =>
       inviteIds.includes(user._userID)
     );
-    console.log(filterAllUsers);
     setFriendInvites(filterAllUsers);
   };
 
   useEffect(() => {
     getCurrentUser();
   }, []);
-
-  const FriendView = ({ user }) => (
-    <View style={styles.item}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: "#1b4557" }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Add Friend"
-          type="clear"
-          titleStyle={{ color: "#1b4557" }}
-          onPress={() => acceptFriendRequest(user)}
-        />
-      </View>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Cancel Friend"
-          type="clear"
-          titleStyle={{ color: "#1b4557" }}
-          onPress={() => cancelFriendRequest(user)}
-        />
-      </View>
-    </View>
-  );
-
-  const RequestView = ({ user }) => (
-    <View style={styles.item}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: "#1b4557" }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Cancel Request"
-          type="clear"
-          titleStyle={{ color: "#1b4557" }}
-          onPress={() => cancelFriendRequest(user)}
-        />
-      </View>
-    </View>
-  );
 
   const acceptFriendRequest = async (friend: User) => {
     try {
@@ -161,7 +112,7 @@ export const RequestScreen = ({ navigation }: any) => {
         const respFriend = await db.editFriends(friend._userID, filterFriend);
 
         if (respUser.succeeded && respFriend.succeeded) {
-          getAllUsers(currentUser);
+          getCurrentUser();
         }
       }
     } catch (error) {
@@ -172,19 +123,20 @@ export const RequestScreen = ({ navigation }: any) => {
   const cancelFriendRequest = async (friend: User) => {
     try {
       if (currentUser) {
-        // update current user to show that they have sent a friend request
+        // update current friend list to remove request
         const filterUser = currentUser._friends.filter(
           (user) => user._friendID != friend._userID
         );
         const respUser = await db.editFriends(currentUser._userID, filterUser);
-        // update friend to show that they have a new friend request
+
+        // update friend to remove request
         const filterFriend = friend._friends.filter(
           (user) => user._friendID != currentUser._userID
         );
         const respFriend = await db.editFriends(friend._userID, filterFriend);
 
         if (respUser.succeeded && respFriend.succeeded) {
-          getAllUsers(currentUser);
+          getCurrentUser();
         }
       }
     } catch (error) {
@@ -192,12 +144,59 @@ export const RequestScreen = ({ navigation }: any) => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    return <FriendView user={item} />;
-  };
+  const RequestView = ({ user }) => (
+    <View style={styles.item}>
+      <Avatar
+        size={36}
+        rounded
+        title={user._username.charAt(0)}
+        containerStyle={{ backgroundColor: "#1b4557" }}
+      />
+      <Text style={styles.subText}>{user._username}</Text>
+      <View style={styles.itemContainer}>
+        <Button
+          title="Add Friend"
+          type="clear"
+          titleStyle={{ color: darkBlueColor, fontSize: 16 }}
+          onPress={() => acceptFriendRequest(user)}
+        />
+      </View>
+      <View style={styles.itemContainer}>
+        <Button
+          title="Deny"
+          type="clear"
+          titleStyle={{ color: hotColor, fontSize: 16 }}
+          onPress={() => cancelFriendRequest(user)}
+        />
+      </View>
+    </View>
+  );
 
-  const renderRequest = ({ item }) => {
+  const InviteView = ({ user }) => (
+    <View style={styles.item}>
+      <Avatar
+        size={36}
+        rounded
+        title={user._username.charAt(0)}
+        containerStyle={{ backgroundColor: darkBlueColor }}
+      />
+      <Text style={styles.subText}>{user._username}</Text>
+      <View style={styles.itemContainer}>
+        <Button
+          title="Cancel Request"
+          type="clear"
+          titleStyle={{ color: hotColor, fontSize: 16 }}
+          onPress={() => cancelFriendRequest(user)}
+        />
+      </View>
+    </View>
+  );
+
+  const renderRequests = ({ item }) => {
     return <RequestView user={item} />;
+  };
+  const renderInvites = ({ item }) => {
+    return <InviteView user={item} />;
   };
 
   return (
@@ -208,18 +207,18 @@ export const RequestScreen = ({ navigation }: any) => {
         </Text>
       </View>
       <View>
-        <Text style={styles.subText}>Request Received</Text>
+        <Text style={styles.subTitle}>Request Received</Text>
         <FlatList
           data={friendRequest}
-          renderItem={renderItem}
+          renderItem={renderRequests}
           keyExtractor={(user) => user._username}
         />
       </View>
       <View>
-        <Text style={styles.subText}>Request Sent</Text>
+        <Text style={styles.subTitle}>Request Sent</Text>
         <FlatList
           data={friendInvites}
-          renderItem={renderRequest}
+          renderItem={renderInvites}
           keyExtractor={(user) => user._username}
         />
       </View>
@@ -241,7 +240,12 @@ const styles = StyleSheet.create({
     padding: 40,
     paddingBottom: 10,
     fontSize: 18,
-    color: "#219f94",
+    color: defaultColor,
+  },
+  subTitle: {
+    fontSize: 16,
+    color: greyColor,
+    paddingTop: 10,
   },
   item: {
     flexDirection: "row",
@@ -255,6 +259,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     fontSize: 14,
-    color: "#626264",
+    color: greyColor,
   },
 });
