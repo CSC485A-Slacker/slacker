@@ -35,6 +35,7 @@ interface IPinActivity {
   shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
+  checkedInUserIds: string[];
 }
 
 interface IPinsState {
@@ -43,7 +44,8 @@ interface IPinsState {
 
 interface IUser {
   _userID: string;
-  _checkInSpot: number;
+  _checkInSpot: LatLng | null;
+  _checkOutTime: Date;
   _username: string;
   _friends: IFriend[];
 }
@@ -65,7 +67,7 @@ interface IDatabase {
 
   getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
-  ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
+  ChangeCheckInSpot(userID: string, newLocation: LatLng, hoursToCheckInFor: number): void;
 
   // Add interfaces for Friends
 
