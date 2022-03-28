@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { Text, SearchBar, Avatar, Button } from "react-native-elements";
+import {
+  Text,
+  SearchBar,
+  Avatar,
+  Button,
+  Tab,
+  TabView,
+} from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
+import { defaultStyles } from "../../style/styles";
 
 const db = new Database();
 
@@ -19,7 +27,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
       if (userDB.data) {
         setCurrentUser(userDB.data);
-      } // add an else saying can't get current user
+      } // TODO: add an else saying can't get current user
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
     }
@@ -133,6 +141,23 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         inputStyle={{ fontSize: 14 }}
       />
       <View>
+        <Text style={defaultStyles.title}>Request Sent</Text>
+        <FlatList
+          data={allUsers}
+          renderItem={renderItem}
+          keyExtractor={(user) => user._username}
+        />
+      </View>
+      <View>
+        <Text style={defaultStyles.title}>Request Received</Text>
+        <FlatList
+          data={allUsers}
+          renderItem={renderItem}
+          keyExtractor={(user) => user._username}
+        />
+      </View>
+      <View>
+        <Text style={defaultStyles.title}>Friends Pendings</Text>
         <FlatList
           data={filteredUsers}
           renderItem={renderItem}
