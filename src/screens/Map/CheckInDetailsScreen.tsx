@@ -17,7 +17,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
   const toast = useToast(); // toast notifications
 
   const { pinCoords, usr, pinTitle } = route.params;
-  const [timeValue, setTimeValue] = useState(0);
+  const [timeValue, setTimeValue] = useState(1);
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
   const [noSlackline, setNoSlackline] = useState(false);
@@ -82,7 +82,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
   }
 
   const interpolate = (start: number, end: number) => {
-    let k = (timeValue - 0) / 10; // 0 =>min  && 10 => MAX
+    let k = (timeValue - 1) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
   };
 
@@ -106,7 +106,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             value={timeValue}
             onValueChange={setTimeValue}
             maximumValue={10}
-            minimumValue={0}
+            minimumValue={1}
             step={1}
             allowTouchTrack
             trackStyle={{ height: 5, backgroundColor: 'black' }}
