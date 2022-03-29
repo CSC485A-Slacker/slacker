@@ -92,7 +92,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         if (change.type === "added") {
           dispatch(addPin(pin));
         } else if (change.type === "modified") {
-          dispatch(updatePin(pin));
+          dispatch(removePin(pin))  
+          dispatch(addPin(pin));
+        //   dispatch(updatePin(pin));
         } else if (change.type === "removed") {
           dispatch(removePin(pin));
         }
