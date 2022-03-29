@@ -7,17 +7,20 @@ import {
   Alert,
 } from "react-native";
 import { Text, Icon, Slider, CheckBox, Button } from "react-native-elements";
+import { useToast } from "react-native-toast-notifications";
 import { useDispatch } from "react-redux";
 import { Database } from "../../data/Database";
 import { Pin, PinActivity } from "../../data/Pin";
 import { updatePin } from "../../redux/PinSlice";
 import { defaultColor, greyColor } from "../../style/styles";
+
 const database = new Database();
 
 export const CheckInDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
+  const toast = useToast(); // toast notifications
 
-  const { pinId, pinCoords, usr, pinTitle } = route.params;
+  const { pinCoords, usr, pinTitle } = route.params;
   const [timeValue, setTimeValue] = useState(0);
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
@@ -61,6 +64,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             
             changeCheckinSpotResult.then(result => {
                 if(result.succeeded) {
+                    // TODO: fix update UI calls
                    // update UI for previous pin (if checked out)
                     if(previousCheckinCoordinates) {
                         database.getPin(previousCheckinCoordinates).then(result => {
@@ -77,11 +81,17 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
                         if(pin) {
                             dispatch(updatePin(pin));
                             navigation.navigate("Map", {pin})
+                            toast.show("You are checked in", {
+                                type: "success",
+                            });
                         }
                     }) 
                 } else {
                     console.log(`${result.message}`)
                     navigation.navigate("Map", {dbPin})
+                    toast.show("Whoops! Checkin failed", {
+                        type: "danger",
+                    });
                 }
             })
             
