@@ -20,6 +20,8 @@ import { Database } from "../data/Database";
 import { defaultColor } from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
 import { useToast } from "react-native-toast-notifications";
+import { useDispatch } from "react-redux";
+import { addPin, removePin } from "../redux/PinSlice";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -33,6 +35,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const photos = pin.photos;
   const user = auth.currentUser
   const toast = useToast(); // toast notifications
+  const dispatch = useDispatch();
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -111,11 +114,19 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                     return
                 }
 
+                // checkout and use dispatch to rerender pin
                 database.checkoutFromSpot(usr._userID, pinCoords).then(() => {
-                    navigation.navigate("Map");
-                    toast.show(`Checked out of ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
-                        type: "success",
-                    });
+                    database.getPin(pinCoords).then(result => {
+                        const pin = result.data
+                        if(pin) {
+                            dispatch(removePin(pin))
+                            dispatch(addPin(pin));
+                            navigation.navigate("Map");
+                            toast.show(`Checked out of ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
+                                type: "success",
+                            });
+                        }
+                    })
                 });
             }
         })

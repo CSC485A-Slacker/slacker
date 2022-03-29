@@ -11,7 +11,7 @@ import { useToast } from "react-native-toast-notifications";
 import { useDispatch } from "react-redux";
 import { Database } from "../../data/Database";
 import { Pin, PinActivity } from "../../data/Pin";
-import { updatePin } from "../../redux/PinSlice";
+import { addPin, removePin } from "../../redux/PinSlice";
 import { defaultColor, greyColor } from "../../style/styles";
 
 const database = new Database();
@@ -64,13 +64,14 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             
             changeCheckinSpotResult.then(result => {
                 if(result.succeeded) {
-                    // TODO: fix update UI calls
+        
                    // update UI for previous pin (if checked out)
                     if(previousCheckinCoordinates) {
                         database.getPin(previousCheckinCoordinates).then(result => {
                             const pin = result.data
                             if(pin) {
-                                dispatch(updatePin(pin));
+                                dispatch(removePin(pin))
+                                dispatch(addPin(pin));
                             }
                         })
                     }
@@ -79,7 +80,8 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
                     database.getPin(pinCoords).then(result => {
                         const pin = result.data
                         if(pin) {
-                            dispatch(updatePin(pin));
+                            dispatch(removePin(pin))
+                            dispatch(addPin(pin));
                             navigation.navigate("Map", {pin})
                             toast.show(`Checked into ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
                                 type: "success",
