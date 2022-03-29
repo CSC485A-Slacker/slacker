@@ -72,7 +72,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             if (usr?._checkInSpot) {
                 if(userIsCheckedIntoSpot(usr, pinCoords)) {
                     navigation.navigate("Map")
-                    toast.show("You are already checked into this spot", {
+                    toast.show(`You are already checked into ${pin.details.title != "" ? pin.details.title : "this spot"}!`, {
                         type: "danger",
                     });
                     return
@@ -105,7 +105,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             if (usr?._checkInSpot) {
                 if(!userIsCheckedIntoSpot(usr, pinCoords)) {
                     navigation.navigate("Map")
-                    toast.show("You are not checked into this spot", {
+                    toast.show(`You are not checked into ${pin.details.title != "" ? pin.details.title : "this spot"}`, {
                         type: "danger",
                     });
                     return
@@ -113,7 +113,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
 
                 database.checkoutFromSpot(usr._userID, pinCoords).then(() => {
                     navigation.navigate("Map");
-                    toast.show("You are checked out", {
+                    toast.show(`Checked out of ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
                         type: "success",
                     });
                 });

@@ -81,7 +81,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
                         if(pin) {
                             dispatch(updatePin(pin));
                             navigation.navigate("Map", {pin})
-                            toast.show("You are checked in", {
+                            toast.show(`Checked into ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
                                 type: "success",
                             });
                         }
