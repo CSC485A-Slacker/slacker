@@ -82,7 +82,7 @@ export const pinSlice = createSlice({
               description: action.payload.details.description,
               slacklineLength: action.payload.details.slacklineLength,
               slacklineType: action.payload.details.slacklineType,
-              color: "red",
+              color: action.payload.details.color,
               draggable: false,
             },
             reviews: action.payload.reviews,

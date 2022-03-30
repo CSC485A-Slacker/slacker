@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   View,
   Alert,
+  FlatList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button, FAB, Icon } from "react-native-elements";
@@ -85,6 +86,10 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
       Alert.alert("You must be signed in to use this feature!");
     }
   };
+
+  const renderPhoto = ({ item }) => (
+    <PhotoItem photo={item} key={item.url} size={150} />
+  );
 
   return (
     <SlidingUpPanel
@@ -196,11 +201,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
           <View>
             <Divider style={styles.divider} />
             {photos.length != 0 ? (
-              <ScrollView horizontal={true}>
-                {photos.map((photo: PinPhoto) => (
-                  <PhotoItem photo={photo} key={photo.url} />
-                ))}
-              </ScrollView>
+              <View style={{ paddingTop: 14 }}>
+                <FlatList
+                  horizontal={true}
+                  data={photos}
+                  renderItem={renderPhoto}
+                  keyExtractor={(item) => item.url}
+                />
+              </View>
             ) : (
               <View>
                 <Text style={styles.subTitle}>Photos</Text>
