@@ -48,7 +48,6 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
     console.log(notSharingSlackline)
     console.log(noSlackline)
     console.log(timeValue)
-    console.log(pinId)
     console.log(pinCoords)
     console.log(usr._userID)
     
@@ -56,26 +55,39 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
     dbPinPromise.then(result => {
       const dbPin = result.data
       if (dbPin) {
-        const updatedPinActivity = new PinActivity(
-          dbPin?.activity.shareableSlackline ? true : sharingSlackline,
-          dbPin?.activity.activeUsers + 1,
-          dbPin?.activity.totalUsers + 1
-        )
-        const updatedPin = new Pin(
-          dbPin.key,
-          dbPin.coordinate,
-          dbPin.details,
-          dbPin.reviews,
-          dbPin.photos,
-          updatedPinActivity
-        )
         try {
-          const resp = database.editPinActivity(pinCoords, updatedPinActivity);
-          dispatch(updatePin(updatedPin))
-          const resp2 = database.ChangeCheckInSpot(usr._userID, pinId)
+            const previousCheckinCoordinates = usr._checkInSpot;
+            const changeCheckinSpotResult = database.ChangeCheckInSpot(usr._userID, pinCoords, timeValue);
+            
+            changeCheckinSpotResult.then(result => {
+                if(result.succeeded) {
+                   // update UI for previous pin (if checked out)
+                    if(previousCheckinCoordinates) {
+                        database.getPin(previousCheckinCoordinates).then(result => {
+                            const pin = result.data
+                            if(pin) {
+                                dispatch(updatePin(pin));
+                            }
+                        })
+                    }
+
+                    // update UI for newly checked in pin and navigate to
+                    database.getPin(pinCoords).then(result => {
+                        const pin = result.data
+                        if(pin) {
+                            dispatch(updatePin(pin));
+                            navigation.navigate("Map", {pin})
+                        }
+                    }) 
+                } else {
+                    console.log(`${result.message}`)
+                    navigation.navigate("Map", {dbPin})
+                }
+            })
+            
           // Still need to update UI with fire emoji or smthn
           // Still need to fix updating fresh map with details on navigation
-          navigation.navigate("Map", {updatedPin})
+          
         } catch(error) {
             console.log(`error updating pin activity: ${error}`);
             Alert.alert('Please try again')

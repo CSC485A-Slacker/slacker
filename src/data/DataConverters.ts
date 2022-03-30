@@ -67,26 +67,34 @@ const pinReviewConverter = {
   },
 };
 
-// TODO: implement generic array converter
 const pinReviewsConverter = {
   toFirestore: (reviews: IPinReview[]) => {
-    const reviewsArray: any = [];
-
-    reviews.forEach((review) => {
-      reviewsArray.push(pinReviewConverter.toFirestore(review));
-    });
-
-    return reviewsArray;
+    return arrayConverter.toFirestore(reviews, pinReviewConverter);
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const reviews = snapshot.get("reviews");
+    return arrayConverter.fromFirestore(snapshot, "reviews", pinReviewConverter);
+  },
+};
 
-    const reviewsList: PinReview[] = [];
-    reviews.forEach((review: any) => {
-      reviewsList.push(pinReviewConverter.fromFirestore(review));
+const arrayConverter = {
+  toFirestore: (array: any[], itemConverter: any) => {
+    const tempArray: any = [];
+
+    array.forEach((item) => {
+      tempArray.push(itemConverter.toFirestore(item));
     });
 
-    return reviewsList;
+    return tempArray;
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot, fieldPath: string, itemConverter: any) => {
+    const array = snapshot.get(fieldPath);
+
+    const tempArray: any[] = [];
+    array.forEach((item: any) => {
+      tempArray.push(itemConverter.fromFirestore(item));
+    });
+
+    return tempArray;
   },
 };
 
@@ -104,25 +112,21 @@ const pinPhotoConverter = {
 
 const pinPhotosConverter = {
   toFirestore: (photos: IPinPhoto[]) => {
-    const photosArray: any = [];
-
-    photos.forEach((photo) => {
-      photosArray.push(pinPhotoConverter.toFirestore(photo));
-    });
-
-    return photosArray;
+    return arrayConverter.toFirestore(photos, pinPhotoConverter);
   },
   fromFirestore: (snapshot: any) => {
-    const photos = snapshot.get("photos");
-
-    const photosList: PinPhoto[] = [];
-    photos.forEach((photo: any) => {
-      photosList.push(pinPhotoConverter.fromFirestore(photo));
-    });
-
-    return photosList;
+    return arrayConverter.fromFirestore(snapshot, "photos", pinPhotoConverter);
   },
 };
+
+// const pinCheckoutTimesConverter = {
+//   toFirestore: (checkoutTimes: Date[]) => {
+//     return arrayConverter.toFirestore(checkoutTimes, pinPhotoConverter);
+//   },
+//   fromFirestore: (snapshot: any) => {
+//     return arrayConverter.fromFirestore(snapshot, "photos", pinPhotoConverter);
+//   },
+// };
 
 const pinActivityConverter = {
   toFirestore: (activity: IPinActivity) => {
@@ -130,6 +134,7 @@ const pinActivityConverter = {
       shareableSlackline: activity.shareableSlackline,
       activeUsers: activity.activeUsers,
       totalUsers: activity.totalUsers,
+      checkedInUserIds: activity.checkedInUserIds
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -137,7 +142,8 @@ const pinActivityConverter = {
     return new PinActivity(
       activity.shareableSlackline,
       activity.activeUsers,
-      activity.totalUsers
+      activity.totalUsers,
+      activity.checkedInUserIds
     );
   },
 };
@@ -151,6 +157,7 @@ const pinConverter = {
       reviews: pinReviewsConverter.toFirestore(pin.reviews),
       photos: pinPhotosConverter.toFirestore(pin.photos),
       activity: pinActivityConverter.toFirestore(pin.activity),
+      privateViewers: pin.privateViewers,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -160,24 +167,37 @@ const pinConverter = {
       pinDetailsConverter.fromFirestore(snapshot),
       pinReviewsConverter.fromFirestore(snapshot),
       pinPhotosConverter.fromFirestore(snapshot),
-      pinActivityConverter.fromFirestore(snapshot)
+      pinActivityConverter.fromFirestore(snapshot),
+      snapshot.get("privateViewers") || []
     );
   },
 };
+
+// const userConverter = {
+//   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+//     return new User(
+//       snapshot.get('userID'),
+//       snapshot.get('checkInSpot'),
+//       snapshot.get('checkOutTime')
+//     );
+//   },
+// };
 
 const userConverter = {
   toFirestore: (user: IUser) => {
     return {
       userID: user._userID,
       checkInSpot: user._checkInSpot,
-      username: user._username
+      checkOutTime: user._checkOutTime,
+      username: user._username,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
       snapshot.get('userID'),
       snapshot.get('checkInSpot'),
-      snapshot.get('username')
+      snapshot.get('checkOutTime').toDate(),
+      snapshot.get("username")
     );
   },
 };
@@ -189,5 +209,5 @@ export {
   pinReviewsConverter,
   pinPhotosConverter,
   pinActivityConverter,
-  userConverter
+  userConverter,
 };

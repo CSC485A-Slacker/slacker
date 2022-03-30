@@ -12,12 +12,18 @@ import {
   updatePin,
 } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
-import { collection, getFirestore, onSnapshot, query } from "@firebase/firestore";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  query,
+} from "@firebase/firestore";
 import { auth, firebaseApp } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
 import { defaultColor, hotColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -41,7 +47,7 @@ let newPin: Pin = {
     description: "",
     slacklineLength: 0,
     slacklineType: "",
-    color: "blue",
+    color: "green",
     draggable: true,
   },
   reviews: [],
@@ -50,10 +56,10 @@ let newPin: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
+    checkedInUserIds: []
   },
+  privateViewers: [],
 };
-
-
 
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
@@ -69,16 +75,15 @@ export const MapScreen = ({ route, navigation }: any) => {
   const db = getFirestore(firebaseApp);
   const q = query(collection(db, "pins"));
 
+  const toast = useToast(); // toast notifications
 
   // navigate to login screen if user is not logged in
-  useEffect( () => {
+  useEffect(() => {
     const user = auth.currentUser;
-    console.log(`user in map: ${user?.uid}`);
-    if(!user) {
-        console.log(`should navigate to login`);
-        navigation.navigate("Login");
+    if (!user) {
+      navigation.navigate("Login");
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -99,9 +104,12 @@ export const MapScreen = ({ route, navigation }: any) => {
   useEffect(() => {
     if (route.params?.confirmedPin) {
       setAddPinVisible(true);
-      setHotSpotToggleVisible(true)
+      setHotSpotToggleVisible(true);
       setConfirmCancelVisible(false);
       route.params.confirmedPin = false;
+      toast.show("Pin added successfuly!", {
+        type: "success",
+      });
     }
   });
 
@@ -109,10 +117,10 @@ export const MapScreen = ({ route, navigation }: any) => {
   // button is red -> only pins with people currently checked in
   // button is aqua -> all pins
   const handleHotspotToggle = () => {
-    let newColor:string = defaultColor;
-    if(hotspotToggleColor == defaultColor) newColor = hotColor;
+    let newColor: string = defaultColor;
+    if (hotspotToggleColor == defaultColor) newColor = hotColor;
     setHotspotToggleColor(newColor);
-  }
+  };
 
   // Keeps track of the map region
   const updateRegionCoordinates = (e: LatLng) => {
@@ -134,7 +142,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: regionLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",
@@ -147,7 +155,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
+      privateViewers: [],
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -165,7 +175,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         longitude: newPinLongitude,
       },
       details: {
-        color: "blue",
+        color: "green",
         draggable: true,
         title: "",
         description: "",
@@ -178,6 +188,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         checkIn: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
     };
     navigation.navigate("Spot Details", {
@@ -207,13 +218,26 @@ export const MapScreen = ({ route, navigation }: any) => {
 
   const onMapPress = () => {
     setPinInfoVisible(false);
-    setSelectedPin(null)
+    setSelectedPin(null);
     setHotSpotToggleVisible(true);
     setAddPinVisible(true);
-  }
+  };
 
-  let pinsToRender = pins;
-  if (hotspotToggleColor == hotColor) pinsToRender = pins.filter(pin => pin.activity.activeUsers > 0);
+  // Filter out any pins that shouldn't be visible to the current user
+  // this means any pins that were created as private by other people
+  // that the current user does not have permission to view
+  // keeps any publicly available pins as well as any private
+  // pins the user has permission to view
+
+  let pinsToRender: Pin[] = pins.filter(
+    (pin: Pin) =>
+      pin.privateViewers?.length == 0 ||
+      !pin.privateViewers ||
+      pin.privateViewers.indexOf(auth.currentUser?.uid || "") > -1
+  );
+
+  if (hotspotToggleColor == hotColor)
+    pinsToRender = pinsToRender.filter((pin) => pin.activity.activeUsers > 0);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -236,7 +260,11 @@ export const MapScreen = ({ route, navigation }: any) => {
             key={pin.key}
             coordinate={pin.coordinate}
             pinColor={pin.details.color}
-            image={pin.activity.activeUsers ? require("../../assets/flame1.png") : null}
+            image={
+              pin.activity.activeUsers
+                ? require("../../assets/flame1.png")
+                : null
+            }
             draggable={pin.details.draggable}
             onDragEnd={(e) => updateNewPinCoordinates(e.nativeEvent.coordinate)}
             onPress={(e) => {
@@ -256,9 +284,9 @@ export const MapScreen = ({ route, navigation }: any) => {
       ) : null}
       {confirmCancelVisible ? (
         <FAB
-          titleStyle={{ color: defaultColor}}
+          titleStyle={{ color: defaultColor }}
           title="Cancel"
-          icon={{ name: "close", color: defaultColor}}
+          icon={{ name: "close", color: defaultColor }}
           color="white"
           onPress={handleCancelPress}
           placement="left"
@@ -266,21 +294,21 @@ export const MapScreen = ({ route, navigation }: any) => {
       ) : null}
       {addPinVisible ? (
         <>
-        {hotspotToggleVisible? (
+          {hotspotToggleVisible ? (
+            <FAB
+              icon={{ name: "whatshot", color: "white" }}
+              style={{ paddingBottom: 65 }} // ensure the button doesn't overlap with the one below it
+              color={hotspotToggleColor}
+              onPress={handleHotspotToggle}
+              placement="right"
+            />
+          ) : null}
           <FAB
-            icon={{ name: "whatshot", color: "white" }}
-            style={{ paddingBottom: 65 }} // ensure the button doesn't overlap with the one below it
-            color={hotspotToggleColor}
-            onPress={handleHotspotToggle}
+            icon={{ name: "add", color: "white" }}
+            color={defaultColor}
+            onPress={handleAddPin}
             placement="right"
           />
-        ) : null}
-        <FAB
-          icon={{ name: "add", color: "white" }}
-          color={defaultColor}
-          onPress={handleAddPin}
-          placement="right"
-        />
         </>
       ) : null}
       {pinInfoVisible ? (
@@ -303,5 +331,5 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-  }
+  },
 });

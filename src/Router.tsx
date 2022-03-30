@@ -50,6 +50,7 @@ function MapStackScreen() {
 function NavTabs (){
   return (
     <Tab.Navigator
+      initialRouteName="Explore"
       screenOptions={{
         tabBarActiveTintColor: defaultColor,
         headerShown: false,

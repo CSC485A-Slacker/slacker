@@ -18,6 +18,7 @@ import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
 import { defaultColor } from "../style/styles";
+import { userIsCheckedIntoSpot } from "../data/User";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -54,11 +55,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
       const userPromise = database.getUser(userId);
       userPromise.then(result => {
         const usr = result.data
-        if (usr?._checkInSpot == pinId) {
-          Alert.alert('You have already checked in here!')
-        } else {
-          navigation.navigate("Check-In Details", { pinId, pinCoords, usr, pinTitle })
+        if (usr?._checkInSpot) {
+            if(userIsCheckedIntoSpot(usr, pinCoords)) {
+                Alert.alert('You are already checked in here!')
+                navigation.navigate("Map")
+                return
+            }
         }
+        navigation.navigate("Check-In Details", { pinId, pinCoords, usr, pinTitle })
       })
     } else {
       Alert.alert('You must be signed in to use this feature!')

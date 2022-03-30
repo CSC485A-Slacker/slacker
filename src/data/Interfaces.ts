@@ -1,5 +1,4 @@
 import { LatLng } from "react-native-maps";
-import { User } from "./User";
 
 interface IPin {
   key: number;
@@ -7,7 +6,8 @@ interface IPin {
   details: IPinDetails;
   reviews: IPinReview[];
   photos: IPinPhoto[];
-  activity: IPinActivity; 
+  activity: IPinActivity;
+  privateViewers: string[];
 }
 
 interface IPinDetails {
@@ -35,6 +35,7 @@ interface IPinActivity {
   shareableSlackline: boolean;
   activeUsers: number;
   totalUsers: number;
+  checkedInUserIds: string[];
 }
 
 interface IPinsState {
@@ -43,20 +44,21 @@ interface IPinsState {
 
 interface IUser {
   _userID: string;
-  _checkInSpot: number;
+  _checkInSpot: LatLng | null;
+  _checkOutTime: Date;
   _username: string;
 }
 
 interface IDatabase {
   addUser(user: IUser): void;
 
-  getUser(userID: string): Promise<IUserActionResult<IUser>>
+  getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
-  ChangeCheckInSpot(userID: string, newCheckInSpot: number): void;
+  ChangeCheckInSpot(userID: string, newLocation: LatLng, hoursToCheckInFor: number): void;
 
   deleteUser(userID: string): void;
 
-  getAllUsers(): Promise<IUserActionResult<IUser[]>>
+  getAllUsers(): Promise<IUserActionResult<IUser[]>>;
   /* Purpose: attempts to add a pin to the database.
    *          Will fail if a pin exists with the same coordinate.
    *
