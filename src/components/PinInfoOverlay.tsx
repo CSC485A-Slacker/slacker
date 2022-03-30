@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text, Divider, Button } from "react-native-elements";
+import { Text, Divider, Button, FAB, Icon } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
 import { Pin, PinPhoto, PinReview } from "../data/Pin";
@@ -17,7 +17,13 @@ import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
-import { defaultColor } from "../style/styles";
+import {
+  blueColor,
+  defaultColor,
+  greyColor,
+  hotColor,
+  mintColor,
+} from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
 
 const ios = Platform.OS === "ios";
@@ -30,7 +36,8 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const navigation = prop.navigation;
   const reviews = pin.reviews;
   const photos = pin.photos;
-  const user = auth.currentUser
+  const user = auth.currentUser;
+  const [favorite, setFavorite] = useState(false);
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -50,24 +57,34 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
     new Animated.Value(draggableRange.bottom)
   );
 
-  const handleCheckIn = (pinId: number, pinCoords: LatLng, userId: string|undefined, pinTitle: string) => {
+  const handleCheckIn = (
+    pinId: number,
+    pinCoords: LatLng,
+    userId: string | undefined,
+    pinTitle: string
+  ) => {
     if (userId) {
       const userPromise = database.getUser(userId);
-      userPromise.then(result => {
-        const usr = result.data
+      userPromise.then((result) => {
+        const usr = result.data;
         if (usr?._checkInSpot) {
-            if(userIsCheckedIntoSpot(usr, pinCoords)) {
-                Alert.alert('You are already checked in here!')
-                navigation.navigate("Map")
-                return
-            }
+          if (userIsCheckedIntoSpot(usr, pinCoords)) {
+            Alert.alert("You are already checked in here!");
+            navigation.navigate("Map");
+            return;
+          }
         }
-        navigation.navigate("Check-In Details", { pinId, pinCoords, usr, pinTitle })
-      })
+        navigation.navigate("Check-In Details", {
+          pinId,
+          pinCoords,
+          usr,
+          pinTitle,
+        });
+      });
     } else {
-      Alert.alert('You must be signed in to use this feature!')
+      Alert.alert("You must be signed in to use this feature!");
     }
-  }
+  };
 
   return (
     <SlidingUpPanel
@@ -83,15 +100,35 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
       friction={0.999}
     >
       <View style={styles.panelContent}>
+        <Icon
+          name="horizontal-rule"
+          type="material"
+          color={mintColor}
+          containerStyle={{ padding: 0, margin: 0 }}
+        />
         <View style={styles.container}>
-          <Text h4>{pin.details.title}</Text>
+          <View style={styles.inlineContainer}>
+            <Text h4>{pin.details.title}</Text>
+            <Icon
+              name={favorite ? "favorite" : "favorite-border"}
+              type="material"
+              color={hotColor}
+              // Add a method here to update favourite for user
+              onPress={() => setFavorite(!favorite)}
+            />
+          </View>
           <Text>{pin.details.slacklineType}</Text>
           <Text>{pin.details.slacklineLength}m</Text>
           <View style={styles.buttonsContainer}>
             <View style={styles.buttonContainer}>
               <Button
                 title="Check In"
-                icon={{name: "angle-double-right",  type: "font-awesome", size: 20, color: "white",}}
+                icon={{
+                  name: "angle-double-right",
+                  type: "font-awesome",
+                  size: 20,
+                  color: "white",
+                }}
                 iconRight
                 buttonStyle={{
                   backgroundColor: defaultColor,
@@ -103,7 +140,14 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() => handleCheckIn(pin.key, pin.coordinate, user?.uid, pin.details.title)}
+                onPress={() =>
+                  handleCheckIn(
+                    pin.key,
+                    pin.coordinate,
+                    user?.uid,
+                    pin.details.title
+                  )
+                }
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -225,7 +269,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    margin: 16,
+    marginHorizontal: 16,
   },
   buttonsContainer: {
     flexDirection: "row",
@@ -236,6 +280,10 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     paddingBottom: 10,
+  },
+  inlineContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   subTitle: {
     fontSize: 20,
@@ -254,7 +302,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     paddingBottom: 14,
-  }
+  },
 });
 
 export default PinInfoOverlay;
