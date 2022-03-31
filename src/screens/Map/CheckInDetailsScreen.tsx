@@ -7,18 +7,17 @@ import {
   Alert,
 } from "react-native";
 import { Text, Icon, Slider, CheckBox, Button } from "react-native-elements";
-import { useDispatch } from "react-redux";
+import { useToast } from "react-native-toast-notifications";
 import { Database } from "../../data/Database";
-import { Pin, PinActivity } from "../../data/Pin";
-import { updatePin } from "../../redux/PinSlice";
 import { defaultColor, greyColor } from "../../style/styles";
+
 const database = new Database();
 
 export const CheckInDetailsScreen = ({ route, navigation }) => {
-  const dispatch = useDispatch();
+  const toast = useToast(); // toast notifications
 
-  const { pinId, pinCoords, usr, pinTitle } = route.params;
-  const [timeValue, setTimeValue] = useState(0);
+  const { pinCoords, usr, pinTitle } = route.params;
+  const [timeValue, setTimeValue] = useState(1);
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
   const [noSlackline, setNoSlackline] = useState(false);
@@ -51,54 +50,39 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
     console.log(pinCoords)
     console.log(usr._userID)
     
-    const dbPinPromise = database.getPin(pinCoords);
-    dbPinPromise.then(result => {
-      const dbPin = result.data
-      if (dbPin) {
-        try {
-            const previousCheckinCoordinates = usr._checkInSpot;
+    try {
+        const dbPinPromise = database.getPin(pinCoords);
+        dbPinPromise.then(result => {
+        const dbPin = result.data
+
+        if (dbPin) {
             const changeCheckinSpotResult = database.ChangeCheckInSpot(usr._userID, pinCoords, timeValue);
             
             changeCheckinSpotResult.then(result => {
                 if(result.succeeded) {
-                   // update UI for previous pin (if checked out)
-                    if(previousCheckinCoordinates) {
-                        database.getPin(previousCheckinCoordinates).then(result => {
-                            const pin = result.data
-                            if(pin) {
-                                dispatch(updatePin(pin));
-                            }
-                        })
-                    }
-
-                    // update UI for newly checked in pin and navigate to
-                    database.getPin(pinCoords).then(result => {
-                        const pin = result.data
-                        if(pin) {
-                            dispatch(updatePin(pin));
-                            navigation.navigate("Map", {pin})
-                        }
-                    }) 
-                } else {
-                    console.log(`${result.message}`)
                     navigation.navigate("Map", {dbPin})
+                    toast.show(`Checked into ${dbPin.details.title != "" ? dbPin.details.title : "spot"}!`, {
+                        type: "success",
+                    })
+                    return 
+                } else {
+                    throw new Error(result.message);
                 }
             })
-            
-          // Still need to update UI with fire emoji or smthn
-          // Still need to fix updating fresh map with details on navigation
-          
-        } catch(error) {
-            console.log(`error updating pin activity: ${error}`);
-            Alert.alert('Please try again')
         }
-      }
-      // should add an else throw err or something here
     })
+    } catch(error) {
+        console.log(`error updating pin activity: ${error}`);
+        navigation.navigate("Map")
+        toast.show("Whoops! Checkin failed", {
+            type: "danger",
+        });
+    }
+    
   }
 
   const interpolate = (start: number, end: number) => {
-    let k = (timeValue - 0) / 10; // 0 =>min  && 10 => MAX
+    let k = (timeValue - 1) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
   };
 
@@ -122,7 +106,7 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             value={timeValue}
             onValueChange={setTimeValue}
             maximumValue={10}
-            minimumValue={0}
+            minimumValue={1}
             step={1}
             allowTouchTrack
             trackStyle={{ height: 5, backgroundColor: 'black' }}
