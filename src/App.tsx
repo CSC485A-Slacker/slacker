@@ -14,7 +14,7 @@ import { ToastProvider } from "react-native-toast-notifications";
 
 export default function App() {
   // hides yellow box warnings on screen - useful for demos
-  // LogBox.ignoreAllLogs() 
+  LogBox.ignoreAllLogs(); 
 
   // runs checkout task on load
   // database.checkoutAllExpiredCheckins(5);

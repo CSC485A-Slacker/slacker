@@ -25,7 +25,6 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
   const toast = useToast();
 
   const getCurrentUser = async () => {
-    console.log("getting current user");
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
       if (userDB.succeeded && userDB.data) {
@@ -43,7 +42,6 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
   };
 
   const getAllUsers = async (currUser: User) => {
-    console.log("getting all users");
     try {
       const response = await db.getAllUsers();
       if (response.data) {
@@ -215,7 +213,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     flex: 1,
     justifyContent: "flex-start",
-    // backgroundColor: "white",
   },
   container: {
     alignItems: "center",

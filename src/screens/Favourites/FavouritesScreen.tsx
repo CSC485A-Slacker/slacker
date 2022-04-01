@@ -36,9 +36,13 @@ export const FavouritesScreen = () => {
       <View style={styles.view}>
         <View style={styles.container}>
           <Text style={styles.title} h3>
-            Favorites
+            Favorite Pins
           </Text>
-          <Text style={styles.subTitle}>{numFavourites} spots</Text>
+          {numFavourites == 1 ? (
+            <Text style={styles.subTitle}>{numFavourites} spot</Text>
+          ) : (
+            <Text style={styles.subTitle}>{numFavourites} spots</Text>
+          )}
         </View>
         <View>
           <FlatList
@@ -58,7 +62,11 @@ export const FavouritesScreen = () => {
           <Text style={styles.title} h3>
             Private Pins
           </Text>
-          <Text style={styles.subTitle}>{numPrivate} spots</Text>
+          {numFavourites == 1 ? (
+            <Text style={styles.subTitle}>{numFavourites} spot</Text>
+          ) : (
+            <Text style={styles.subTitle}>{numFavourites} spots</Text>
+          )}
         </View>
         <View>
           <FlatList
