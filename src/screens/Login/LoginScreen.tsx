@@ -1,5 +1,12 @@
-import React, {  useState } from 'react'
-import { KeyboardAvoidingView, StyleSheet, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image,
+} from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Text } from "react-native-elements";
 import {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Platform,
   Animated,
@@ -26,6 +26,7 @@ import {
   mintColor,
 } from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
+import { useToast } from "react-native-toast-notifications";
 
 const ios = Platform.OS === "ios";
 const TOP_NAV_BAR = 100;
@@ -39,6 +40,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const photos = pin.photos;
   const user = auth.currentUser;
   const [favorite, setFavorite] = useState(false);
+  const toast = useToast(); // toast notifications
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -58,38 +60,104 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
     new Animated.Value(draggableRange.bottom)
   );
 
-  const handleCheckIn = (
-    pinId: number,
-    pinCoords: LatLng,
-    userId: string | undefined,
-    pinTitle: string
-  ) => {
-    if (userId) {
-      const userPromise = database.getUser(userId);
-      userPromise.then((result) => {
-        const usr = result.data;
-        if (usr?._checkInSpot) {
-          if (userIsCheckedIntoSpot(usr, pinCoords)) {
-            Alert.alert("You are already checked in here!");
-            navigation.navigate("Map");
-            return;
-          }
-        }
-        navigation.navigate("Check-In Details", {
-          pinId,
-          pinCoords,
-          usr,
-          pinTitle,
-        });
-      });
-    } else {
-      Alert.alert("You must be signed in to use this feature!");
-    }
-  };
+  const [isCheckedIn, setCheckedIn] = useState(false);
+  
+  useEffect( () => {
+      checkedIn(pin.coordinate, user?.uid).then((checkedIn) => { 
+        // console.log(`checkedIn in useEffect ${checkedIn}`) 
+        setCheckedIn(checkedIn)
+    });
+  }, [pin])
 
-  const renderPhoto = ({ item }) => (
-    <PhotoItem photo={item} key={item.url} size={150} />
-  );
+  const handleCheckIn = (pinCoords: LatLng, userId: string|undefined, pinTitle: string) => {
+    try {
+        if (userId) {
+        
+            const userPromise = database.getUser(userId);
+            userPromise.then(result => {
+            const usr = result.data
+
+            if (usr?._checkInSpot) {
+                if(userIsCheckedIntoSpot(usr, pinCoords)) {
+                    navigation.navigate("Map")
+                    toast.show(`You are already checked into ${pin.details.title != "" ? pin.details.title : "this spot"}!`, {
+                        type: "danger",
+                    });
+                    return
+                }
+            }
+            navigation.navigate("Check-In Details", {pinCoords, usr, pinTitle })
+        })
+        } else {
+            toast.show("You must be signed in to use this feature!", {
+                type: "danger",
+            });
+        }
+    } catch (error) {
+        console.log(`${error}`)
+        navigation.navigate("Map")
+        toast.show("Whoops! Checkin failed", {
+            type: "danger",
+        });
+    }
+  }
+
+  const handleCheckOut = (pinCoords: LatLng, userId: string|undefined) => {
+      try {
+        if (userId) {
+
+            const userPromise = database.getUser(userId);
+            userPromise.then(result => {
+            const usr = result.data
+
+            if (usr?._checkInSpot) {
+                if(!userIsCheckedIntoSpot(usr, pinCoords)) {
+                    navigation.navigate("Map")
+                    toast.show(`You are not checked into ${pin.details.title != "" ? pin.details.title : "this spot"}`, {
+                        type: "danger",
+                    });
+                    return
+                }
+
+                // checkout and use dispatch to rerender pin
+                database.checkoutFromSpot(usr._userID, pinCoords).then(() => {
+                    navigation.navigate("Map");
+                    toast.show(`Checked out of ${pin.details.title != "" ? pin.details.title : "spot"}!`, {
+                        type: "success",
+                    });
+                });
+            }
+        })
+        } else {
+            toast.show("You must be signed in to use this feature", {
+                type: "danger",
+            });
+        }
+      } catch(error) {
+            console.log(`${error}`)
+            navigation.navigate("Map")
+            toast.show("Whoops! Checkout failed", {
+                type: "danger",
+            });
+      }
+  }
+
+  const checkedIn = async (pinCoords: LatLng, userId: string|undefined): Promise<boolean> => {
+      if (userId) {
+
+      const checkedIn = database.getUser(userId).then(result => {
+        const usr = result.data;
+        if (usr) {
+            const checked = userIsCheckedIntoSpot(usr, pinCoords);
+            return userIsCheckedIntoSpot(usr, pinCoords);
+        }
+        return false
+      })
+        return checkedIn
+    }
+
+    return false;
+  }
 
   return (
     <SlidingUpPanel
@@ -127,13 +195,8 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
           <View style={styles.buttonsContainer}>
             <View style={styles.buttonContainer}>
               <Button
-                title="Check In"
-                icon={{
-                  name: "angle-double-right",
-                  type: "font-awesome",
-                  size: 20,
-                  color: "white",
-                }}
+                title={ isCheckedIn ? "Check Out" : "Check In" }
+                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
                 iconRight
                 buttonStyle={{
                   backgroundColor: defaultColor,
@@ -145,14 +208,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() =>
-                  handleCheckIn(
-                    pin.key,
-                    pin.coordinate,
-                    user?.uid,
-                    pin.details.title
-                  )
-                }
+                onPress={() => isCheckedIn ? handleCheckOut(pin.coordinate, user?.uid) : handleCheckIn(pin.coordinate, user?.uid, pin.details.title)}
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -210,12 +266,13 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                 />
               </View>
             ) : (
-              <View>
-                <Text style={styles.subTitle}>Photos</Text>
-                <Text style={styles.text}>
-                  Share your photos using the buttom above!
-                </Text>
-              </View>
+                <View>
+                  <Text style={styles.subTitle}>Photos</Text>
+                  <Text style={styles.text}>
+                    Share your photos using the button above!
+                  </Text>
+                </View>
+              
             )}
           </View>
           <View>

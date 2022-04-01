@@ -2,7 +2,7 @@ import { firebaseApp } from "../config/FirebaseConfig"
 import { getFirestore, collection, getDocs, setDoc, doc, getDoc, updateDoc, deleteDoc, Firestore, query } from 'firebase/firestore/lite';
 import { Pin, PinDetails, coordinateToString, coordinateFromString, PinReview, PinPhoto, PinActivity } from "./Pin"
 import { IPin, IDatabaseActionResult, IPinActionResult, IDatabase, IUser, IUserActionResult } from "./Interfaces"
-import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter } from "./DataConverters";
+import { pinActivityConverter, pinConverter, pinDetailsConverter, pinPhotosConverter, pinReviewsConverter, userConverter, userFriendsConverter } from "./DataConverters";
 import { Coordinate, LatLng } from "react-native-maps";
 import { onSnapshot, Timestamp } from "@firebase/firestore";
 import {
@@ -11,7 +11,7 @@ import {
   updatePin,
 } from "../redux/PinSlice";
 import { store } from "../redux/Store"
-import { User, userIsCheckedIntoSpot } from "./User";
+import { User, userIsCheckedIntoSpot, Friend } from "./User";
 
 class Database implements IDatabase {
     database: Firestore;
@@ -29,7 +29,7 @@ class Database implements IDatabase {
           {
             throw new Error(`User already existed with ID ${user._userID}`)
           }
-          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, checkOutTime: user._checkOutTime, username:user._username})
+          await setDoc(userDocRef, {userID: user._userID, checkInSpot: user._checkInSpot, checkOutTime: user._checkOutTime, username:user._username, friends: user._friends})
         } catch (e) {
           console.log("Error adding user: ", e);
         }
@@ -77,9 +77,7 @@ class Database implements IDatabase {
           throw new Error(`User with ID ${userID} doesn't exist`)
         }
         
-        // console.log(userDocSnap)
         const usr = userConverter.fromFirestore(userDocSnap);
-        // console.log(usr)
 
         return new UserActionResult<IUser>(
           new DatabaseActionResult(
@@ -312,6 +310,28 @@ class Database implements IDatabase {
         console.log(`delete user failed: ${error}`)
       }
     }
+  
+  async editFriends(userID: string, newFriends: Friend[]) {
+    const userDocRef = doc(this.database, "users", userID)
+    try {
+      const userDocSnap = await getDoc(userDocRef)
+      if(!userDocSnap.exists()) {
+        throw new Error("User doesn't exist")
+      }
+      
+      updateDoc(userDocRef, {friends: userFriendsConverter.toFirestore(newFriends)})
+    } catch(error) {
+      return new DatabaseActionResult(
+          false,
+          `Failed: could not add friend to user: ${userID}. ${error}`
+        );
+    }
+    return new DatabaseActionResult(
+          true,
+          `Succeeded: friend added to user: ${userID}`
+        );
+  }
+   
 
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {

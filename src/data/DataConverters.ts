@@ -4,12 +4,13 @@ import {
   IPinReview,
   IPinPhoto,
   IPinActivity,
+  IFriend,
   IUser,
 } from "./Interfaces";
 import { QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { PinDetails, Pin, PinReview, PinPhoto, PinActivity } from "./Pin";
 import { LatLng } from "react-native-maps";
-import { User } from "./User";
+import { Friend, User } from "./User";
 
 // data converters to transform data to and from json objects for firestore use
 const pinCoordinateConverter = {
@@ -173,15 +174,45 @@ const pinConverter = {
   },
 };
 
-// const userConverter = {
-//   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-//     return new User(
-//       snapshot.get('userID'),
-//       snapshot.get('checkInSpot'),
-//       snapshot.get('checkOutTime')
-//     );
-//   },
-// };
+const friendConverter = {
+  toFirestore: (friend: IFriend) => {
+    return {
+      friendID: friend._friendID,
+      status: friend._status,
+    };
+  },
+  fromFirestore: (friend: any) => {
+    return new Friend(friend.friendID, friend.status);
+  },
+};
+
+const userFriendsConverter = {
+  toFirestore: (friends: IFriend[]) => {
+    const friendsArray: any = [];
+
+    friends.forEach((friend) => {
+      friendsArray.push(friendConverter.toFirestore(friend));
+    });
+
+    return friendsArray;
+  },
+  fromFirestore: (snapshot: any) => {
+    const friends = snapshot.get("friends");
+
+    const friendsArray: Friend[] = [];
+
+    if (friends == undefined) {
+      return []
+    } else {
+      friends.forEach((friend: any) => {
+      friendsArray.push(friendConverter.fromFirestore(friend));
+      });
+    }
+    
+
+    return friendsArray;
+  },
+};
 
 const userConverter = {
   toFirestore: (user: IUser) => {
@@ -190,6 +221,7 @@ const userConverter = {
       checkInSpot: user._checkInSpot,
       checkOutTime: user._checkOutTime,
       username: user._username,
+      friends: user._friends,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -197,7 +229,8 @@ const userConverter = {
       snapshot.get('userID'),
       snapshot.get('checkInSpot'),
       snapshot.get('checkOutTime').toDate(),
-      snapshot.get("username")
+      snapshot.get("username"),
+      userFriendsConverter.fromFirestore(snapshot) || []
     );
   },
 };
@@ -210,4 +243,5 @@ export {
   pinPhotosConverter,
   pinActivityConverter,
   userConverter,
+  userFriendsConverter,
 };

@@ -47,6 +47,19 @@ interface IUser {
   _checkInSpot: LatLng | null;
   _checkOutTime: Date;
   _username: string;
+  _friends: IFriend[];
+}
+
+enum Status {
+  accepted = "ACCEPTED",
+  blocked = "BLOCKED",  
+  received = "RECEIVED", 
+  sent = "SENT"
+}
+
+interface IFriend {
+  _friendID: string;
+  _status: Status;
 }
 
 interface IDatabase {
@@ -55,6 +68,8 @@ interface IDatabase {
   getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
   ChangeCheckInSpot(userID: string, newLocation: LatLng, hoursToCheckInFor: number): void;
+
+  editFriends(userID: string, newFriends: IFriend[]): Promise<IDatabaseActionResult>;
 
   deleteUser(userID: string): void;
 
@@ -149,6 +164,7 @@ interface IUserActionResult<T> extends IDatabaseActionResult {
 export {
   IPin,
   IUser,
+  IFriend,
   IUserActionResult,
   IPinDetails,
   IPinReview,
@@ -158,4 +174,5 @@ export {
   IPinsState,
   IDatabase,
   IDatabaseActionResult,
+  Status,
 };
