@@ -65,6 +65,7 @@ let newPin: Pin = {
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
+  const user = auth.currentUser;
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
@@ -239,6 +240,10 @@ export const MapScreen = ({ route, navigation }: any) => {
       !pin.privateViewers ||
       pin.privateViewers.indexOf(auth.currentUser?.uid || "") > -1
   );
+
+  pinsToRender.forEach(pin => {
+    if(user && pin.favoriteUsers.includes(user.uid)) pin.details.color = "purple"
+  })
 
   if (hotspotToggleColor == hotColor)
     pinsToRender = pinsToRender.filter((pin) => pin.activity.activeUsers > 0);

@@ -33,12 +33,17 @@ const BOTTOM_NAV_BAR = 135;
 const database = new Database();
 
 function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
+
+
   const pin = prop.pin;
   const navigation = prop.navigation;
   const reviews = pin.reviews;
   const photos = pin.photos;
   const user = auth.currentUser;
-  const [favorite, setFavorite] = useState(false);
+  const isPinFavorite = () => {
+    if(user) return pin.favoriteUsers.includes(user?.uid);
+  }
+  const [favorite, setFavorite] = useState(isPinFavorite());
   const toast = useToast();
 
   // strange calculation here to get the top of the draggable range correct
@@ -67,6 +72,10 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
         setCheckedIn(checkedIn)
     });
   }, [pin])
+
+  const renderPhoto = ({ item }: any) => (
+    <PhotoItem photo={item} key={item.url} size={150} />
+  );
 
   const handleCheckIn = (pinCoords: LatLng, userId: string|undefined, pinTitle: string) => {
     try {

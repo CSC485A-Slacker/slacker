@@ -17,11 +17,11 @@ export default function App() {
   // LogBox.ignoreAllLogs() 
 
   // runs checkout task on load
-  database.checkoutAllExpiredCheckins(5);
+  // database.checkoutAllExpiredCheckins(5);
 
   // runs the task every 1 min
   // loops through all users if it has been 5 mins since last loop
-  database.checkoutAllExpiredCheckinsTask(1, 5);
+  // database.checkoutAllExpiredCheckinsTask(1, 5);
 
   return (
     <ToastProvider
