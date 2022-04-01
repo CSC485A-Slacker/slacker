@@ -89,7 +89,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
           currentUser._friends
         );
         // update friend to show that they have a new friend request
-        friend._friends.push(new Friend(currentUser._userID, friend._username, Status.received));
+        friend._friends.push(new Friend(currentUser._userID, currentUser._username, Status.received));
         const respFriend = await db.editFriends(
           friend._userID,
           friend._friends
