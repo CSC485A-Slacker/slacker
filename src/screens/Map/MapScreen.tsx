@@ -56,6 +56,7 @@ let newPin: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
+    checkedInUserIds: []
   },
   privateViewers: [],
 };
@@ -91,7 +92,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         if (change.type === "added") {
           dispatch(addPin(pin));
         } else if (change.type === "modified") {
-          dispatch(updatePin(pin));
+          dispatch(removePin(pin))  
+          dispatch(addPin(pin));
+        //   dispatch(updatePin(pin));
         } else if (change.type === "removed") {
           dispatch(removePin(pin));
         }
@@ -154,7 +157,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
+      privateViewers: [],
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -185,6 +190,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         checkIn: false,
         activeUsers: 0,
         totalUsers: 0,
+        checkedInUserIds: []
       },
     };
     navigation.navigate("Spot Details", {

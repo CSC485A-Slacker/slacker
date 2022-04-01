@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Alert } from "react-native";
 import { Text, SearchBar, Avatar, Button } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
+import { darkBlueColor } from "../../style/styles";
 
 const db = new Database();
 
@@ -17,52 +18,68 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
-      if (userDB.data) {
+      if (userDB.succeeded && userDB.data) {
         setCurrentUser(userDB.data);
-      } // add an else saying can't get current user
+        getAllUsers(userDB.data);
+      } else {
+        Alert.alert("We have an error on our side. Please try again later.");
+        navigation.navigate("All Friends");
+      }
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
+      Alert.alert("We have an error on our side. Please try again later.");
+      navigation.navigate("All Friends");
     }
   };
 
-  const getAllUsers = async () => {
-    if (!currentUser) {
-      getCurrentUser();
-    }
+  const getAllUsers = async (currUser: User) => {
     try {
       const response = await db.getAllUsers();
-      if (response.data && currentUser) {
+      if (response.data) {
         // exclude the currents user's id and their friend's ids
-        const excludedIds = currentUser?._friends.map(
+        const excludedIds = currUser?._friends.map(
           ({ _friendID }) => _friendID
         );
-        excludedIds.push(currentUser._userID);
+        excludedIds.push(currUser._userID);
         const filterAllUsers = response.data.filter(
           (user) => !excludedIds.includes(user._userID)
         );
         setAllUsers(filterAllUsers);
         setFilteredUsers(filterAllUsers);
-      } // add an else saying can't get current users
+      } else {
+        Alert.alert("We have an error on our side. Please try again later.");
+        navigation.navigate("All Friends");
+      }
     } catch (error) {
       console.log(`Error getting to retrieve all users: ${error}`);
+      Alert.alert("We have an error on our side. Please try again later.");
+      navigation.navigate("All Friends");
     }
   };
 
   useEffect(() => {
     getCurrentUser();
-    getAllUsers();
   }, []);
 
-  // add
   const searchFilter = (text) => {
     if (text) {
+      const newData = allUsers.filter(function (item) {
+        const itemData = item._username
+          ? item._username.toUpperCase()
+          : "".toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredUsers(newData);
       setSearch(text);
-      getAllUsers();
+    } else {
+      // Inserted text is blank, set to all useers
+      setFilteredUsers(allUsers);
+      setSearch(text);
     }
   };
 
-  const addFriend = async (friend: User) => {
-    console.log(currentUser);
+  const sendFriendRequest = async (friend: User) => {
     try {
       if (currentUser) {
         // update current user to show that they have sent a friend request
@@ -79,7 +96,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         );
 
         if (respUser.succeeded && respFriend.succeeded) {
-          getAllUsers();
+          getAllUsers(currentUser);
         }
       }
     } catch (error) {
@@ -93,15 +110,15 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         size={36}
         rounded
         title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: "#1b4557" }}
+        containerStyle={{ backgroundColor: darkBlueColor }}
       />
       <Text style={styles.subText}>{user._username}</Text>
       <View style={styles.itemContainer}>
         <Button
           title="Add Friend"
           type="clear"
-          titleStyle={{ color: "#1b4557" }}
-          onPress={() => addFriend(user)}
+          titleStyle={{ color: darkBlueColor, fontSize: 16 }}
+          onPress={() => sendFriendRequest(user)}
         />
       </View>
     </View>
@@ -121,8 +138,9 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
       <SearchBar
         placeholder="Search by username"
         onChangeText={(text) => searchFilter(text)}
+        onClear={() => searchFilter("")}
         value={search}
-        // platform={platform}
+        autoCapitalize="none"
         containerStyle={{
           backgroundColor: "white",
           borderTopColor: "white",
@@ -132,6 +150,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         inputContainerStyle={{ backgroundColor: "white" }}
         inputStyle={{ fontSize: 14 }}
       />
+
       <View>
         <FlatList
           data={filteredUsers}

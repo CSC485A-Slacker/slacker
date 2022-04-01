@@ -14,9 +14,8 @@ import { RegisterScreen } from "./screens/Login/RegisterScreen";
 import { HomeScreen } from "./screens/Home/HomeScreen";
 import { defaultColor } from "./style/styles";
 import { SearchFriendsScreen } from "./screens/Friends/SearchScreen";
-import { FriendRequestsScreen } from "./screens/Friends/FriendRequestsScreen";
+import { RequestScreen } from "./screens/Friends/RequestScreen";
 import { FriendsChatScreen } from "./screens/Friends/FriendsChatScreen";
-
 
 const Tab = createBottomTabNavigator();
 
@@ -57,7 +56,7 @@ function FriendsStackScreen() {
     <MapStack.Navigator>
       <MapStack.Screen name="All Friends" component={FriendsScreen} options={{ title: "Friends" }} />
       <MapStack.Screen name="Search Friends" component={SearchFriendsScreen} options={{ title: "" }} />
-      <MapStack.Screen name="Friend Requests" component={FriendRequestsScreen} options={{ title: "" }} />
+      <MapStack.Screen name="Friend Request" component={RequestScreen} options={{ title: "" }} />
       <MapStack.Screen name="Friend Chat" component={FriendsChatScreen} options={{ title: "" }} />
     </MapStack.Navigator>
   );
@@ -66,6 +65,7 @@ function FriendsStackScreen() {
 function NavTabs (){
   return (
     <Tab.Navigator
+      initialRouteName="Explore"
       screenOptions={{
         tabBarActiveTintColor: defaultColor,
         headerShown: false,

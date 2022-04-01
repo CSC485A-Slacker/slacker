@@ -28,7 +28,7 @@ export const LoginScreen = ({ navigation }) => {
     signInWithEmailAndPassword(auth, email.trimEnd(), password)
       .then((userCredentials) => {
         const user = userCredentials.user;
-        navigation.navigate("Main");
+        navigation.push("Main")
       })
       .catch((error) => alert(error.message));
   };

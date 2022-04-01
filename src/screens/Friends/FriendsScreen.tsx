@@ -82,7 +82,7 @@ export const FriendsScreen = ({ navigation }: any) => {
                   }}
                   titleStyle={{ fontSize: 14, color: defaultColor }}
                   onPress={(e) => {
-                    navigation.navigate("Friend Requests");
+                    navigation.navigate("Friend Request");
                   }}
                 />
               </View>
