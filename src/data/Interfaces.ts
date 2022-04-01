@@ -8,6 +8,7 @@ interface IPin {
   photos: IPinPhoto[];
   activity: IPinActivity;
   privateViewers: string[];
+  favoriteUsers: string[];
 }
 
 interface IPinDetails {
@@ -54,7 +55,11 @@ interface IDatabase {
 
   getUser(userID: string): Promise<IUserActionResult<IUser>>;
 
-  ChangeCheckInSpot(userID: string, newLocation: LatLng, hoursToCheckInFor: number): void;
+  ChangeCheckInSpot(
+    userID: string,
+    newLocation: LatLng,
+    hoursToCheckInFor: number
+  ): void;
 
   deleteUser(userID: string): void;
 

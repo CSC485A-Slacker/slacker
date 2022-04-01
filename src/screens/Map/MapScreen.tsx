@@ -56,9 +56,10 @@ let newPin: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
-    checkedInUserIds: []
+    checkedInUserIds: [],
   },
   privateViewers: [],
+  favoriteUsers: [],
 };
 
 export const MapScreen = ({ route, navigation }: any) => {
@@ -155,9 +156,10 @@ export const MapScreen = ({ route, navigation }: any) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
       privateViewers: [],
+      favoriteUsers: [],
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -188,7 +190,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         checkIn: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
     };
     navigation.navigate("Spot Details", {

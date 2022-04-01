@@ -15,6 +15,7 @@ class Pin implements IPin {
   photos: IPinPhoto[];
   activity: IPinActivity;
   privateViewers: string[];
+  favoriteUsers: string[];
 
   constructor(
     key: number,
@@ -23,7 +24,8 @@ class Pin implements IPin {
     reviews: PinReview[],
     photos: IPinPhoto[],
     activity: PinActivity,
-    privateViewers: string[] = []
+    privateViewers: string[] = [],
+    favoriteUsers: string[] = []
   ) {
     this.key = key;
     this.coordinate = coordinate;
@@ -32,6 +34,7 @@ class Pin implements IPin {
     this.photos = photos;
     this.activity = activity;
     this.privateViewers = privateViewers;
+    this.favoriteUsers = favoriteUsers;
   }
 
   toString(): string {
@@ -146,7 +149,12 @@ class PinActivity implements IPinActivity {
   totalUsers: number;
   checkedInUserIds: string[];
 
-  constructor(shareableSlackline: boolean, activeUsers: number, totalUsers: number, checkedInUserIds: string[]) {
+  constructor(
+    shareableSlackline: boolean,
+    activeUsers: number,
+    totalUsers: number,
+    checkedInUserIds: string[]
+  ) {
     this.shareableSlackline = shareableSlackline;
     this.activeUsers = activeUsers;
     this.totalUsers = totalUsers;

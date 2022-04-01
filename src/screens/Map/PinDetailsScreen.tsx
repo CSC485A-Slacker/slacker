@@ -64,13 +64,14 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
       privateViewers: isPrivate
         ? userId
           ? [userId]
           : ([] as string[])
         : ([] as string[]),
+      favoriteUsers: [] as string[],
     };
     dispatch(removePin(confirmPin));
     navigation.navigate({

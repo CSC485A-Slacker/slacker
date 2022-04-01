@@ -72,7 +72,11 @@ const pinReviewsConverter = {
     return arrayConverter.toFirestore(reviews, pinReviewConverter);
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    return arrayConverter.fromFirestore(snapshot, "reviews", pinReviewConverter);
+    return arrayConverter.fromFirestore(
+      snapshot,
+      "reviews",
+      pinReviewConverter
+    );
   },
 };
 
@@ -86,7 +90,11 @@ const arrayConverter = {
 
     return tempArray;
   },
-  fromFirestore: (snapshot: QueryDocumentSnapshot, fieldPath: string, itemConverter: any) => {
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    fieldPath: string,
+    itemConverter: any
+  ) => {
     const array = snapshot.get(fieldPath);
 
     const tempArray: any[] = [];
@@ -134,7 +142,7 @@ const pinActivityConverter = {
       shareableSlackline: activity.shareableSlackline,
       activeUsers: activity.activeUsers,
       totalUsers: activity.totalUsers,
-      checkedInUserIds: activity.checkedInUserIds
+      checkedInUserIds: activity.checkedInUserIds,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -158,6 +166,7 @@ const pinConverter = {
       photos: pinPhotosConverter.toFirestore(pin.photos),
       activity: pinActivityConverter.toFirestore(pin.activity),
       privateViewers: pin.privateViewers,
+      favoriteUsers: pin.favoriteUsers,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -168,7 +177,8 @@ const pinConverter = {
       pinReviewsConverter.fromFirestore(snapshot),
       pinPhotosConverter.fromFirestore(snapshot),
       pinActivityConverter.fromFirestore(snapshot),
-      snapshot.get("privateViewers") || []
+      snapshot.get("privateViewers") || [],
+      snapshot.get("favoriteUsers") || []
     );
   },
 };
@@ -194,9 +204,9 @@ const userConverter = {
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return new User(
-      snapshot.get('userID'),
-      snapshot.get('checkInSpot'),
-      snapshot.get('checkOutTime').toDate(),
+      snapshot.get("userID"),
+      snapshot.get("checkInSpot"),
+      snapshot.get("checkOutTime").toDate(),
       snapshot.get("username")
     );
   },
