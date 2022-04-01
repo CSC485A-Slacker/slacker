@@ -178,11 +178,12 @@ const friendConverter = {
   toFirestore: (friend: IFriend) => {
     return {
       friendID: friend._friendID,
+      username: friend._username,
       status: friend._status,
     };
   },
   fromFirestore: (friend: any) => {
-    return new Friend(friend.friendID, friend.status);
+    return new Friend(friend.friendID, friend.username, friend.status);
   },
 };
 
