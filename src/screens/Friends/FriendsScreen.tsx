@@ -34,6 +34,10 @@ export const FriendsScreen = ({ navigation }: any) => {
     return navigation.navigate("Friend Chat", { userID } );
   };
 
+  let validFriends = currentUser?._friends.filter((friend) => 
+    friend._status == Status.accepted
+  );
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ScrollView>
@@ -91,7 +95,7 @@ export const FriendsScreen = ({ navigation }: any) => {
           <Card>
           <Card.Title>Your Friends</Card.Title> 
           <Card.Divider />
-            {currentUser?._friends.map((u, i) => {
+            {validFriends?.map((u, i) => {
               return (
                 <View style={styles.friendView}>
                   <Avatar
