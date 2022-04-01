@@ -26,8 +26,8 @@ const examplePin1: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
-    checkedInUserIds: []
-  }
+    checkedInUserIds: [],
+  },
 };
 
 const examplePin2: Pin = {
@@ -50,8 +50,8 @@ const examplePin2: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
-    checkedInUserIds: []
-  }
+    checkedInUserIds: [],
+  },
 };
 
 export interface PinsState {
@@ -89,6 +89,7 @@ export const pinSlice = createSlice({
             photos: action.payload.photos,
             activity: action.payload.activity,
             privateViewers: action.payload.privateViewers,
+            favoriteUsers: action.payload.favoriteUsers,
           };
         }
         return pin;

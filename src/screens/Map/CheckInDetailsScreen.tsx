@@ -23,23 +23,23 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
   const [noSlackline, setNoSlackline] = useState(false);
 
   const handleSharingSlackline = () => {
-    console.log("Sharing Slackline")
-    setSharingSlackline(!sharingSlackline)
-  }
+    console.log("Sharing Slackline");
+    setSharingSlackline(!sharingSlackline);
+  };
 
   const handleNotSharingSlackline = () => {
-    console.log("Not Sharing Slackline")
-    setNotSharingSlackline(!notSharingSlackline)
-  }
+    console.log("Not Sharing Slackline");
+    setNotSharingSlackline(!notSharingSlackline);
+  };
 
   const handleNoSlackline = () => {
-    console.log("No Slackline")
-    setNoSlackline(!noSlackline)
-  }
+    console.log("No Slackline");
+    setNoSlackline(!noSlackline);
+  };
 
   const handleCancelPress = () => {
-    navigation.navigate('Map')
-  }
+    navigation.navigate("Map");
+  };
 
   const handleConfirmPress = () => {
     // can remove these logs when done debugging
@@ -97,7 +97,10 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.view}>
         <View style={styles.container}>
-          <Text style={styles.title} h3> Going to {pinTitle}?</Text>
+          <Text style={styles.title} h3>
+            {" "}
+            Going to {pinTitle}?
+          </Text>
         </View>
         <Text style={styles.questionTitle}> How long are you staying?</Text>
 
@@ -109,8 +112,12 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             minimumValue={1}
             step={1}
             allowTouchTrack
-            trackStyle={{ height: 5, backgroundColor: 'black' }}
-            thumbStyle={{ height: 20, width: 20, backgroundColor: 'transparent' }}
+            trackStyle={{ height: 5, backgroundColor: "black" }}
+            thumbStyle={{
+              height: 20,
+              width: 20,
+              backgroundColor: "transparent",
+            }}
             thumbProps={{
               children: (
                 <Icon
@@ -125,73 +132,106 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
             }}
           />
 
-          <Text style={{ paddingTop: 15, color: greyColor, fontSize: 12 }}>Duration: {timeValue} hours</Text>
+          <Text style={{ paddingTop: 15, color: greyColor, fontSize: 12 }}>
+            Duration: {timeValue} hours
+          </Text>
         </View>
-          <Text style={styles.questionTitle}> Are you bringing a slackline? </Text>
-          
-          <View style={styles.contentView}>
-            <CheckBox
-              title="Yes - I can share with others"
-              checked={sharingSlackline}
-              onPress={handleSharingSlackline}
-              checkedColor={defaultColor}
-            />
-            <CheckBox
-              title="Yes - I'm flying solo"
-              checked={notSharingSlackline}
-              onPress={handleNotSharingSlackline}
-              checkedColor={defaultColor}
-            />
-            <CheckBox
-              title="No"
-              checked={noSlackline}
-              onPress={handleNoSlackline}
-              checkedColor={defaultColor}
-            />
-          </View>
+        <Text style={styles.questionTitle}>
+          {" "}
+          Are you bringing a slackline?{" "}
+        </Text>
 
-          <View style={{ padding: 20, width: '100%', justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
-            <Button 
-              title="Cancel"
-              icon={{ name: 'ban', type: 'font-awesome', size: 16, color: 'white' }}
-              iconRight
-              iconContainerStyle={{ marginLeft: 10 }}
-              titleStyle={{ fontWeight: '500', fontSize: 15 }}
-              buttonStyle={{ backgroundColor: defaultColor, borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
-              containerStyle={{ width: "auto", flex: 1, padding: 10 }}
-              onPress={handleCancelPress}
-            />
+        <View style={styles.contentView}>
+          <CheckBox
+            title="Yes - I can share with others"
+            checked={sharingSlackline}
+            onPress={handleSharingSlackline}
+            checkedColor={defaultColor}
+          />
+          <CheckBox
+            title="Yes - I'm flying solo"
+            checked={notSharingSlackline}
+            onPress={handleNotSharingSlackline}
+            checkedColor={defaultColor}
+          />
+          <CheckBox
+            title="No"
+            checked={noSlackline}
+            onPress={handleNoSlackline}
+            checkedColor={defaultColor}
+          />
+        </View>
 
-            <Button 
-              title="Check-In"
-              icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
-              iconRight
-              iconContainerStyle={{ marginLeft: 10 }}
-              titleStyle={{ fontWeight: '500', fontSize: 15 }}
-              buttonStyle={{ backgroundColor: defaultColor, borderColor: 'transparent', borderWidth: 0, borderRadius: 30 }}
-              containerStyle={{ width: "auto", flex: 1, padding: 10 }}
-              onPress={handleConfirmPress}
-            />
-          </View>
-          
-          <View style={{ flexDirection: 'row', marginTop: 10}}>
-            <Icon
-              name="info-circle"
-              type="font-awesome"
-              color={greyColor}
-              size={30}
-              underlayColor="clear"
-              iconStyle={{marginRight: 10}}
-            />
-            
-            <Text style={styles.subText}> 
-              Checking in lets others know someone is at this spot! {'\n'}But don't worry, your identity will not be made public.
-            </Text>
-          </View>
+        <View
+          style={{
+            padding: 20,
+            width: "100%",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+            flexDirection: "row",
+          }}
+        >
+          <Button
+            title="Cancel"
+            icon={{
+              name: "ban",
+              type: "font-awesome",
+              size: 16,
+              color: "white",
+            }}
+            iconRight
+            iconContainerStyle={{ marginLeft: 10 }}
+            titleStyle={{ fontWeight: "500", fontSize: 15 }}
+            buttonStyle={{
+              backgroundColor: defaultColor,
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 30,
+            }}
+            containerStyle={{ width: "auto", flex: 1, padding: 10 }}
+            onPress={handleCancelPress}
+          />
+
+          <Button
+            title="Check-In"
+            icon={{
+              name: "angle-double-right",
+              type: "font-awesome",
+              size: 20,
+              color: "white",
+            }}
+            iconRight
+            iconContainerStyle={{ marginLeft: 10 }}
+            titleStyle={{ fontWeight: "500", fontSize: 15 }}
+            buttonStyle={{
+              backgroundColor: defaultColor,
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 30,
+            }}
+            containerStyle={{ width: "auto", flex: 1, padding: 10 }}
+            onPress={handleConfirmPress}
+          />
+        </View>
+
+        <View style={{ flexDirection: "row", marginTop: 10 }}>
+          <Icon
+            name="info-circle"
+            type="font-awesome"
+            color={greyColor}
+            size={30}
+            underlayColor="clear"
+            iconStyle={{ marginRight: 10 }}
+          />
+
+          <Text style={styles.subText}>
+            Checking in lets others know someone is at this spot! {"\n"}But
+            don't worry, your identity will not be made public.
+          </Text>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
-    
 };
 
 const styles = StyleSheet.create({
@@ -200,14 +240,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
   },
-    container: {
+  container: {
     alignItems: "center",
   },
   title: {
     padding: 40,
     paddingBottom: 20,
     color: defaultColor,
-    textAlign: "center"
+    textAlign: "center",
   },
   questionTitle: {
     padding: 10,
@@ -230,13 +270,13 @@ const styles = StyleSheet.create({
   },
   contentView: {
     padding: 20,
-    paddingTop:  10,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'stretch',
+    paddingTop: 10,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "stretch",
   },
   questionText: {
     paddingTop: 10,
     color: "#696969",
-  }
+  },
 });

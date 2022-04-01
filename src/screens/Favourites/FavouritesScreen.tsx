@@ -5,11 +5,16 @@ import { darkBlueColor, defaultColor, greyColor } from "../../style/styles";
 import { Text, Divider } from "react-native-elements";
 import React from "react";
 import FavoriteCard from "../../components/FavoriteCard";
+import { auth } from "../../config/FirebaseConfig";
 
 export const FavouritesScreen = () => {
+  const user = auth.currentUser;
+
   // TODO: adjust filter to only select the user's favourite pins
   const pins = useSelector((state: RootState) => state.pins.pins).filter(
-    (pin) => pin.privateViewers.length > 0
+    (pin) => {
+      if (user) return pin.favoriteUsers.includes(user.uid);
+    }
   );
 
   const renderItem = ({ item }) => <FavoriteCard pin={item} />;

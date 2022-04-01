@@ -1,12 +1,49 @@
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text, Icon, Card } from "react-native-elements";
+import { Database } from "../data/Database";
 import { Pin } from "../data/Pin";
 import { defaultColor, hotColor } from "../style/styles";
+import { auth } from "../config/FirebaseConfig";
+import { useToast } from "react-native-toast-notifications";
 
 const FavoriteCard = (prop: { pin: Pin }) => {
+  const user = auth.currentUser;
+  const toast = useToast();
+
+  const database = new Database();
+
+  const [favorite, setFavorite] = useState(true);
+
   const pin = prop.pin;
 
   const photos = pin.photos;
+
+  const handleFavorite = () => {
+    let newFavorites: string[] = [...pin.favoriteUsers];
+
+    if (favorite) {
+      newFavorites = newFavorites.filter((usr) => {
+        return usr != user?.uid;
+      });
+    } else {
+      if (!user) alert("You need to be logged in!");
+      else newFavorites.push(user?.uid || "");
+    }
+
+    database
+      .editPinFavorites(pin.coordinate, newFavorites)
+      .then(() => {
+        // setFavorite(!favorite);
+      })
+      .finally(() => {
+        // pin.favoriteUsers = [...newFavorites];
+        toast.show("Removed pin from favorites!", {
+          type: "normal",
+        });
+      });
+  };
+
   return (
     <Card
       containerStyle={styles.favoriteContainer}
@@ -28,8 +65,7 @@ const FavoriteCard = (prop: { pin: Pin }) => {
           name={"favorite"}
           type="material"
           color={hotColor}
-          // TODO: Add a method here to update favourite for user
-          onPress={() => console.log("Update to remove favorite")}
+          onPress={handleFavorite}
         />
       </View>
 

@@ -19,13 +19,12 @@ import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
 import {
-  blueColor,
   defaultColor,
-  greyColor,
   hotColor,
   mintColor,
 } from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
+import { pinSlice } from "../redux/PinSlice";
 import { useToast } from "react-native-toast-notifications";
 
 const ios = Platform.OS === "ios";
@@ -40,7 +39,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const photos = pin.photos;
   const user = auth.currentUser;
   const [favorite, setFavorite] = useState(false);
-  const toast = useToast(); // toast notifications
+  const toast = useToast();
 
   // strange calculation here to get the top of the draggable range correct
   const insets = useSafeAreaInsets();
@@ -159,6 +158,39 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
     return false;
   }
 
+  const handleFavorite = () => {
+    let newFavorites: string[] = [...pin.favoriteUsers];
+
+    if (favorite) {
+      newFavorites = newFavorites.filter((usr) => {
+        return usr != user?.uid;
+      });
+    } else {
+      if (!user) alert("You need to be logged in!");
+      else {
+        newFavorites.push(user?.uid || "");
+      }
+    }
+
+    database
+      .editPinFavorites(pin.coordinate, newFavorites)
+      .then(() => {
+        setFavorite(!favorite);
+      })
+      .finally(() => {
+        pin.favoriteUsers = [...newFavorites];
+        const notification = {
+          msg: "Added pin to favorites!",
+          type: "success",
+        };
+        if (favorite) {
+          (notification.msg = "Removed pin from favorites!"),
+            (notification.type = "normal");
+        }
+        toast.show(notification.msg, { type: notification.type });
+      });
+  };
+
   return (
     <SlidingUpPanel
       ref={panelRef}
@@ -186,8 +218,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
               name={favorite ? "favorite" : "favorite-border"}
               type="material"
               color={hotColor}
-              // Add a method here to update favourite for user
-              onPress={() => setFavorite(!favorite)}
+              onPress={handleFavorite}
             />
           </View>
           <Text>{pin.details.slacklineType}</Text>

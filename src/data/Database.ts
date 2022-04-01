@@ -456,6 +456,32 @@ class Database implements IDatabase {
       return new DatabaseActionResult(true, `Succeeded: pin activity edited at ${coordinateToString(coordinate)}`);
   }
 
+  // Edits pin details at coordinate
+  async editPinFavorites(coordinate: LatLng, favorites: string[]): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, { favoriteUsers: favorites });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin edited at ${coordinateToString(coordinate)}`
+    );
+  }
+
     // Deletes pin at given coordinate
     async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
         try {
@@ -646,4 +672,3 @@ class UserActionResult<T> implements IUserActionResult<T> {
 }
 
  export { Database };
-
