@@ -16,15 +16,17 @@ class User implements IUser {
 
 class Friend implements IFriend {
   _friendID: string;
+  _username: string;
   _status: Status;
 
-  constructor(friendID: string, status: Status) {
+  constructor(friendID: string, username: string, status: Status) {
     this._friendID = friendID;
+    this._username = username
     this._status = status;
   }
 
   toString(): string {
-    return "friendID: " + this._friendID + "\nstatus: " + this._status;
+    return "friendID: " + this._friendID + "username: " + this._username + "\nstatus: " + this._status;
   }
 }
 

@@ -58,6 +58,7 @@ enum Status {
 interface IFriend {
   _friendID: string;
   _status: Status;
+  _username: string;
 }
 
 interface IDatabase {

@@ -66,13 +66,13 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
     try {
       if (currentUser) {
         // update current user to show that they have sent a friend request
-        currentUser._friends.push(new Friend(friend._userID, Status.sent));
+        currentUser._friends.push(new Friend(friend._userID, friend._username, Status.sent));
         const respUser = await db.editFriends(
           currentUser._userID,
           currentUser._friends
         );
         // update friend to show that they have a new friend request
-        friend._friends.push(new Friend(currentUser._userID, Status.received));
+        friend._friends.push(new Friend(currentUser._userID, friend._username, Status.received));
         const respFriend = await db.editFriends(
           friend._userID,
           friend._friends

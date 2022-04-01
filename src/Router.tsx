@@ -15,6 +15,7 @@ import { HomeScreen } from "./screens/Home/HomeScreen";
 import { defaultColor } from "./style/styles";
 import { SearchFriendsScreen } from "./screens/Friends/SearchScreen";
 import { FriendRequestsScreen } from "./screens/Friends/FriendRequestsScreen";
+import { FriendsChatScreen } from "./screens/Friends/FriendsChatScreen";
 
 
 const Tab = createBottomTabNavigator();
@@ -54,9 +55,10 @@ function MapStackScreen() {
 function FriendsStackScreen() {
   return (
     <MapStack.Navigator>
-      <MapStack.Screen name="All Friends" component={FriendsScreen} options={{ title: "" }} />
+      <MapStack.Screen name="All Friends" component={FriendsScreen} options={{ title: "Friends" }} />
       <MapStack.Screen name="Search Friends" component={SearchFriendsScreen} options={{ title: "" }} />
       <MapStack.Screen name="Friend Requests" component={FriendRequestsScreen} options={{ title: "" }} />
+      <MapStack.Screen name="Friend Chat" component={FriendsChatScreen} options={{ title: "" }} />
     </MapStack.Navigator>
   );
 }
