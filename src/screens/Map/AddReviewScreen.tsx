@@ -10,6 +10,7 @@ import { AirbnbRating } from "react-native-ratings";
 import { PinReview } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { defaultColor, greyColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -18,12 +19,13 @@ export const AddReviewScreen = ({ route, navigation }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [buttomDisabled, setButtomDisabled] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
     if (rating != 0 && comment != "") {
-      setButtomDisabled(false)
+      setButtomDisabled(false);
     }
-  }, [rating, comment])
+  }, [rating, comment]);
 
   const onSubmitPress = async () => {
     try {
@@ -33,16 +35,19 @@ export const AddReviewScreen = ({ route, navigation }) => {
       navigation.navigate({
         name: "Map",
       });
-      const resp = await database.editPinReviews(
-        pin.coordinate,
-        pin.reviews
-      );
-      console.log(resp);
+      const resp = await database.editPinReviews(pin.coordinate, pin.reviews);
+      if (resp.succeeded) {
+        toast.show("Added a review successfully!", {
+          type: "success",
+        });
+      }
     } catch (error) {
-      console.log(`Error updating pin when trying to save new review: ${error}`);
+      console.log(
+        `Error updating pin when trying to save new review: ${error}`
+      );
       alert("Review upload failed, sorry :( try again later");
       navigation.navigate({
-            name: "Map",
+        name: "Map",
       });
     }
   };
@@ -82,23 +87,28 @@ export const AddReviewScreen = ({ route, navigation }) => {
           />
           <View style={styles.container}>
             <Button
-                title="Submit"
-                buttonStyle={{
-                  backgroundColor: defaultColor,
-                  borderWidth: 1,
-                  borderColor: "white",
-                  borderRadius: 30,
-                  padding: 10,
-                  width: 150,
-                }}
-                containerStyle={{
-                  margin: 15,
-                }}
-                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
-                titleStyle={{ fontSize: 16}}
-                onPress={onSubmitPress}
-                disabled={buttomDisabled}
-              />
+              title="Submit"
+              buttonStyle={{
+                backgroundColor: defaultColor,
+                borderWidth: 1,
+                borderColor: "white",
+                borderRadius: 30,
+                padding: 10,
+                width: 150,
+              }}
+              containerStyle={{
+                margin: 15,
+              }}
+              icon={{
+                name: "angle-double-right",
+                type: "font-awesome",
+                size: 20,
+                color: "white",
+              }}
+              titleStyle={{ fontSize: 16 }}
+              onPress={onSubmitPress}
+              disabled={buttomDisabled}
+            />
           </View>
         </View>
       </View>

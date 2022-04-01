@@ -16,11 +16,13 @@ import { User, userIsCheckedIntoSpot, Friend } from "./User";
 class Database implements IDatabase {
     database: Firestore;
 
-    constructor() {
+  constructor() {
+      console.log("create")
         this.database = getFirestore(firebaseApp);
     }
 
-    async addUser(user: IUser) {
+  async addUser(user: IUser) {
+      console.log("Add user")
       const userDocRef = doc(this.database, "users", user._userID)
         try
         {
@@ -37,6 +39,7 @@ class Database implements IDatabase {
 
     async getAllUsers(): Promise<IUserActionResult<IUser[]>>
     {
+      console.log("get all users")
       try {
         const pinsCollection = collection(this.database, "users").withConverter(userConverter)
   
@@ -67,10 +70,12 @@ class Database implements IDatabase {
       }
     }
 
-    async getUser(userID: string): Promise<IUserActionResult<IUser>> {
-      const userDocRef = doc(this.database, "users", userID)
+  async getUser(userID: string): Promise<IUserActionResult<IUser>> {
+      console.log("get user")
+      
       try
       {
+        const userDocRef = doc(this.database, "users", userID)
         const userDocSnap = await getDoc(userDocRef)
         if (!userDocSnap.exists())
         {
@@ -99,12 +104,12 @@ class Database implements IDatabase {
 
     async ChangeCheckInSpot(userID:string, newLocation:LatLng, hoursToCheckInFor: number): Promise<IDatabaseActionResult>
     {
-        const userDocRef = doc(this.database, "users", userID)
-        const userResult = await this.getUser(userID)
-        const user = userResult.data
-
+      console.log("change check in spot")
         try
         {
+          const userDocRef = doc(this.database, "users", userID)
+        const userResult = await this.getUser(userID)
+        const user = userResult.data
             const userDocSnap = await getDoc(userDocRef)
             if(!user) {
                 throw new Error("User doesn't exist")
@@ -220,66 +225,67 @@ class Database implements IDatabase {
     }
 
     // will perform checkout task every minutesBetweenCheckoutTask minutes
-    async checkoutAllExpiredCheckins(minutesBetweenCheckoutTask: number) {
-        const currentDate = new Date();
-        let usersWereCheckedOut = false;
+    // async checkoutAllExpiredCheckins(minutesBetweenCheckoutTask: number) {
+    //     const currentDate = new Date();
+    //     let usersWereCheckedOut = false;
 
-        console.log(`attempt checkoutAllExpiredCheckins at ${currentDate}`);
-        try {
-            const checkInRef = doc(this.database, "tasks", "checkIn");
-            const checkInDocSnap = await getDoc(checkInRef);
+    //     console.log(`attempt checkoutAllExpiredCheckins at ${currentDate}`);
+    //     try {
+    //         const checkInRef = doc(this.database, "tasks", "checkIn");
+    //         const checkInDocSnap = await getDoc(checkInRef);
 
-            if (!checkInDocSnap.exists()) {
-                throw new Error(`Could not get checkIn task doc`);
-            }
+    //         if (!checkInDocSnap.exists()) {
+    //             throw new Error(`Could not get checkIn task doc`);
+    //         }
 
-            let lastCheckoutAllExpiredCheckins: Date = checkInDocSnap.data().lastCheckoutAllExpiredCheckins.toDate();
-            console.log(`last checkoutAllExpiredCheckins: ${lastCheckoutAllExpiredCheckins}`);
+    //         let lastCheckoutAllExpiredCheckins: Date = checkInDocSnap.data().lastCheckoutAllExpiredCheckins.toDate();
+    //         console.log(`last checkoutAllExpiredCheckins: ${lastCheckoutAllExpiredCheckins}`);
 
-            lastCheckoutAllExpiredCheckins.setMinutes(lastCheckoutAllExpiredCheckins.getMinutes() + minutesBetweenCheckoutTask);
-            console.log(`next checkoutAllExpiredUsers in ${minutesBetweenCheckoutTask} minutes, at ${lastCheckoutAllExpiredCheckins}`)
+    //         lastCheckoutAllExpiredCheckins.setMinutes(lastCheckoutAllExpiredCheckins.getMinutes() + minutesBetweenCheckoutTask);
+    //         console.log(`next checkoutAllExpiredUsers in ${minutesBetweenCheckoutTask} minutes, at ${lastCheckoutAllExpiredCheckins}`)
 
-            // only reads the users from the db once every minutesBetweenCheckoutTask minutes
-            if(currentDate.getTime() > lastCheckoutAllExpiredCheckins.getTime()) {
-                console.log(`running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
+    //         // only reads the users from the db once every minutesBetweenCheckoutTask minutes
+    //         if(currentDate.getTime() > lastCheckoutAllExpiredCheckins.getTime()) {
+    //             console.log(`running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
 
-                const usersResult = await this.getAllUsers();
-                const users = usersResult.data;
+    //             const usersResult = await this.getAllUsers();
+    //             const users = usersResult.data;
 
-                updateDoc(checkInRef, {lastCheckoutAllExpiredCheckins: currentDate});
+    //             updateDoc(checkInRef, {lastCheckoutAllExpiredCheckins: currentDate});
                 
-                if(!users) {
-                    throw new Error(`${usersResult.message}`);
-                }
+    //             if(!users) {
+    //                 throw new Error(`${usersResult.message}`);
+    //             }
 
-                users.forEach(user => {
-                    if(user._checkInSpot && currentDate.getTime() > user._checkOutTime.getTime()) {
-                        usersWereCheckedOut = true;
-                        console.log(`checking out user: ${user._userID}, from spot: ${coordinateToString(user._checkInSpot)}, with checkout time: ${user._checkOutTime}.`);
-                        this.checkoutFromSpot(user._userID, user._checkInSpot);
-                    }
-                });
-            } else {
-                console.log(`NOT running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
-            }
+    //             users.forEach(user => {
+    //                 if(user._checkInSpot && currentDate.getTime() > user._checkOutTime.getTime()) {
+    //                     usersWereCheckedOut = true;
+    //                     console.log(`checking out user: ${user._userID}, from spot: ${coordinateToString(user._checkInSpot)}, with checkout time: ${user._checkOutTime}.`);
+    //                     this.checkoutFromSpot(user._userID, user._checkInSpot);
+    //                 }
+    //             });
+    //         } else {
+    //             console.log(`NOT running checkoutAllExpiredUsers: ${lastCheckoutAllExpiredCheckins}`);
+    //         }
            
-        } catch (error) {
-            console.log(`could not checkout all expired checkins: ${error}`)
-        }
-        if(!usersWereCheckedOut) {
-            console.log(`no users were checked out`);
-        }
-    }
+    //     } catch (error) {
+    //         console.log(`could not checkout all expired checkins: ${error}`)
+    //     }
+    //     if(!usersWereCheckedOut) {
+    //         console.log(`no users were checked out`);
+    //     }
+    // }
 
     // will try to checkout all expired checkins as often as specified by intervalInMinutes
     // intervalBetweenTasks: how often to run the checkout task (minutes)
     // intervalBetweenRunningCheckoutAllExpiredCheckins: how often to check the checkout status of all users (minutes)
-    async checkoutAllExpiredCheckinsTask(minutesBetweenTasks: number, minutesBetweenRunningCheckoutAllExpiredCheckins: number) {
-        setInterval(() => this.checkoutAllExpiredCheckins(minutesBetweenRunningCheckoutAllExpiredCheckins), 1000 * 60 * minutesBetweenTasks)
-    }
+    // async checkoutAllExpiredCheckinsTask(minutesBetweenTasks: number, minutesBetweenRunningCheckoutAllExpiredCheckins: number) {
+    //     setInterval(() => this.checkoutAllExpiredCheckins(minutesBetweenRunningCheckoutAllExpiredCheckins), 1000 * 60 * minutesBetweenTasks)
+    // }
 
     // to test checkin
-    async getCheckInOfUser(userID: string) {
+  async getCheckInOfUser(userID: string) {
+      console.log("Check in user")
         const userResult = await this.getUser(userID);
         const user = userResult.data;
 
@@ -295,9 +301,10 @@ class Database implements IDatabase {
     }
 
     async deleteUser(userID: string) {
-      const userDocRef = doc(this.database, "users", userID)
+      console.log("delete user")
       try
       {
+        const userDocRef = doc(this.database, "users", userID)
         const userDocSnap = await getDoc(userDocRef)
         if (!userDocSnap.exists())
         {
@@ -312,8 +319,10 @@ class Database implements IDatabase {
     }
   
   async editFriends(userID: string, newFriends: Friend[]) {
-    const userDocRef = doc(this.database, "users", userID)
+    console.log("edit friends")
+    
     try {
+      const userDocRef = doc(this.database, "users", userID)
       const userDocSnap = await getDoc(userDocRef)
       if(!userDocSnap.exists()) {
         throw new Error("User doesn't exist")
@@ -335,9 +344,10 @@ class Database implements IDatabase {
 
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {
-        const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
+      console.log("add pins")
 
-        try {
+      try {
+           const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
             const pinDocSnap = await getDoc(pinRef);
 
             if (pinDocSnap.exists()) {
@@ -361,7 +371,8 @@ class Database implements IDatabase {
     }
 
     // Edits pin details at coordinate
-    async editPinDetails(coordinate: LatLng,details: PinDetails): Promise<IDatabaseActionResult> {
+  async editPinDetails(coordinate: LatLng, details: PinDetails): Promise<IDatabaseActionResult> {
+      console.log("edit pins details")
         try {
         const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
         const pinDocSnap = await getDoc(pinRef);
@@ -382,6 +393,7 @@ class Database implements IDatabase {
   
   // Edits pin reviews at coordinate
   async editPinReviews(coordinate: LatLng, reviews: PinReview[]): Promise<IDatabaseActionResult> {
+    console.log("edit pins reviews")
     try {
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
       const pinDocSnap = await getDoc(pinRef);
@@ -410,6 +422,7 @@ class Database implements IDatabase {
 
   // Edits pin photos at coordinate
   async editPinPhotos(coordinate: LatLng, photos: PinPhoto[]): Promise<IDatabaseActionResult> {
+    console.log("edit pins photos")
     try {
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
       const pinDocSnap = await getDoc(pinRef);
@@ -437,7 +450,8 @@ class Database implements IDatabase {
   }
 
     // Edits pin activity at coordinate
-    async editPinActivity(coordinate: LatLng, activity: PinActivity): Promise<IDatabaseActionResult> {
+  async editPinActivity(coordinate: LatLng, activity: PinActivity): Promise<IDatabaseActionResult> {
+      console.log("edit pins activity")
       try {
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
       const pinDocSnap = await getDoc(pinRef);
@@ -459,6 +473,7 @@ class Database implements IDatabase {
   // Edits pin details at coordinate
   async editPinFavorites(coordinate: LatLng, favorites: string[]): Promise<IDatabaseActionResult> {
     try {
+      console.log("edit pins favorites")
       const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
       const pinDocSnap = await getDoc(pinRef);
 
@@ -483,7 +498,8 @@ class Database implements IDatabase {
   }
 
     // Deletes pin at given coordinate
-    async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
+  async deletePin(coordinate: LatLng): Promise<IDatabaseActionResult> {
+      console.log("delete pins")
         try {
             const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
             const pinDocSnap = await getDoc(pinRef);
@@ -506,7 +522,8 @@ class Database implements IDatabase {
     }
 
     // Get the pin at a given coordinate
-    async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
+  async getPin(coordinate: LatLng): Promise<IPinActionResult<IPin>> {
+      console.log("get pin")
         try {
         const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
 
@@ -538,6 +555,7 @@ class Database implements IDatabase {
 
   // Get a pin[] of all pins from the database
   async getAllPins(): Promise<IPinActionResult<IPin[]>> {
+    console.log("get all pins")
     try {
       const pinsCollection = collection(this.database, "pins").withConverter(
         pinConverter
@@ -573,6 +591,7 @@ class Database implements IDatabase {
   // Get a coordinate[] of all pins from the database without retreiving details
   // Use getPin to get a specific pin
   async getAllPinCoordinates(): Promise<IPinActionResult<LatLng[]>> {
+    console.log("get all pin coordinates")
     try {
       const pinsCollection = collection(this.database, "pins");
 
@@ -608,31 +627,27 @@ class Database implements IDatabase {
 // should update the state of the store dependent on changes
 // returns a subscriber that can be called to unsubcribe from changes
 // https://firebase.google.com/docs/firestore/query-data/listen
- async monitorDatabaseChanges() {
-    const pinsCollection = collection(this.database, "pins");
-    const pinSnapshot = await getDocs(pinsCollection);
-    const q = query(pinsCollection);
+//  async monitorDatabaseChanges() {
+//     const pinsCollection = collection(this.database, "pins");
+//     const pinSnapshot = await getDocs(pinsCollection);
+//     const q = query(pinsCollection);
 
-    return onSnapshot(pinsCollection, (snapshot) => {
+//     return onSnapshot(pinsCollection, (snapshot) => {
 
-        snapshot.docChanges().forEach((change) => {
-            const pin = pinConverter.fromFirestore(change.doc); 
-            console.log(`change: ${change}`);
-            if(change.type === "added") {
-                store.dispatch(addPin(pin));
-            }
-            else if(change.type === "modified") {
-                store.dispatch(updatePin(pin));
-            } else if(change.type === "removed") {
-                store.dispatch(removePin(pin));
-            }
-        })
-    })
-  }
-
-  async updatePinActivity() {
-      
-  }
+//         snapshot.docChanges().forEach((change) => {
+//             const pin = pinConverter.fromFirestore(change.doc); 
+//             console.log(`change: ${change}`);
+//             if(change.type === "added") {
+//                 store.dispatch(addPin(pin));
+//             }
+//             else if(change.type === "modified") {
+//                 store.dispatch(updatePin(pin));
+//             } else if(change.type === "removed") {
+//                 store.dispatch(removePin(pin));
+//             }
+//         })
+//     })
+//   }
 }
 
 // action result implementations

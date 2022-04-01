@@ -19,13 +19,10 @@ import {
   query,
 } from "@firebase/firestore";
 import { auth, firebaseApp } from "../../config/FirebaseConfig";
-import { Database } from "../../data/Database";
-import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
 import { defaultColor, hotColor } from "../../style/styles";
 import { useToast } from "react-native-toast-notifications";
-
-const database = new Database();
+import { pinConverter } from "../../data/DataConverters";
 
 // Keeps track of the middle point of the current map display
 let regionLatitude = 48.463708;
@@ -94,9 +91,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         if (change.type === "added") {
           dispatch(addPin(pin));
         } else if (change.type === "modified") {
-          dispatch(removePin(pin))  
+          dispatch(removePin(pin));
           dispatch(addPin(pin));
-        //   dispatch(updatePin(pin));
+          //   dispatch(updatePin(pin));
         } else if (change.type === "removed") {
           dispatch(removePin(pin));
         }
@@ -241,9 +238,10 @@ export const MapScreen = ({ route, navigation }: any) => {
       pin.privateViewers.indexOf(auth.currentUser?.uid || "") > -1
   );
 
-  pinsToRender.forEach(pin => {
-    if(user && pin.favoriteUsers.includes(user.uid)) pin.details.color = "purple"
-  })
+  pinsToRender.forEach((pin) => {
+    if (user && pin.favoriteUsers.includes(user.uid))
+      pin.details.color = "purple";
+  });
 
   if (hotspotToggleColor == hotColor)
     pinsToRender = pinsToRender.filter((pin) => pin.activity.activeUsers > 0);

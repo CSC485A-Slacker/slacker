@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import { timedBackground } from "./data/Tasks";
 import { Database } from "./data/Database";
 
-const database = new Database();
+// const database = new Database();
 
 import { LogBox } from "react-native";
 import { ToastProvider } from "react-native-toast-notifications";

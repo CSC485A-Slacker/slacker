@@ -46,7 +46,7 @@ export const LoginScreen = ({ navigation }) => {
         Welcome to Slacker!
       </Text>
       <Text style={defaultStyles.subTitle}>
-        A slackliner's everyday solution
+        Connecting slackliners one line at a time
       </Text>
       <View style={styles.inputContainer}>
         <TextInput

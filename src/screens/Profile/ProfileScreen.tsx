@@ -17,7 +17,7 @@ export const ProfileScreen = ({ navigation }) => {
         setEmail(auth.currentUser?.email);
       }
     });
-  }, [email]);
+  }, []);
 
   const handleLogout = () => {
     signOut(auth)
