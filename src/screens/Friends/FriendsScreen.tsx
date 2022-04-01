@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Image, FlatList } from "react-native";
+import { View, StyleSheet, ScrollView, Image, FlatList, Alert } from "react-native";
 import { Button, Card, Text, Icon, ListItem, Avatar } from "react-native-elements";
 import { Database } from "../../data/Database";
 import { auth } from "../../config/FirebaseConfig";
-import { User } from "../../data/User";
+import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
 import { defaultColor } from "../../style/styles";
 import {Dimensions} from 'react-native';
@@ -12,31 +12,41 @@ const db = new Database();
 
 export const FriendsScreen = ({ navigation }: any) => {
   const [currentUser, setCurrentUser] = useState<User>();
-  const numFriendRequests = currentUser?._friends.filter((friend) => friend._status == Status.received).length;
+  const [validFriends, setValidFriends] = useState<Friend[]>();
+  const [numFriendRequests, setNumFriendRequests] = useState<number>();
   const friendsRequestTitle = "Requests (" + numFriendRequests + ")";
 
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
-      if (userDB.data) {
+      if (userDB.succeeded && userDB.data) {
         setCurrentUser(userDB.data);
-      } // add an else saying can't get current user
+        const listOfFriends = currentUser?._friends.filter((friend) => friend._status == Status.accepted);
+        setValidFriends(listOfFriends);
+        const numFriendReqs = userDB.data?._friends.filter((friend) => friend._status == Status.received).length;
+        setNumFriendRequests(numFriendReqs);
+      } else {
+        Alert.alert("We have an error on our side. Please try again later.");
+        navigation.navigate("All Friends");
+      }
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
+      Alert.alert("We have an error on our side. Please try again later.");
+      navigation.navigate("All Friends");
     }
   };
 
   useEffect(() => {
     getCurrentUser();
-  }, []);
+  }, [currentUser]);
 
   const handleChat = ( userID ) => {
     return navigation.navigate("Friend Chat", { userID } );
   };
 
-  let validFriends = currentUser?._friends.filter((friend) => 
-    friend._status == Status.accepted
-  );
+  // let validFriendss = currentUser?._friends.filter((friend) => 
+  //   friend._status == Status.accepted
+  // );
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
