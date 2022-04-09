@@ -15,10 +15,12 @@ import {
   defaultStyles,
 } from "../../style/styles";
 import { auth } from "../../config/FirebaseConfig";
+import { useToast } from "react-native-toast-notifications";
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useToast();
 
   const handleSignUp = () => {
     navigation.navigate("Register");
@@ -30,7 +32,32 @@ export const LoginScreen = ({ navigation }) => {
         const user = userCredentials.user;
         navigation.push("Main")
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+          const errorCode = error.code;
+          let userErrorMessage = "Login failed";
+        
+        console.log(`error logging in: ${errorCode}`);
+
+        switch(errorCode) {
+            case "auth/invalid-email":
+                userErrorMessage = "Invalid email";
+                if(email.trimEnd() == "") userErrorMessage = "Email required"
+                break;
+            case "auth/wrong-password":
+                userErrorMessage = "Wrong password";
+                break;
+            case "auth/user-not-found":
+                userErrorMessage = "Account not registered";
+                break;
+            default:
+                userErrorMessage = "Login failed";
+                if(password == "") userErrorMessage = "Password required"
+        }
+
+        toast.show(`Whoops! ${userErrorMessage}`, {
+            type: "danger",
+        });
+      } );
   };
 
   return (
