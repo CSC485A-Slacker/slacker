@@ -7,9 +7,8 @@ const IMAGE_FOLDER = "images/";
 
 const storage = getStorage();
 
-const PhotoItem = (prop: { photo: PinPhoto; key: string; size: number }) => {
+const PhotoItem = (prop: { photo: PinPhoto; key: string }) => {
   const photo = prop.photo;
-  const size = prop.size;
 
   return (
     <View style={styles.container}>
@@ -18,8 +17,8 @@ const PhotoItem = (prop: { photo: PinPhoto; key: string; size: number }) => {
           <Image
             source={{ uri: photo.url }}
             style={{
-              width: size,
-              height: size,
+              width: 150,
+              height: 150,
               borderRadius: 10,
             }}
           />
@@ -37,7 +36,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flexDirection: "row",
-    // marginTop: 15,
+    marginTop: 15,
   },
   text: {
     padding: 10,

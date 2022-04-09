@@ -305,7 +305,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             {photos.length != 0 ? (
               <ScrollView horizontal={true}>
                 {photos.map((photo: PinPhoto) => (
-                  <PhotoItem photo={photo} key={photo.url} size={150} />
+                  <PhotoItem photo={photo} key={photo.url} />
                 ))}
               </ScrollView>
             ) : (
