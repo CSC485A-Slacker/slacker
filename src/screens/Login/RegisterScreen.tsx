@@ -23,8 +23,8 @@ export const RegisterScreen = ({ navigation }) => {
 
   const handleSignUp = async () => {
     try {
-      // TODO: fix getAllUsers() (returns undefined)
       const allUsers = await db.getAllUsers();
+      
       if (allUsers.data != undefined) {
         allUsers.data?.forEach((user) => {
           if (user._username == username) {
@@ -34,6 +34,12 @@ export const RegisterScreen = ({ navigation }) => {
             throw new Error("Username already exists");
           }
         });
+      }
+      else {
+          toast.show("Whoops! We had an issue on our end. Try again later.", {
+                type: "danger",
+            });
+          throw new Error("Could not get users list.")
       }
 
       createUserWithEmailAndPassword(auth, email.trimEnd(), password)
