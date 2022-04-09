@@ -13,7 +13,7 @@ import { defaultColor, greyColor } from "../../style/styles";
 
 const database = new Database();
 
-export const CheckInDetailsScreen = ({ route, navigation }) => {
+export const CheckInDetailsScreen = ({ route, navigation }: any) => {
   const toast = useToast(); // toast notifications
 
   const { pinCoords, usr, pinTitle } = route.params;

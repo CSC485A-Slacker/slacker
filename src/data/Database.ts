@@ -334,7 +334,6 @@ class Database implements IDatabase {
 
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {
-       
         try {
             const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
             const pinDocSnap = await getDoc(pinRef);

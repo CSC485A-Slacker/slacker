@@ -49,37 +49,8 @@ export const FriendsScreen = ({ navigation }: any) => {
     return willFocusSubscription;
   }, []);
 
-  const handleChat = (userID) => {
+  const handleChat = (userID: String) => {
     return navigation.navigate("Friend Chat", { userID });
-  };
-  const FriendView = ({ user }) => (
-    <View style={styles.friendView}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: defaultColor }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Chat"
-          type="clear"
-          titleStyle={{ fontSize: 15, color: defaultColor }}
-          onPress={() => handleChat(user._friendID)}
-          icon={{
-            name: "comment",
-            type: "material",
-            size: 16,
-            color: defaultColor,
-          }}
-        />
-      </View>
-    </View>
-  );
-
-  const renderFriends = ({ item }) => {
-    return <FriendView user={item} />;
   };
 
   return (
@@ -165,7 +136,7 @@ export const FriendsScreen = ({ navigation }: any) => {
       </ScrollView>
     </View>
   );
-};;;;;;;
+};
 
 const styles = StyleSheet.create({
   container: {

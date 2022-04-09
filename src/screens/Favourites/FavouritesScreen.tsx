@@ -2,19 +2,16 @@ import { StyleSheet, View, FlatList } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/Store";
 import { darkBlueColor, defaultColor, greyColor } from "../../style/styles";
-import { Text, Divider } from "react-native-elements";
+import { Text } from "react-native-elements";
 import React from "react";
 import FavoriteCard from "../../components/FavoriteCard";
 import { auth } from "../../config/FirebaseConfig";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import PrivateCard from "../../components/PrivateCard";
 
 export const FavouritesScreen = () => {
   const user = auth.currentUser;
 
-  // TODO: adjust filter to only select the user's favourite pins
   const allPins = useSelector((state: RootState) => state.pins.pins);
 
   const favouritePins = allPins.filter((pin) => {
@@ -28,8 +25,8 @@ export const FavouritesScreen = () => {
   const numFavourites = favouritePins.length;
   const numPrivate = privatePins.length;
 
-  const renderFavorite = ({ item }) => <FavoriteCard pin={item} />;
-  const renderPrivate = ({ item }) => <PrivateCard pin={item} />;
+  const renderFavorite = ({ item }: any) => <FavoriteCard pin={item} />;
+  const renderPrivate = ({ item }: any) => <PrivateCard pin={item} />;
 
   function HomeScreen() {
     return (
@@ -48,7 +45,7 @@ export const FavouritesScreen = () => {
           <FlatList
             data={favouritePins}
             renderItem={renderFavorite}
-            keyExtractor={(item) => item.key}
+            keyExtractor={(item) => item.key.valueOf().toString()}
           />
         </View>
       </View>
@@ -72,7 +69,7 @@ export const FavouritesScreen = () => {
           <FlatList
             data={privatePins}
             renderItem={renderPrivate}
-            keyExtractor={(item) => item.key}
+            keyExtractor={(item) => item.key.valueOf().toString()}
           />
         </View>
       </View>
