@@ -54,7 +54,7 @@ export const LoginScreen = ({ navigation }) => {
                 if(password == "") userErrorMessage = "Password required"
         }
 
-        toast.show(`Whoops! ${userErrorMessage}`, {
+        toast.show(`Whoops! ${userErrorMessage}.`, {
             type: "danger",
         });
       } );

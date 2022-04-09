@@ -10,6 +10,7 @@ import { Database } from "../../data/Database";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
 import { defaultColor, greyColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const IMAGE_FOLDER = "images/"
 
@@ -22,6 +23,7 @@ export const AddPhotoScreen = ({ route, navigation }) => {
   const [photoRef, setPhotoRef] = useState("")
   const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false)
+  const toast = useToast();
 
   const pickPhoto = async () => {
     // No permissions request is necessary for launching the image library
@@ -88,7 +90,9 @@ export const AddPhotoScreen = ({ route, navigation }) => {
     );
       } catch (error) {
       console.log(`Error uploading photo to firebase: ${error}`);
-      alert("Photo upload failed, sorry :( try again later");
+      toast.show(`Whoops! Photo upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
             name: "Map",
       });
@@ -110,7 +114,9 @@ export const AddPhotoScreen = ({ route, navigation }) => {
       console.log(resp);
     } catch (error) {
       console.log(`Error updating pin when trying to save new photo: ${error}`);
-      alert("Photo upload failed, sorry :( try again later");
+      toast.show(`Whoops! Photo upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
             name: "Map",
       });

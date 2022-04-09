@@ -115,7 +115,6 @@ class Database implements IDatabase {
             if(previousLocation) {
                 // exit if user is already checked into new spot
                 if(userIsCheckedIntoSpot(user, newLocation)) {
-                    alert(`You are already checked in here!`);
                     throw new Error(`User already checked into spot ${coordinateToString(newLocation)}.`);
                 }
 
