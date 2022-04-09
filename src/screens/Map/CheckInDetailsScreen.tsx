@@ -43,43 +43,51 @@ export const CheckInDetailsScreen = ({ route, navigation }) => {
 
   const handleConfirmPress = () => {
     // can remove these logs when done debugging
-    console.log(sharingSlackline)
-    console.log(notSharingSlackline)
-    console.log(noSlackline)
-    console.log(timeValue)
-    console.log(pinCoords)
-    console.log(usr._userID)
-    
+    console.log(sharingSlackline);
+    console.log(notSharingSlackline);
+    console.log(noSlackline);
+    console.log(timeValue);
+    console.log(pinCoords);
+    console.log(usr._userID);
+
     try {
-        const dbPinPromise = database.getPin(pinCoords);
-        dbPinPromise.then(result => {
-        const dbPin = result.data
+      const dbPinPromise = database.getPin(pinCoords);
+      dbPinPromise.then((result) => {
+        const dbPin = result.data;
 
         if (dbPin) {
-            const changeCheckinSpotResult = database.ChangeCheckInSpot(usr._userID, pinCoords, timeValue);
-            
-            changeCheckinSpotResult.then(result => {
-                if(result.succeeded) {
-                    navigation.navigate("Map", {dbPin})
-                    toast.show(`Checked into ${dbPin.details.title != "" ? dbPin.details.title : "spot"}!`, {
-                        type: "success",
-                    })
-                    return 
-                } else {
-                    throw new Error(result.message);
+          const changeCheckinSpotResult = database.ChangeCheckInSpot(
+            usr._userID,
+            pinCoords,
+            timeValue
+          );
+
+          changeCheckinSpotResult.then((result) => {
+            if (result.succeeded) {
+              navigation.navigate("Map", { dbPin });
+              toast.show(
+                `Checked into ${
+                  dbPin.details.title != "" ? dbPin.details.title : "spot"
+                }!`,
+                {
+                  type: "success",
                 }
-            })
+              );
+              return;
+            } else {
+              throw new Error(result.message);
+            }
+          });
         }
-    })
-    } catch(error) {
-        console.log(`error updating pin activity: ${error}`);
-        navigation.navigate("Map")
-        toast.show("Whoops! Checkin failed", {
-            type: "danger",
-        });
+      });
+    } catch (error) {
+      console.log(`error updating pin activity: ${error}`);
+      navigation.navigate("Map");
+      toast.show("Whoops! Checkin failed", {
+        type: "danger",
+      });
     }
-    
-  }
+  };
 
   const interpolate = (start: number, end: number) => {
     let k = (timeValue - 1) / 10; // 0 =>min  && 10 => MAX

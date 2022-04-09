@@ -6,11 +6,9 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
-  Alert,
-  FlatList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text, Divider, Button, FAB, Icon } from "react-native-elements";
+import { Text, Divider, Button, Icon } from "react-native-elements";
 import SlidingUpPanel from "rn-sliding-up-panel";
 import ReviewCard from "./ReviewCard";
 import { Pin, PinPhoto, PinReview } from "../data/Pin";
@@ -24,7 +22,6 @@ import {
   mintColor,
 } from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
-import { pinSlice } from "../redux/PinSlice";
 import { useToast } from "react-native-toast-notifications";
 
 const ios = Platform.OS === "ios";
@@ -72,10 +69,6 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
         setCheckedIn(checkedIn)
     });
   }, [pin])
-
-  const renderPhoto = ({ item }: any) => (
-    <PhotoItem photo={item} key={item.url} size={150} />
-  );
 
   const handleCheckIn = (pinCoords: LatLng, userId: string|undefined, pinTitle: string) => {
     try {
