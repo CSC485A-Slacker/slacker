@@ -62,10 +62,10 @@ export const FavouritesScreen = () => {
           <Text style={styles.title} h3>
             Private Pins
           </Text>
-          {numFavourites == 1 ? (
-            <Text style={styles.subTitle}>{numFavourites} spot</Text>
+          {numPrivate == 1 ? (
+            <Text style={styles.subTitle}>{numPrivate} spot</Text>
           ) : (
-            <Text style={styles.subTitle}>{numFavourites} spots</Text>
+            <Text style={styles.subTitle}>{numPrivate} spots</Text>
           )}
         </View>
         <View>

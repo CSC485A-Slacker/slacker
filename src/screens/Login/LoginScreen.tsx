@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   View,
   Image,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Text } from "react-native-elements";
@@ -34,47 +36,52 @@ export const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
-      <Image
-        source={{
-          width: 200,
-          height: 200,
-          uri: "https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker-Logo.png",
-        }}
-      />
-      <Text style={defaultStyles.title} h3>
-        Welcome to Slacker!
-      </Text>
-      <Text style={defaultStyles.subTitle}>
-        Connecting slackliners one line at a time
-      </Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Email"
-          value={email}
-          autoCapitalize="none"
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <Image
+          source={{
+            width: 200,
+            height: 200,
+            uri: "https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker-Logo.png",
+          }}
         />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          autoCapitalize="none"
-          onChangeText={(text) => setPassword(text)}
-          style={styles.input}
-          secureTextEntry
-        />
-      </View>
+        <Text style={defaultStyles.title} h3>
+          Welcome to Slacker!
+        </Text>
+        <Text style={defaultStyles.subTitle}>
+          Connecting slackliners one line at a time
+        </Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Email"
+            value={email}
+            autoCapitalize="none"
+            onChangeText={(text) => setEmail(text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            autoCapitalize="none"
+            onChangeText={(text) => setPassword(text)}
+            style={styles.input}
+            secureTextEntry
+          />
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSignUp} style={[styles.buttonOutline]}>
-          <Text style={styles.buttonTextRegister}>Not a user? Register</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleLogin} style={styles.button}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleSignUp}
+            style={[styles.buttonOutline]}
+          >
+            <Text style={styles.buttonTextRegister}>Not a user? Register</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

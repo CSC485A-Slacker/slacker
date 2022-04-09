@@ -235,8 +235,13 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
           <View style={styles.buttonsContainer}>
             <View style={styles.buttonContainer}>
               <Button
-                title={ isCheckedIn ? "Check Out" : "Check In" }
-                icon={{ name: 'angle-double-right', type: 'font-awesome', size: 20, color: 'white' }}
+                title={isCheckedIn ? "Check Out" : "Check In"}
+                icon={{
+                  name: "angle-double-right",
+                  type: "font-awesome",
+                  size: 20,
+                  color: "white",
+                }}
                 iconRight
                 buttonStyle={{
                   backgroundColor: defaultColor,
@@ -248,7 +253,15 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
                   marginRight: 10,
                 }}
                 titleStyle={{ fontSize: 14 }}
-                onPress={() => isCheckedIn ? handleCheckOut(pin.coordinate, user?.uid) : handleCheckIn(pin.coordinate, user?.uid, pin.details.title)}
+                onPress={() =>
+                  isCheckedIn
+                    ? handleCheckOut(pin.coordinate, user?.uid)
+                    : handleCheckIn(
+                        pin.coordinate,
+                        user?.uid,
+                        pin.details.title
+                      )
+                }
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -297,22 +310,18 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
           <View>
             <Divider style={styles.divider} />
             {photos.length != 0 ? (
-              <View style={{ paddingTop: 14 }}>
-                <FlatList
-                  horizontal={true}
-                  data={photos}
-                  renderItem={renderPhoto}
-                  keyExtractor={(item) => item.url}
-                />
-              </View>
+              <ScrollView horizontal={true}>
+                {photos.map((photo: PinPhoto) => (
+                  <PhotoItem photo={photo} key={photo.url} size={150} />
+                ))}
+              </ScrollView>
             ) : (
-                <View>
-                  <Text style={styles.subTitle}>Photos</Text>
-                  <Text style={styles.text}>
-                    Share your photos using the button above!
-                  </Text>
-                </View>
-              
+              <View>
+                <Text style={styles.subTitle}>Photos</Text>
+                <Text style={styles.text}>
+                  Share your photos using the button above!
+                </Text>
+              </View>
             )}
           </View>
           <View>

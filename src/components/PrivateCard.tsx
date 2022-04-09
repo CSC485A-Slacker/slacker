@@ -8,12 +8,7 @@ import { auth } from "../config/FirebaseConfig";
 import { useToast } from "react-native-toast-notifications";
 
 const PrivateCard = (prop: { pin: Pin }) => {
-  const user = auth.currentUser;
   const toast = useToast();
-
-  const database = new Database();
-
-  const [favorite, setFavorite] = useState(true);
 
   const pin = prop.pin;
 

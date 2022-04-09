@@ -42,6 +42,11 @@ export const FriendsScreen = ({ navigation }: any) => {
 
   useEffect(() => {
     getCurrentUser();
+    const willFocusSubscription = navigation.addListener("focus", () => {
+      getCurrentUser();
+    });
+
+    return willFocusSubscription;
   }, []);
 
   const handleChat = (userID) => {
@@ -134,17 +139,33 @@ export const FriendsScreen = ({ navigation }: any) => {
           <Card>
             <Card.Title>Your Friends</Card.Title>
             <Card.Divider />
-            <FlatList
-              data={validFriends}
-              renderItem={renderFriends}
-              keyExtractor={(user) => user._username}
-            />
+            {validFriends?.map((u, i) => {
+              return (
+                <View style={styles.friendView}>
+                  <Avatar
+                    size={36}
+                    rounded
+                    title={u._username.charAt(0)}
+                    containerStyle={{ backgroundColor: defaultColor }}
+                  />
+                  <Text style={styles.subText}>{u._username}</Text>
+                  <View style={styles.itemContainer}>
+                    <Button
+                      title="Chat"
+                      type="clear"
+                      titleStyle={{ fontSize: 15, color: defaultColor }}
+                      onPress={() => handleChat(u._friendID)}
+                    />
+                  </View>
+                </View>
+              );
+            })}
           </Card>
         </View>
       </ScrollView>
     </View>
   );
-};
+};;;;;;;
 
 const styles = StyleSheet.create({
   container: {
