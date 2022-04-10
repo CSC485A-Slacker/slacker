@@ -13,7 +13,7 @@ import { Database } from "../../data/Database";
 import { User } from "../../data/User";
 import { defaultColor, defaultStyles } from "../../style/styles";
 
-export const RegisterScreen = ({ navigation }) => {
+export const RegisterScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");

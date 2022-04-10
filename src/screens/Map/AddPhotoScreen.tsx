@@ -17,7 +17,7 @@ const IMAGE_FOLDER = "images/";
 const database = new Database();
 const storage = getStorage();
 
-export const AddPhotoScreen = ({ route, navigation }) => {
+export const AddPhotoScreen = ({ route, navigation }: any) => {
   const { pin } = route.params;
   const [photoUri, setPhotoUri] = useState("null");
   const [photoRef, setPhotoRef] = useState("");
@@ -45,7 +45,7 @@ export const AddPhotoScreen = ({ route, navigation }) => {
   // Created using this: https://firebase.google.com/docs/storage/web/upload-files#full_example
   const onSubmitPress = async () => {
     try {
-      const blob = await new Promise((resolve, reject) => {
+      const blob: any = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
           resolve(xhr.response);
@@ -194,7 +194,7 @@ export const AddPhotoScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.container}>
           <Overlay
-            visible={loading}
+            isVisible={loading}
             overlayStyle={{
               borderRadius: 10,
             }}
