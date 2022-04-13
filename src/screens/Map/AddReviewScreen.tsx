@@ -10,6 +10,7 @@ import { AirbnbRating } from "react-native-ratings";
 import { PinReview } from "../../data/Pin";
 import { Database } from "../../data/Database";
 import { defaultColor, greyColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
@@ -18,6 +19,7 @@ export const AddReviewScreen = ({ route, navigation }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [buttomDisabled, setButtomDisabled] = useState(true);
+const toast = useToast();
 
   useEffect(() => {
     if (rating != 0 && comment != "") {
@@ -40,7 +42,9 @@ export const AddReviewScreen = ({ route, navigation }) => {
       console.log(resp);
     } catch (error) {
       console.log(`Error updating pin when trying to save new review: ${error}`);
-      alert("Review upload failed, sorry :( try again later");
+      toast.show(`Whoops! "Review upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
             name: "Map",
       });

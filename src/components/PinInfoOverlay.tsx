@@ -6,7 +6,6 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
-  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button } from "react-native-elements";

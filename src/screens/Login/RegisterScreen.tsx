@@ -12,34 +12,70 @@ import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { User } from "../../data/User";
 import { defaultColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 export const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const toast = useToast();
   const db = new Database();
 
   const handleSignUp = async () => {
     try {
       const allUsers = await db.getAllUsers();
+      
       if (allUsers.data != undefined) {
         allUsers.data?.forEach((user) => {
           if (user._username == username) {
-            alert("username already existed!");
-            throw new Error("");
+            toast.show("Whoops! Username already exists", {
+                type: "danger",
+            });
+            throw new Error("Username already exists");
           }
         });
       }
-    } catch (error) {
-      return;
-    }
-    createUserWithEmailAndPassword(auth, email.trimEnd(), password)
+      else {
+          toast.show("Whoops! We had an issue on our end. Try again later.", {
+                type: "danger",
+            });
+          throw new Error("Could not get users list.")
+      }
+
+      createUserWithEmailAndPassword(auth, email.trimEnd(), password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
         db.addUser(new User(user.uid, null, new Date(), username, []));
         navigation.push("Main")
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+          const errorCode = error.code;
+          let userErrorMessage = "Register failed";
+        
+        console.log(`error logging in: ${errorCode}`);
+
+        switch(errorCode) {
+            case "auth/invalid-email":
+                userErrorMessage = "Invalid email";
+                if(email.trimEnd() == "") userErrorMessage = "Enter an email"
+                break;
+            case "auth/weak-password":
+                userErrorMessage = "Weak password";
+                break;
+            default:
+                userErrorMessage = "Register failed";
+                if(password == "") userErrorMessage = "Enter a password"
+        }
+
+        toast.show(`Whoops! ${userErrorMessage}.`, {
+            type: "danger",
+        });
+      } );
+
+    } catch (error) {
+        console.log(`Error creating user: ${error}`);
+      return;
+    }
   };
 
   return (
