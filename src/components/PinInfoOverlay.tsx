@@ -6,6 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   View,
+  FlatList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, Divider, Button, Icon } from "react-native-elements";
@@ -16,11 +17,7 @@ import PhotoItem from "./PhotoItem";
 import { auth } from "../config/FirebaseConfig";
 import { LatLng } from "react-native-maps";
 import { Database } from "../data/Database";
-import {
-  defaultColor,
-  hotColor,
-  mintColor,
-} from "../style/styles";
+import { defaultColor, hotColor, mintColor } from "../style/styles";
 import { userIsCheckedIntoSpot } from "../data/User";
 import { useToast } from "react-native-toast-notifications";
 
@@ -34,11 +31,12 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const navigation = prop.navigation;
   const reviews = pin.reviews;
   const photos = pin.photos;
+  const [activity, setActivity] = useState(pin.activity);
   const user = auth.currentUser;
-  const isPinFavorite = () => {
+  const isPinFavorite = (pin: Pin) => {
     if (user) return pin.favoriteUsers.includes(user?.uid);
   };
-  const [favorite, setFavorite] = useState(isPinFavorite());
+  const [favorite, setFavorite] = useState(isPinFavorite(pin));
   const toast = useToast();
 
   // strange calculation here to get the top of the draggable range correct
@@ -62,11 +60,21 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
   const [isCheckedIn, setCheckedIn] = useState(false);
 
   useEffect(() => {
+    handlePinUpdate();
     checkedIn(pin.coordinate, user?.uid).then((checkedIn) => {
       // console.log(`checkedIn in useEffect ${checkedIn}`)
       setCheckedIn(checkedIn);
     });
   }, [pin]);
+
+  // Update local state when the pin gets updated
+  const handlePinUpdate = async () => {
+    const dbPinPromise = await database.getPin(pin.coordinate);
+    if (dbPinPromise.succeeded && dbPinPromise) {
+      setActivity(dbPinPromise.data?.activity || pin.activity);
+      setFavorite(isPinFavorite(dbPinPromise.data || pin));
+    }
+  };
 
   const handleCheckIn = (
     pinCoords: LatLng,
@@ -185,18 +193,21 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
         return usr != user?.uid;
       });
     } else {
-      if (!user) alert("You need to be logged in!");
-      else {
+      if (!user) {
+        toast.show(
+          "Failed to add pin to favorites. You need to be logged in.",
+          {
+            type: "error",
+          }
+        );
+        return;
+      } else {
         newFavorites.push(user?.uid || "");
       }
     }
-
     database
       .editPinFavorites(pin.coordinate, newFavorites)
       .then(() => {
-        setFavorite(!favorite);
-      })
-      .finally(() => {
         pin.favoriteUsers = [...newFavorites];
         const notification = {
           msg: "Added pin to favorites!",
@@ -207,7 +218,16 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             (notification.type = "normal");
         }
         toast.show(notification.msg, { type: notification.type });
+      })
+      .catch(() => {
+        toast.show("Failed to add pin to favorites. Please try again later.", {
+          type: "error",
+        });
       });
+  };
+
+  const renderPhotos = ({ item }: any) => {
+    return <PhotoItem photo={item} key={item.url} />;
   };
 
   return (
@@ -297,7 +317,7 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
             </View>
             <View style={styles.buttonContainer}>
               <Button
-                title="Add Photos"
+                title="Add Photo"
                 buttonStyle={{
                   backgroundColor: "white",
                   borderWidth: 1,
@@ -320,11 +340,15 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
           <View>
             <Divider style={styles.divider} />
             {photos.length != 0 ? (
-              <ScrollView horizontal={true}>
-                {photos.map((photo: PinPhoto) => (
-                  <PhotoItem photo={photo} key={photo.url} />
-                ))}
-              </ScrollView>
+              <FlatList
+                data={photos}
+                renderItem={renderPhotos}
+                keyExtractor={(photo: PinPhoto) => photo.url}
+                horizontal={true}
+                onTouchStart={() => setDragging(false)}
+                onTouchEnd={() => setDragging(true)}
+                onTouchCancel={() => setDragging(true)}
+              />
             ) : (
               <View>
                 <Text style={styles.subTitle}>Photos</Text>
@@ -340,13 +364,13 @@ function PinInfoOverlay(prop: { pin: Pin; navigation: any }) {
               <Text style={styles.subTitle}>Details</Text>
               <Text style={styles.text}>{pin.details.description}</Text>
               <Text style={styles.text}>
-                Active Slackliners: {pin.activity.activeUsers}
+                Active Slackliners: {activity.activeUsers}
               </Text>
               <Text style={styles.text}>
-                Total People Visited: {pin.activity.totalUsers}
+                Total People Visited: {activity.totalUsers}
               </Text>
               <Text style={styles.text}>
-                {pin.activity.shareableSlackline
+                {activity.shareableSlackline
                   ? "Slacklining gear is available to share!"
                   : "Please bring your own gear!"}
               </Text>
