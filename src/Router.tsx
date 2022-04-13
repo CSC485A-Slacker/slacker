@@ -85,7 +85,7 @@ function NavTabs (){
         name="Favourites"
         component={FavouritesScreen}
         options={{
-          tabBarLabel: "Favourites",
+          tabBarLabel: "My Pins",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="heart" color={color} size={size} />
           ),

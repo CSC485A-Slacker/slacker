@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { Text, SearchBar, Avatar, Button } from "react-native-elements";
+import { Text, SearchBar, Avatar, Button, Card } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { Friend, User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
-import { darkBlueColor } from "../../style/styles";
+import { darkBlueColor, defaultColor, greyColor } from "../../style/styles";
 import { useToast } from "react-native-toast-notifications";
 
 const db = new Database();
 
 export const SearchFriendsScreen = ({ navigation }: any) => {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User>();
@@ -68,11 +68,21 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
     }
   };
 
+  const updateAllUsers = (currUser: User) => {
+    const excludedIds = currUser?._friends.map(({ _friendID }) => _friendID);
+    excludedIds.push(currUser._userID);
+    const filterAllUsers = allUsers.filter(
+      (user) => !excludedIds.includes(user._userID)
+    );
+    setAllUsers(filterAllUsers);
+    setFilteredUsers(filterAllUsers);
+  };
+
   useEffect(() => {
     getCurrentUser();
   }, []);
 
-  const searchFilter = (text) => {
+  const searchFilter = (text: string) => {
     if (text) {
       const newData = allUsers.filter(function (item) {
         const itemData = item._username
@@ -94,20 +104,36 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
     try {
       if (currentUser) {
         // update current user to show that they have sent a friend request
-        currentUser._friends.push(new Friend(friend._userID, friend._username, Status.sent));
+        currentUser._friends.push(
+          new Friend(friend._userID, friend._username, Status.sent)
+        );
         const respUser = await db.editFriends(
           currentUser._userID,
           currentUser._friends
         );
         // update friend to show that they have a new friend request
-        friend._friends.push(new Friend(currentUser._userID, currentUser._username, Status.received));
+        friend._friends.push(
+          new Friend(
+            currentUser._userID,
+            currentUser._username,
+            Status.received
+          )
+        );
         const respFriend = await db.editFriends(
           friend._userID,
           friend._friends
         );
 
         if (respUser.succeeded && respFriend.succeeded) {
-          getAllUsers(currentUser);
+          toast.show(
+            `Sent ${
+              friend._username != "" ? friend._username : ""
+            } a friend request!`,
+            {
+              type: "success",
+            }
+          );
+          updateAllUsers(currentUser);
         }
       }
     } catch (error) {
@@ -115,35 +141,50 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
     }
   };
 
-  const FriendView = ({ user }) => (
-    <View style={styles.item}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: darkBlueColor }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Add Friend"
-          type="clear"
-          titleStyle={{ color: darkBlueColor, fontSize: 16 }}
-          onPress={() => sendFriendRequest(user)}
+  const FriendView = ({ user }: any) => (
+    <Card
+      containerStyle={styles.favoriteContainer}
+      wrapperStyle={{ borderColor: "white" }}
+    >
+      <View style={styles.inlineContainer}>
+        <Avatar
+          size={36}
+          rounded
+          title={user._username.charAt(0)}
+          containerStyle={{ backgroundColor: darkBlueColor }}
         />
+        <Text style={styles.subText}>{user._username}</Text>
+        <View style={styles.itemContainer}>
+          <Button
+            title="Add Friend"
+            type="clear"
+            titleStyle={{ color: defaultColor, fontSize: 16 }}
+            onPress={() => sendFriendRequest(user)}
+            icon={{
+              name: "person-add",
+              type: "material",
+              size: 16,
+              color: defaultColor,
+            }}
+          />
+        </View>
       </View>
-    </View>
+    </Card>
   );
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: any) => {
     return <FriendView user={item} />;
   };
 
   return (
     <View style={styles.view}>
       <View style={styles.container}>
-        <Text style={styles.title} h4>
+        <Text style={styles.title} h3>
           Discover Friends
+        </Text>
+        <Text style={styles.text}>
+          Please note that the user will have to accept your request before
+          becoming friends
         </Text>
       </View>
       <SearchBar
@@ -152,12 +193,7 @@ export const SearchFriendsScreen = ({ navigation }: any) => {
         onClear={() => searchFilter("")}
         value={search}
         autoCapitalize="none"
-        containerStyle={{
-          backgroundColor: "white",
-          borderTopColor: "white",
-          borderBottomColor: "white",
-          padding: 0,
-        }}
+        containerStyle={styles.searchContainer}
         inputContainerStyle={{ backgroundColor: "white" }}
         inputStyle={{ fontSize: 14 }}
       />
@@ -183,24 +219,46 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
-  title: {
-    padding: 40,
-    paddingBottom: 10,
-    fontSize: 18,
-    color: "#219f94",
+  searchContainer: {
+    backgroundColor: "white",
+    borderTopColor: "white",
+    borderBottomColor: "white",
+    padding: 0,
+    marginBottom: 10,
   },
-  item: {
+  favoriteContainer: {
+    backgroundColor: "white",
+    borderColor: "white",
+    marginHorizontal: 0,
+    marginTop: 5,
+    marginBottom: 5,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+  },
+  inlineContainer: {
     flexDirection: "row",
-    marginTop: 10,
+    justifyContent: "space-between",
   },
   itemContainer: {
     flex: 1,
     alignItems: "flex-end",
   },
+  title: {
+    padding: 30,
+    paddingBottom: 10,
+    color: defaultColor,
+  },
+  text: {
+    textAlign: "center",
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: greyColor,
+  },
   subText: {
     alignItems: "center",
     padding: 10,
-    fontSize: 14,
-    color: "#626264",
+    fontSize: 16,
+    color: greyColor,
   },
 });

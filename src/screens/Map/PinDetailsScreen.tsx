@@ -5,7 +5,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Text, Input, FAB, Switch, Button } from "react-native-elements";
+import { Text, Input, Switch, Button } from "react-native-elements";
 import { useDispatch } from "react-redux";
 import { removePin } from "../../redux/PinSlice";
 import { Pin } from "../../data/Pin";
@@ -64,13 +64,14 @@ export const PinDetailsScreen = ({ route, navigation }) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
       privateViewers: isPrivate
         ? userId
           ? [userId]
           : ([] as string[])
         : ([] as string[]),
+      favoriteUsers: [] as string[],
     };
     dispatch(removePin(confirmPin));
     navigation.navigate({
@@ -127,13 +128,14 @@ export const PinDetailsScreen = ({ route, navigation }) => {
             alignItems: "center",
           }}
         >
-          <Text>Is this a private pin?</Text>
+          <Text>Is this a private pin? </Text>
           <Switch
             trackColor={{ false: "#767577", true: "#219f94" }}
             thumbColor={"#f4f3f4"}
             ios_backgroundColor="#3e3e3e"
             onValueChange={togglePrivate}
             value={isPrivate}
+            style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }] }}
           />
         </View>
         <Button

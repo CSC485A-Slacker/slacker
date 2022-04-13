@@ -21,9 +21,9 @@ class Database implements IDatabase {
     }
 
     async addUser(user: IUser) {
-      const userDocRef = doc(this.database, "users", user._userID)
         try
         {
+          const userDocRef = doc(this.database, "users", user._userID)
           const userSnap =await getDoc(userDocRef)
           if(userSnap.exists())
           {
@@ -68,9 +68,9 @@ class Database implements IDatabase {
     }
 
     async getUser(userID: string): Promise<IUserActionResult<IUser>> {
-      const userDocRef = doc(this.database, "users", userID)
       try
       {
+        const userDocRef = doc(this.database, "users", userID)
         const userDocSnap = await getDoc(userDocRef)
         if (!userDocSnap.exists())
         {
@@ -99,12 +99,11 @@ class Database implements IDatabase {
 
     async ChangeCheckInSpot(userID:string, newLocation:LatLng, hoursToCheckInFor: number): Promise<IDatabaseActionResult>
     {
-        const userDocRef = doc(this.database, "users", userID)
-        const userResult = await this.getUser(userID)
-        const user = userResult.data
-
         try
         {
+          const userDocRef = doc(this.database, "users", userID)
+          const userResult = await this.getUser(userID)
+          const user = userResult.data
             const userDocSnap = await getDoc(userDocRef)
             if(!user) {
                 throw new Error("User doesn't exist")
@@ -311,8 +310,8 @@ class Database implements IDatabase {
     }
   
   async editFriends(userID: string, newFriends: Friend[]) {
-    const userDocRef = doc(this.database, "users", userID)
     try {
+      const userDocRef = doc(this.database, "users", userID)
       const userDocSnap = await getDoc(userDocRef)
       if(!userDocSnap.exists()) {
         throw new Error("User doesn't exist")
@@ -334,9 +333,8 @@ class Database implements IDatabase {
 
     // Adds a pin to the database
     async addPin(pin: IPin): Promise<IDatabaseActionResult> {
-        const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
-
         try {
+            const pinRef = doc(this.database, "pins", coordinateToString(pin.coordinate));
             const pinDocSnap = await getDoc(pinRef);
 
             if (pinDocSnap.exists()) {
@@ -453,6 +451,32 @@ class Database implements IDatabase {
       }
 
       return new DatabaseActionResult(true, `Succeeded: pin activity edited at ${coordinateToString(coordinate)}`);
+  }
+
+  // Edits pin details at coordinate
+  async editPinFavorites(coordinate: LatLng, favorites: string[]): Promise<IDatabaseActionResult> {
+    try {
+      const pinRef = doc(this.database, "pins", coordinateToString(coordinate));
+      const pinDocSnap = await getDoc(pinRef);
+
+      if (!pinDocSnap.exists()) {
+        throw new Error(`Pin could not be found.`);
+      }
+
+      await updateDoc(pinRef, { favoriteUsers: favorites });
+    } catch (error) {
+      return new DatabaseActionResult(
+        false,
+        `Failed: could not edit pin at coordinate ${coordinateToString(
+          coordinate
+        )}. ${error}`
+      );
+    }
+
+    return new DatabaseActionResult(
+      true,
+      `Succeeded: pin edited at ${coordinateToString(coordinate)}`
+    );
   }
 
     // Deletes pin at given coordinate
@@ -644,5 +668,4 @@ class UserActionResult<T> implements IUserActionResult<T> {
     }
 }
 
- export { Database };
-
+export { Database };

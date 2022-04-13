@@ -13,17 +13,21 @@ const db = new Database();
 export const FriendsScreen = ({ navigation }: any) => {
   const [currentUser, setCurrentUser] = useState<User>();
   const [validFriends, setValidFriends] = useState<Friend[]>();
-  const [numFriendRequests, setNumFriendRequests] = useState<number>();
-  const friendsRequestTitle = "Requests (" + numFriendRequests + ")";
+  const [numFriendRequests, setNumFriendRequests] = useState<number>(0);
+  const friendsRequestTitle = "Invites (" + numFriendRequests + ")";
 
   const getCurrentUser = async () => {
     try {
       const userDB = await db.getUser(auth.currentUser?.uid || "");
       if (userDB.succeeded && userDB.data) {
         setCurrentUser(userDB.data);
-        const listOfFriends = currentUser?._friends.filter((friend) => friend._status == Status.accepted);
+        const listOfFriends = userDB.data?._friends.filter(
+          (friend) => friend._status == Status.accepted
+        );
         setValidFriends(listOfFriends);
-        const numFriendReqs = userDB.data?._friends.filter((friend) => friend._status == Status.received).length;
+        const numFriendReqs = userDB.data?._friends.filter(
+          (friend) => friend._status == Status.received
+        ).length;
         setNumFriendRequests(numFriendReqs);
       } else {
         Alert.alert("We have an error on our side. Please try again later.");
@@ -38,33 +42,34 @@ export const FriendsScreen = ({ navigation }: any) => {
 
   useEffect(() => {
     getCurrentUser();
-  }, [currentUser]);
+    const willFocusSubscription = navigation.addListener("focus", () => {
+      getCurrentUser();
+    });
 
-  const handleChat = ( userID ) => {
-    return navigation.navigate("Friend Chat", { userID } );
+    return willFocusSubscription;
+  }, []);
+
+  const handleChat = (userID: String) => {
+    return navigation.navigate("Friend Chat", { userID });
   };
-
-  // let validFriendss = currentUser?._friends.filter((friend) => 
-  //   friend._status == Status.accepted
-  // );
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ScrollView>
+      <ScrollView>
         <View style={styles.container}>
           <Card containerStyle={styles.card_container}>
             <Card.Image
               style={styles.card_image}
               source={require("../../assets/friends-header.png")}
             />
-            <Text style={{ alignSelf: 'center', paddingTop: 10 }}>
+            <Text style={{ alignSelf: "center", paddingTop: 10 }}>
               Welcome to your friends page!
             </Text>
             <View style={styles.buttonsContainer}>
               <View style={styles.buttonContainer}>
                 <Button
                   title="Find Friends"
-                  icon={{ name: 'add', size: 20, color: 'white' }}
+                  icon={{ name: "add", size: 20, color: "white" }}
                   iconRight
                   buttonStyle={{
                     backgroundColor: defaultColor,
@@ -103,8 +108,8 @@ export const FriendsScreen = ({ navigation }: any) => {
             </View>
           </Card>
           <Card>
-          <Card.Title>Your Friends</Card.Title> 
-          <Card.Divider />
+            <Card.Title>Your Friends</Card.Title>
+            <Card.Divider />
             {validFriends?.map((u, i) => {
               return (
                 <View style={styles.friendView}>

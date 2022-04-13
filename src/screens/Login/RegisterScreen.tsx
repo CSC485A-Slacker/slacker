@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Text } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { User } from "../../data/User";
 import { defaultColor } from "../../style/styles";
 import { useToast } from "react-native-toast-notifications";
 
-export const RegisterScreen = ({ navigation }) => {
+export const RegisterScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -22,6 +22,7 @@ export const RegisterScreen = ({ navigation }) => {
   const db = new Database();
 
   const handleSignUp = async () => {
+    const db = new Database();
     try {
       const allUsers = await db.getAllUsers();
       
@@ -46,7 +47,7 @@ export const RegisterScreen = ({ navigation }) => {
       .then(async (userCredentials) => {
         const user = userCredentials.user;
         db.addUser(new User(user.uid, null, new Date(), username, []));
-        navigation.push("Main")
+        navigation.push("Main");
       })
       .catch((error) => {
           const errorCode = error.code;
@@ -81,6 +82,9 @@ export const RegisterScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.inputContainer}>
+        <Text style={styles.title} h4>
+          Please enter your details here
+        </Text>
         <TextInput
           placeholder="Email"
           value={email}
@@ -161,5 +165,12 @@ const styles = StyleSheet.create({
     color: defaultColor,
     fontWeight: "700",
     fontSize: 16,
+  },
+  title: {
+    padding: 40,
+    paddingBottom: 10,
+    fontSize: 18,
+    color: defaultColor,
+    textAlign: "center",
   },
 });

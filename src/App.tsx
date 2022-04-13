@@ -6,15 +6,14 @@ import { store } from "./redux/Store";
 import { Provider } from "react-redux";
 import { timedBackground } from "./data/Tasks";
 import { Database } from "./data/Database";
-
-const database = new Database();
-
 import { LogBox } from "react-native";
 import { ToastProvider } from "react-native-toast-notifications";
 
+const database = new Database();
+
 export default function App() {
   // hides yellow box warnings on screen - useful for demos
-  // LogBox.ignoreAllLogs() 
+  //LogBox.ignoreAllLogs();
 
   // runs checkout task on load
   database.checkoutAllExpiredCheckins(5);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { Text, Avatar, Button } from "react-native-elements";
+import { Text, Avatar, Button, Card } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { User } from "../../data/User";
@@ -92,9 +92,9 @@ export const RequestScreen = ({ navigation }: any) => {
     setFriendInvites(filterAllUsers);
   };
 
-//   useEffect(() => {
-//     getCurrentUser();
-//   }, []);
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
 
   const acceptFriendRequest = async (friend: User) => {
     try {
@@ -119,6 +119,14 @@ export const RequestScreen = ({ navigation }: any) => {
         const respFriend = await db.editFriends(friend._userID, filterFriend);
 
         if (respUser.succeeded && respFriend.succeeded) {
+          toast.show(
+            `Added ${
+              friend._username != "" ? friend._username : ""
+            } as a friend!`,
+            {
+              type: "success",
+            }
+          );
           getCurrentUser();
         }
       }
@@ -143,6 +151,14 @@ export const RequestScreen = ({ navigation }: any) => {
         const respFriend = await db.editFriends(friend._userID, filterFriend);
 
         if (respUser.succeeded && respFriend.succeeded) {
+          toast.show(
+            `Canceled friend invite ${
+              friend._username != "" ? "with " + friend._username : ""
+            }`,
+            {
+              type: "normal",
+            }
+          );
           getCurrentUser();
         }
       }
@@ -151,83 +167,126 @@ export const RequestScreen = ({ navigation }: any) => {
     }
   };
 
-  const RequestView = ({ user }) => (
-    <View style={styles.item}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: "#1b4557" }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Add Friend"
-          type="clear"
-          titleStyle={{ color: darkBlueColor, fontSize: 16 }}
-          onPress={() => acceptFriendRequest(user)}
-        />
+  const RequestView = ({ user }: any) => (
+    <Card
+      containerStyle={styles.favoriteContainer}
+      wrapperStyle={{ borderColor: "white" }}
+    >
+      <View style={styles.inlineContainer}>
+        <View style={styles.closeContainer}>
+          <Avatar
+            size={36}
+            rounded
+            title={user._username.charAt(0)}
+            containerStyle={{ backgroundColor: "#1b4557" }}
+          />
+          <Text style={styles.nameText}>{user._username}</Text>
+        </View>
+        <View style={styles.closeContainer}>
+          <View style={styles.closeContainer}>
+            <Button
+              title="Add"
+              type="clear"
+              titleStyle={{ color: defaultColor, fontSize: 16 }}
+              onPress={() => acceptFriendRequest(user)}
+              icon={{
+                name: "mood",
+                type: "material",
+                size: 16,
+                color: defaultColor,
+              }}
+            />
+          </View>
+          <View style={styles.closeContainer}>
+            <Button
+              title="Decline"
+              type="clear"
+              titleStyle={{ color: hotColor, fontSize: 16 }}
+              onPress={() => cancelFriendRequest(user)}
+              icon={{
+                name: "block",
+                type: "material",
+                size: 16,
+                color: hotColor,
+              }}
+            />
+          </View>
+        </View>
       </View>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Deny"
-          type="clear"
-          titleStyle={{ color: hotColor, fontSize: 16 }}
-          onPress={() => cancelFriendRequest(user)}
-        />
-      </View>
-    </View>
+    </Card>
   );
 
-  const InviteView = ({ user }) => (
-    <View style={styles.item}>
-      <Avatar
-        size={36}
-        rounded
-        title={user._username.charAt(0)}
-        containerStyle={{ backgroundColor: darkBlueColor }}
-      />
-      <Text style={styles.subText}>{user._username}</Text>
-      <View style={styles.itemContainer}>
-        <Button
-          title="Cancel Request"
-          type="clear"
-          titleStyle={{ color: hotColor, fontSize: 16 }}
-          onPress={() => cancelFriendRequest(user)}
+  const InviteView = ({ user }: any) => (
+    <Card
+      containerStyle={styles.favoriteContainer}
+      wrapperStyle={{ borderColor: "white" }}
+    >
+      <View style={styles.inlineContainer}>
+        <Avatar
+          size={36}
+          rounded
+          title={user._username.charAt(0)}
+          containerStyle={{ backgroundColor: darkBlueColor }}
         />
+        <Text style={styles.nameText}>{user._username}</Text>
+        <View style={styles.itemContainer}>
+          <Button
+            title="Cancel"
+            type="clear"
+            titleStyle={{ color: hotColor, fontSize: 16 }}
+            onPress={() => cancelFriendRequest(user)}
+            icon={{
+              name: "person-remove",
+              type: "material",
+              size: 16,
+              color: hotColor,
+            }}
+          />
+        </View>
       </View>
-    </View>
+    </Card>
   );
 
-  const renderRequests = ({ item }) => {
+  const renderRequests = ({ item }: any) => {
     return <RequestView user={item} />;
   };
-  const renderInvites = ({ item }) => {
+  const renderInvites = ({ item }: any) => {
     return <InviteView user={item} />;
   };
 
   return (
     <View style={styles.view}>
       <View style={styles.container}>
-        <Text style={styles.title} h4>
-          Current Friend Invites
+        <Text style={styles.title} h3>
+          Friend Invites
+        </Text>
+        <Text style={styles.text}>
+          Here you can confirm or cancel friend invites
         </Text>
       </View>
       <View>
-        <Text style={styles.subTitle}>Request Received</Text>
-        <FlatList
-          data={friendRequest}
-          renderItem={renderRequests}
-          keyExtractor={(user) => user._username}
-        />
+        <Text style={styles.subTitle}>Received</Text>
+        {friendRequest.length == 0 ? (
+          <Text style={styles.subText}>No invites to be found...</Text>
+        ) : (
+          <FlatList
+            data={friendRequest}
+            renderItem={renderRequests}
+            keyExtractor={(user) => user._username}
+          />
+        )}
       </View>
       <View>
-        <Text style={styles.subTitle}>Request Sent</Text>
-        <FlatList
-          data={friendInvites}
-          renderItem={renderInvites}
-          keyExtractor={(user) => user._username}
-        />
+        <Text style={styles.subTitle}>Sent</Text>
+        {friendInvites.length == 0 ? (
+          <Text style={styles.subText}>No invites to be found...</Text>
+        ) : (
+          <FlatList
+            data={friendInvites}
+            renderItem={renderInvites}
+            keyExtractor={(user) => user._username}
+          />
+        )}
       </View>
     </View>
   );
@@ -243,29 +302,56 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
-  title: {
-    padding: 40,
-    paddingBottom: 10,
-    fontSize: 18,
-    color: defaultColor,
+  favoriteContainer: {
+    backgroundColor: "white",
+    borderColor: "white",
+    marginHorizontal: 0,
+    marginTop: 5,
+    marginBottom: 5,
+    shadowOpacity: 0,
+    shadowRadius: 0,
   },
-  subTitle: {
-    fontSize: 16,
-    color: greyColor,
-    paddingTop: 10,
-  },
-  item: {
+  inlineContainer: {
     flexDirection: "row",
-    marginTop: 10,
+    justifyContent: "space-between",
+  },
+  closeContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   itemContainer: {
     flex: 1,
     alignItems: "flex-end",
   },
+  title: {
+    padding: 40,
+    paddingBottom: 10,
+    color: defaultColor,
+  },
+  subTitle: {
+    fontSize: 18,
+    color: darkBlueColor,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  text: {
+    textAlign: "center",
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: greyColor,
+  },
+
   subText: {
     alignItems: "center",
     padding: 10,
     fontSize: 14,
+    color: greyColor,
+  },
+  nameText: {
+    alignItems: "center",
+    padding: 10,
+    fontSize: 16,
     color: greyColor,
   },
 });

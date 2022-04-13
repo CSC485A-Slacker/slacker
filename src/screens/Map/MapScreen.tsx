@@ -19,13 +19,10 @@ import {
   query,
 } from "@firebase/firestore";
 import { auth, firebaseApp } from "../../config/FirebaseConfig";
-import { Database } from "../../data/Database";
-import { pinConverter } from "../../data/DataConverters";
 import PinInfoOverlay from "../../components/PinInfoOverlay";
 import { defaultColor, hotColor } from "../../style/styles";
 import { useToast } from "react-native-toast-notifications";
-
-const database = new Database();
+import { pinConverter } from "../../data/DataConverters";
 
 // Keeps track of the middle point of the current map display
 let regionLatitude = 48.463708;
@@ -56,14 +53,16 @@ let newPin: Pin = {
     shareableSlackline: false,
     activeUsers: 0,
     totalUsers: 0,
-    checkedInUserIds: []
+    checkedInUserIds: [],
   },
   privateViewers: [],
+  favoriteUsers: [],
 };
 
 export const MapScreen = ({ route, navigation }: any) => {
   const pins = useSelector((state: RootState) => state.pins.pins);
   const dispatch = useDispatch();
+  const user = auth.currentUser;
 
   const [addPinVisible, setAddPinVisible] = useState(true);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
@@ -92,9 +91,9 @@ export const MapScreen = ({ route, navigation }: any) => {
         if (change.type === "added") {
           dispatch(addPin(pin));
         } else if (change.type === "modified") {
-          dispatch(removePin(pin))  
+          dispatch(removePin(pin));
           dispatch(addPin(pin));
-        //   dispatch(updatePin(pin));
+          //   dispatch(updatePin(pin));
         } else if (change.type === "removed") {
           dispatch(removePin(pin));
         }
@@ -157,9 +156,10 @@ export const MapScreen = ({ route, navigation }: any) => {
         shareableSlackline: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
       privateViewers: [],
+      favoriteUsers: [],
     };
     newPinLatitude = regionLatitude;
     newPinLongitude = regionLongitude;
@@ -190,7 +190,7 @@ export const MapScreen = ({ route, navigation }: any) => {
         checkIn: false,
         activeUsers: 0,
         totalUsers: 0,
-        checkedInUserIds: []
+        checkedInUserIds: [],
       },
     };
     navigation.navigate("Spot Details", {
@@ -205,7 +205,7 @@ export const MapScreen = ({ route, navigation }: any) => {
     setHotSpotToggleVisible(true);
   };
 
-  const handlePinPress = (e, pin: Pin) => {
+  const handlePinPress = (e: any, pin: Pin) => {
     if (pin.details.title != "") {
       e.stopPropagation();
       setHotSpotToggleVisible(false);
@@ -220,7 +220,6 @@ export const MapScreen = ({ route, navigation }: any) => {
 
   const onMapPress = () => {
     setPinInfoVisible(false);
-    setSelectedPin(null);
     setHotSpotToggleVisible(true);
     setAddPinVisible(true);
   };
@@ -237,6 +236,11 @@ export const MapScreen = ({ route, navigation }: any) => {
       !pin.privateViewers ||
       pin.privateViewers.indexOf(auth.currentUser?.uid || "") > -1
   );
+
+  pinsToRender.forEach((pin) => {
+    if (user && pin.favoriteUsers.includes(user.uid))
+      pin.details.color = "purple";
+  });
 
   if (hotspotToggleColor == hotColor)
     pinsToRender = pinsToRender.filter((pin) => pin.activity.activeUsers > 0);
