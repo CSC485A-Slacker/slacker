@@ -96,7 +96,9 @@ export const AddPhotoScreen = ({ route, navigation }: any) => {
       );
     } catch (error) {
       console.log(`Error uploading photo to firebase: ${error}`);
-      alert("Photo upload failed, sorry :( try again later");
+      toast.show(`Whoops! Photo upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
         name: "Map",
       });
@@ -119,7 +121,9 @@ export const AddPhotoScreen = ({ route, navigation }: any) => {
       }
     } catch (error) {
       console.log(`Error updating pin when trying to save new photo: ${error}`);
-      alert("Photo upload failed, sorry :( try again later");
+      toast.show(`Whoops! Photo upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
         name: "Map",
       });

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Alert } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Text, Avatar, Button, Card } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
-import { Friend, User } from "../../data/User";
+import { User } from "../../data/User";
 import { Status } from "../../data/Interfaces";
 import {
   darkBlueColor,
@@ -14,12 +14,13 @@ import {
 import { useToast } from "react-native-toast-notifications";
 
 const db = new Database();
+const errorMessage = "Whoops! We have an error on our side. Please try again later.";
 
 export const RequestScreen = ({ navigation }: any) => {
+  const toast = useToast();
   const [friendRequest, setFriendRequest] = useState<User[]>([]);
   const [friendInvites, setFriendInvites] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const toast = useToast();
 
   const getCurrentUser = async () => {
     try {
@@ -28,12 +29,16 @@ export const RequestScreen = ({ navigation }: any) => {
         setCurrentUser(userDB.data);
         getAllUsers(userDB.data);
       } else {
-        Alert.alert("We have an error on our side. Please try again later.");
+        toast.show(errorMessage, {
+            type: "danger",
+        });
         navigation.navigate("All Friends");
       }
     } catch (error) {
       console.log(`Error getting to get current user: ${error}`);
-      Alert.alert("We have an error on our side. Please try again later.");
+      toast.show(errorMessage, {
+            type: "danger",
+        });
       navigation.navigate("All Friends");
     }
   };
@@ -51,12 +56,16 @@ export const RequestScreen = ({ navigation }: any) => {
         getFriendRequests(currUser, filterAllUsers);
         getFriendInvites(currUser, filterAllUsers);
       } else {
-        Alert.alert("We have an error on our side. Please try again later.");
+        toast.show(errorMessage, {
+            type: "danger",
+        });
         navigation.navigate("All Friends");
       }
     } catch (error) {
       console.log(`Error getting to retrieve all users: ${error}`);
-      Alert.alert("We have an error on our side. Please try again later.");
+      toast.show(errorMessage, {
+            type: "danger",
+        });
       navigation.navigate("All Friends");
     }
   };

@@ -4,11 +4,14 @@ import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { auth } from "../../config/FirebaseConfig";
 import { Database } from "../../data/Database";
 import { defaultColor } from "../../style/styles";
+import { useToast } from "react-native-toast-notifications";
 
 export const ProfileScreen = ({ navigation }) => {
   const db = new Database();
   const [email, setEmail] = useState(auth.currentUser?.email);
   const [username, setUsername] = useState(auth.currentUser?.email);
+  const toast = useToast();
+  
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -22,7 +25,11 @@ export const ProfileScreen = ({ navigation }) => {
   const handleLogout = () => {
     signOut(auth)
       .then(navigation.navigate("Login"))
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+          toast.show(`Whoops! There was an issue logging out.`, {
+            type: "danger",
+        });
+      });
   };
 
   return (

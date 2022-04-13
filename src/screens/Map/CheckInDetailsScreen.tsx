@@ -4,7 +4,6 @@ import {
   View,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert,
 } from "react-native";
 import { Text, Icon, Slider, CheckBox, Button } from "react-native-elements";
 import { useToast } from "react-native-toast-notifications";

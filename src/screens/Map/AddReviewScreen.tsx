@@ -14,7 +14,7 @@ import { useToast } from "react-native-toast-notifications";
 
 const database = new Database();
 
-export const AddReviewScreen = ({ route, navigation }) => {
+export const AddReviewScreen = ({ route, navigation }: any) => {
   const { pin } = route.params;
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -42,10 +42,10 @@ export const AddReviewScreen = ({ route, navigation }) => {
         });
       }
     } catch (error) {
-      console.log(
-        `Error updating pin when trying to save new review: ${error}`
-      );
-      alert("Review upload failed, sorry :( try again later");
+      console.log(`Error updating pin when trying to save new review: ${error}`);
+      toast.show(`Whoops! "Review upload failed. Try again later.`, {
+            type: "danger",
+        });
       navigation.navigate({
         name: "Map",
       });
