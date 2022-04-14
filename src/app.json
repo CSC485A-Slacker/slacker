@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "slacker",
-    "slug": "slacker",
-    "version": "1.0.0",
+    "name": "Slacker",
+    "slug": "csc485a-slacker",
+    "version": "2.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "../src/Slacker-Logo.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "../src/Slacker-Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,16 +17,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.slacker.slacker",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyAf7gDwXKzx2al4nG7ir5Vi7RnqAUlKD5U"
+        } 
     },
     "android": {
+      "package": "com.yourcompany.yourappname",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "../src/Slacker-Logo.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "../src/Slacker-Logo.png"
     }
   }
 }
