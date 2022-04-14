@@ -53,9 +53,33 @@ export const FriendsScreen = ({ navigation }: any) => {
     return navigation.navigate("Friend Chat", { userID });
   };
 
+  const FriendCard = (prop: { u: Friend; key: string }) => {
+    const u = prop.u;
+
+    return (
+      <View style={styles.friendView}>
+        <Avatar
+          size={36}
+          rounded
+          title={u._username.charAt(0)}
+          containerStyle={{ backgroundColor: defaultColor }}
+        />
+        <Text style={styles.subText}>{u._username}</Text>
+        <View style={styles.itemContainer}>
+          <Button
+            title="Chat"
+            type="clear"
+            titleStyle={{ fontSize: 15, color: defaultColor }}
+            onPress={() => handleChat(u._friendID)}
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ScrollView>
+    <ScrollView>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <View style={styles.container}>
           <Card containerStyle={styles.card_container}>
             <Card.Image
@@ -110,31 +134,13 @@ export const FriendsScreen = ({ navigation }: any) => {
           <Card>
             <Card.Title>Your Friends</Card.Title>
             <Card.Divider />
-            {validFriends?.map((u, i) => {
-              return (
-                <View style={styles.friendView}>
-                  <Avatar
-                    size={36}
-                    rounded
-                    title={u._username.charAt(0)}
-                    containerStyle={{ backgroundColor: defaultColor }}
-                  />
-                  <Text style={styles.subText}>{u._username}</Text>
-                  <View style={styles.itemContainer}>
-                    <Button
-                      title="Chat"
-                      type="clear"
-                      titleStyle={{ fontSize: 15, color: defaultColor }}
-                      onPress={() => handleChat(u._friendID)}
-                    />
-                  </View>
-                </View>
-              );
-            })}
+            {validFriends?.map((u, i) => (
+              <FriendCard u={u} key={u._username} />
+            ))}
           </Card>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 

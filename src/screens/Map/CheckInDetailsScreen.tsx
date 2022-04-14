@@ -20,20 +20,30 @@ export const CheckInDetailsScreen = ({ route, navigation }: any) => {
   const [sharingSlackline, setSharingSlackline] = useState(false);
   const [notSharingSlackline, setNotSharingSlackline] = useState(false);
   const [noSlackline, setNoSlackline] = useState(false);
+  const [buttomDisabled, setButtomDisabled] = useState(true);
 
   const handleSharingSlackline = () => {
     console.log("Sharing Slackline");
-    setSharingSlackline(!sharingSlackline);
+    setSharingSlackline(true);
+    setNotSharingSlackline(false);
+    setNoSlackline(false);
+    setButtomDisabled(false);
   };
 
   const handleNotSharingSlackline = () => {
     console.log("Not Sharing Slackline");
-    setNotSharingSlackline(!notSharingSlackline);
+    setNotSharingSlackline(true);
+    setSharingSlackline(false);
+    setNoSlackline(false);
+    setButtomDisabled(false);
   };
 
   const handleNoSlackline = () => {
     console.log("No Slackline");
-    setNoSlackline(!noSlackline);
+    setNoSlackline(true);
+    setSharingSlackline(false);
+    setNotSharingSlackline(false);
+    setButtomDisabled(false);
   };
 
   const handleCancelPress = () => {
@@ -58,7 +68,8 @@ export const CheckInDetailsScreen = ({ route, navigation }: any) => {
           const changeCheckinSpotResult = database.ChangeCheckInSpot(
             usr._userID,
             pinCoords,
-            timeValue
+            timeValue,
+            sharingSlackline
           );
 
           changeCheckinSpotResult.then((result) => {
@@ -218,6 +229,7 @@ export const CheckInDetailsScreen = ({ route, navigation }: any) => {
             }}
             containerStyle={{ width: "auto", flex: 1, padding: 10 }}
             onPress={handleConfirmPress}
+            disabled={buttomDisabled}
           />
         </View>
 
