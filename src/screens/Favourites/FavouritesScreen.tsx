@@ -9,7 +9,7 @@ import { auth } from "../../config/FirebaseConfig";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import PrivateCard from "../../components/PrivateCard";
 
-export const FavouritesScreen = () => {
+export const FavouritesScreen = ({ route, navigation }: any) => {
   const user = auth.currentUser;
 
   const allPins = useSelector((state: RootState) => state.pins.pins);
@@ -25,8 +25,12 @@ export const FavouritesScreen = () => {
   const numFavourites = favouritePins.length;
   const numPrivate = privatePins.length;
 
-  const renderFavorite = ({ item }: any) => <FavoriteCard pin={item} />;
-  const renderPrivate = ({ item }: any) => <PrivateCard pin={item} />;
+  const renderFavorite = ({ item }: any) => (
+    <FavoriteCard pin={item} navigation={navigation} route={route} />
+  );
+  const renderPrivate = ({ item }: any) => (
+    <PrivateCard pin={item} navigation={navigation} route={route} />
+  );
 
   function HomeScreen() {
     return (

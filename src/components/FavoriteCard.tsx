@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, Icon, Card } from "react-native-elements";
 import { Database } from "../data/Database";
 import { Pin } from "../data/Pin";
@@ -7,8 +7,9 @@ import { defaultColor, hotColor } from "../style/styles";
 import { auth } from "../config/FirebaseConfig";
 import { useToast } from "react-native-toast-notifications";
 
-const FavoriteCard = (prop: { pin: Pin }) => {
+const FavoriteCard = (prop: { pin: Pin; route: any; navigation: any }) => {
   const user = auth.currentUser;
+  const navigation = prop.navigation;
   const toast = useToast();
 
   const database = new Database();
@@ -44,34 +45,45 @@ const FavoriteCard = (prop: { pin: Pin }) => {
       });
   };
 
+  const handleNav = () => {
+    navigation.navigate({
+      name: "Map",
+      params: {
+        myPin: pin,
+      },
+    });
+  };
+
   return (
     <Card
       containerStyle={styles.favoriteContainer}
       wrapperStyle={{ borderColor: "white" }}
     >
-      {photos.length == 0 ? null : (
-        <View>
-          <Card.Image
-            source={{ uri: photos[0].url }}
-            style={{ borderRadius: 10 }}
+      <TouchableOpacity onPress={handleNav}>
+        {photos.length == 0 ? null : (
+          <View>
+            <Card.Image
+              source={{ uri: photos[0].url }}
+              style={{ borderRadius: 10 }}
+            />
+            <Card.Divider />
+          </View>
+        )}
+
+        <View style={styles.inlineContainer}>
+          <Text style={styles.favTitle}>{pin.details.title}</Text>
+          <Icon
+            name={"favorite"}
+            type="material"
+            color={hotColor}
+            onPress={handleFavorite}
           />
-          <Card.Divider />
         </View>
-      )}
 
-      <View style={styles.inlineContainer}>
-        <Text style={styles.favTitle}>{pin.details.title}</Text>
-        <Icon
-          name={"favorite"}
-          type="material"
-          color={hotColor}
-          onPress={handleFavorite}
-        />
-      </View>
-
-      <Text>
-        {pin.details.slacklineLength} | {pin.details.slacklineType}
-      </Text>
+        <Text>
+          {pin.details.slacklineLength} | {pin.details.slacklineType}
+        </Text>
+      </TouchableOpacity>
       {/* TODO: add more information? Maybe add a data here about how many times you've been to your favourite place? */}
     </Card>
   );

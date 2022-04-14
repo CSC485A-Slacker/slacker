@@ -1,16 +1,14 @@
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, Card, Icon } from "react-native-elements";
-import { Database } from "../data/Database";
 import { Pin } from "../data/Pin";
-import { defaultColor, hotColor } from "../style/styles";
-import { auth } from "../config/FirebaseConfig";
+import { defaultColor } from "../style/styles";
 import { useToast } from "react-native-toast-notifications";
 
-const PrivateCard = (prop: { pin: Pin }) => {
+const PrivateCard = (prop: { pin: Pin; route: any; navigation: any }) => {
   const toast = useToast();
 
   const pin = prop.pin;
+  const navigation = prop.navigation;
 
   const photos = pin.photos;
 
@@ -20,34 +18,45 @@ const PrivateCard = (prop: { pin: Pin }) => {
     });
   };
 
+  const handleNav = () => {
+    navigation.navigate({
+      name: "Map",
+      params: {
+        myPin: pin,
+      },
+    });
+  };
+
   return (
     <Card
       containerStyle={styles.favoriteContainer}
       wrapperStyle={{ borderColor: "white" }}
     >
-      {photos.length == 0 ? null : (
-        <View>
-          <Card.Image
-            source={{ uri: photos[0].url }}
-            style={{ borderRadius: 10 }}
+      <TouchableOpacity onPress={handleNav}>
+        {photos.length == 0 ? null : (
+          <View>
+            <Card.Image
+              source={{ uri: photos[0].url }}
+              style={{ borderRadius: 10 }}
+            />
+            <Card.Divider />
+          </View>
+        )}
+
+        <View style={styles.inlineContainer}>
+          <Text style={styles.favTitle}>{pin.details.title}</Text>
+          <Icon
+            name={"share"}
+            type="material"
+            color={defaultColor}
+            onPress={handleFavorite}
           />
-          <Card.Divider />
         </View>
-      )}
 
-      <View style={styles.inlineContainer}>
-        <Text style={styles.favTitle}>{pin.details.title}</Text>
-        <Icon
-          name={"share"}
-          type="material"
-          color={defaultColor}
-          onPress={handleFavorite}
-        />
-      </View>
-
-      <Text>
-        {pin.details.slacklineLength} | {pin.details.slacklineType}
-      </Text>
+        <Text>
+          {pin.details.slacklineLength} | {pin.details.slacklineType}
+        </Text>
+      </TouchableOpacity>
     </Card>
   );
 };
