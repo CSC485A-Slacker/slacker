@@ -4,9 +4,9 @@
     "slug": "csc485a-slacker",
     "version": "2.0.0",
     "orientation": "portrait",
-    "icon": "../src/Slacker-Logo.png",
+    "icon": "./assets/Slacker-Logo.png",
     "splash": {
-      "image": "../src/Slacker-Logo.png",
+      "image": "./assets/Slacker-Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -28,12 +28,12 @@
       "package": "com.yourcompany.yourappname",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "../src/Slacker-Logo.png",
+        "foregroundImage": "./assets/Slacker-Logo.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "../src/Slacker-Logo.png"
+      "favicon": "./assets/Slacker-Logo.png"
     }
   }
 }
