@@ -1,7 +1,8 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
+import { Text } from "react-native-elements";
 import { auth } from "../../config/FirebaseConfig";
+import { defaultStyles } from "../../style/styles";
 
 export const HomeScreen = ({ navigation }) => {
   // navigate to main screen if user is logged in
@@ -18,17 +19,19 @@ export const HomeScreen = ({ navigation }) => {
   }, []);
   return (
     <View style={styles.container}>
-      {/* <Text style={{ color: "white" }}>
-        Welcome to Slacker! A slackliner's everyday solution!
-      </Text>
       <Image
         source={{
           width: 200,
           height: 200,
-          uri: "https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker_logo.png",
+          uri: "https://github.com/CSC485A-Slacker/slacker/raw/main/Slacker-Logo.png",
         }}
       />
-      <StatusBar style="auto" /> */}
+      <Text style={defaultStyles.title} h3>
+        Slacker!
+      </Text>
+      <Text style={defaultStyles.subTitle}>
+        Connecting slackliners one line at a time
+      </Text>
     </View>
   );
 };

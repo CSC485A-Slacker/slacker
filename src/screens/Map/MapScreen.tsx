@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import MapView, { LatLng } from "react-native-maps";
 import { View, StyleSheet } from "react-native";
 import { Marker } from "react-native-maps";
@@ -76,6 +76,8 @@ export const MapScreen = ({ route, navigation }: any) => {
 
   const toast = useToast(); // toast notifications
 
+  const mapRef = useRef<MapView | null>(null);
+
   // navigate to login screen if user is not logged in
   useEffect(() => {
     const user = auth.currentUser;
@@ -111,6 +113,30 @@ export const MapScreen = ({ route, navigation }: any) => {
       toast.show("Pin added successfuly!", {
         type: "success",
       });
+    }
+  });
+
+  // When user selects a favorite or private pin from the mypins page,
+  // this takes them to the pin on the map
+  useEffect(() => {
+    if (route.params?.myPin) {
+      const myPin: Pin = route.params?.myPin;
+      regionLatitude = myPin.coordinate.latitude;
+      regionLongitude = myPin.coordinate.longitude;
+      mapRef.current?.animateToRegion({
+        latitude: regionLatitude,
+        longitude: regionLongitude,
+        longitudeDelta: 0.05,
+        latitudeDelta: 0.05,
+      });
+      route.params = null;
+      setHotSpotToggleVisible(false);
+      setAddPinVisible(false);
+      setPinInfoVisible(true);
+      setSelectedPin((selectedPin) => ({
+        ...selectedPin,
+        ...myPin,
+      }));
     }
   });
 
@@ -248,6 +274,7 @@ export const MapScreen = ({ route, navigation }: any) => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: regionLatitude,

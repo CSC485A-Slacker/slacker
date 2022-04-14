@@ -72,7 +72,8 @@ interface IDatabase {
   ChangeCheckInSpot(
     userID: string,
     newLocation: LatLng,
-    hoursToCheckInFor: number
+    hoursToCheckInFor: number,
+    sharingSlackline: boolean
   ): void;
 
   editFriends(userID: string, newFriends: IFriend[]): Promise<IDatabaseActionResult>;

@@ -97,7 +97,7 @@ class Database implements IDatabase {
       }
     }
 
-    async ChangeCheckInSpot(userID:string, newLocation:LatLng, hoursToCheckInFor: number): Promise<IDatabaseActionResult>
+    async ChangeCheckInSpot(userID:string, newLocation:LatLng, hoursToCheckInFor: number, sharingSlackline: boolean): Promise<IDatabaseActionResult>
     {
         try
         {
@@ -122,7 +122,7 @@ class Database implements IDatabase {
             }
 
             // check into new spot
-            await this.checkIntoSpot(userID, newLocation, hoursToCheckInFor);
+            await this.checkIntoSpot(userID, newLocation, hoursToCheckInFor, sharingSlackline);
         }
         catch(error)
         {
@@ -157,6 +157,7 @@ class Database implements IDatabase {
             // update the pin's checkout info
             previousPinActivity.checkedInUserIds = previousPinCheckedInUserIds.filter(id => id !== userID);
             previousPinActivity.activeUsers--;
+            previousPinActivity.shareableSlackline = false;
             const editPinActivityResult = await this.editPinActivity(location, previousPinActivity)
 
             if(!editPinActivityResult.succeeded) {
@@ -173,7 +174,7 @@ class Database implements IDatabase {
     }
 
     // checks a user into a pin
-    async checkIntoSpot(userID: string, location: LatLng, hoursToCheckinFor: number) {
+    async checkIntoSpot(userID: string, location: LatLng, hoursToCheckinFor: number, sharingSlackline: boolean) {
         console.log(`attempt checkIntoSpot for user ${userID} at location ${coordinateToString(location)}`);
         try {
             const userDocRef = doc(this.database, "users", userID)
@@ -201,6 +202,7 @@ class Database implements IDatabase {
             pinCheckedInUserIds.push(userID);
             pinActivity.activeUsers++;
             pinActivity.totalUsers++;
+            pinActivity.shareableSlackline = sharingSlackline;
             const editPinActivityResult = await this.editPinActivity(location, pinActivity);
 
             if(!editPinActivityResult.succeeded) {
