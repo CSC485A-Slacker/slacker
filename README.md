@@ -49,8 +49,8 @@ By this point the team will have a more solid grasp of our tech stack and will b
 ## Milestone 3: Favorites & Friends (⚠ Due Apr 1, 2022)
 This milestone focuses on more of the *nice-to-have's* than the previous two, however the features implemented here will still be very useful and make using the app a much easier experience as the userbase and number of registered spots grows.
 
-- [ ] Add/delete your favorite spots in a list where you can click on any one of them to take you right to that location for viewing information.
-- [ ] Any spots that are on the map which are also a part of the user's `favorites` list will be highlighted.
+- [x] Add/delete your favorite spots in a list where you can click on any one of them to take you right to that location for viewing information.
+- [x] Any spots that are on the map which are also a part of the user's `favorites` list will be highlighted.
 - [ ] ~~Send a URL invite for a particular spot to anybody, and if the recipient doesn't have the app, they will be directed to the appropriate location to download it.~~
 
 ## Possible Future Extensions
