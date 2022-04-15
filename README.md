@@ -16,6 +16,7 @@
 We propose to create a mobile application where users can quickly and easily see where fellow slackliners are setting up their slacklines, and have the option to announce where they are via placing a pin on our map.
 
 Checkout out our product page [here](https://sites.google.com/view/csc485a-slacker/home)
+You can also find our Demo video [here](https://www.youtube.com/watch?v=SG7ucTStNiw)
 
 ### ✔ Decisions Made
 * Real-time view of slackliners on the map
