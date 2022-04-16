@@ -3,7 +3,7 @@
 <p align="center">
 
 
-# Slacker - Connecting Slackliners One Rope at a Time
+# Slacker - Connecting Slackliners One Line at a Time
 📝 **Authors**:
 - Dianna Borinaga (DiannaBanana)
 - Brendan Micetich (brendanmicetich)
